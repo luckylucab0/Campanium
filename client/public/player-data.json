@@ -1,0 +1,259 @@
+{
+  "entitaeten": [
+    {
+      "id": "gregor-der-kerzenmacher",
+      "name": "Gregor der Kerzenmacher",
+      "erstellt": "2026-04-20T18:10:00.000Z",
+      "geaendert": "2026-05-29T21:00:00.000Z",
+      "tags": ["nebelfurt", "handwerker"],
+      "dmOnly": false,
+      "kampagnenLog": [
+        {
+          "sessionNr": 1,
+          "text": "Verkaufte der Party drei „Lichter gegen das Flüstern“."
+        },
+        {
+          "sessionNr": 2,
+          "text": "Bat die Party, [[Kerzen für die Toten]] zum Friedhof zu bringen."
+        }
+      ],
+      "typ": "nsc",
+      "status": "lebendig",
+      "haltung": "freundlich",
+      "ortId": "nebelfurt",
+      "fraktionId": "zirkel-der-kerzenwaechter",
+      "wer": "Mürrischer Kerzenmacher mit wachsverbrannten Händen und goldenem Herzen",
+      "will": "Dass in jedem Fenster von Nebelfurt nachts ein Licht brennt",
+      "beschreibung": "Gregor spricht langsam, als koste jedes Wort Wachs. Seine Werkstatt riecht nach Honig und Talg. Er verschenkt Kerzenstummel an Kinder – *„Damit das Dunkel weiß, dass es nicht willkommen ist.“*",
+      "beziehungen": "- [[Mara Wachsherz]] – seine Nichte, er liefert ihr die Gasthauskerzen\n- [[Lyra vom Hohlweg]] – misstraut ihrer Laterne, respektiert ihren Mut"
+    },
+    {
+      "id": "mara-wachsherz",
+      "name": "Mara Wachsherz",
+      "erstellt": "2026-04-20T18:12:00.000Z",
+      "geaendert": "2026-05-29T21:05:00.000Z",
+      "tags": ["nebelfurt", "verbuendete"],
+      "dmOnly": false,
+      "kampagnenLog": [
+        {
+          "sessionNr": 1,
+          "text": "Gab der Party Quartier und warnte sie vor dem Moorpfad."
+        },
+        {
+          "sessionNr": 2,
+          "text": "Stellte sich schützend vor [[Lyra vom Hohlweg]], als der Fremde am Friedhofstor erschien."
+        }
+      ],
+      "typ": "nsc",
+      "status": "lebendig",
+      "haltung": "verbündet",
+      "ortId": "nebelfurt",
+      "fraktionId": "zirkel-der-kerzenwaechter",
+      "wer": "Wirtin der „Tropfenden Kerze“, laut, warmherzig, unerschrocken",
+      "will": "Ihr Gasthaus als letzten sicheren Ort des Dorfes verteidigen",
+      "beschreibung": "Mara füllt jeden Raum, den sie betritt. Sie schenkt heißen Met aus, merkt sich jeden Namen und duldet keinen Streit unter ihrem Dach.",
+      "beziehungen": "- [[Gregor der Kerzenmacher]] – ihr Onkel\n- Die Party – „meine Leute“, seit Session 2"
+    },
+    {
+      "id": "das-lied-im-nebel",
+      "name": "Das Lied im Nebel",
+      "erstellt": "2026-05-29T20:00:00.000Z",
+      "geaendert": "2026-05-29T20:00:00.000Z",
+      "tags": ["moor"],
+      "dmOnly": false,
+      "kampagnenLog": [],
+      "typ": "quest",
+      "status": "offen",
+      "questgeberId": "mara-wachsherz",
+      "ortId": null,
+      "auftrag": "Herausfinden, wer (oder was) nachts im Moor die alten Wiegenlieder singt.",
+      "belohnung": "Mara verspricht freie Kost und Logis „bis zum Frühling – falls der kommt“.",
+      "fortschritt": [
+        {
+          "text": "Mit den Fischern über das Lied sprechen",
+          "erledigt": false
+        }
+      ]
+    },
+    {
+      "id": "kerzen-fuer-die-toten",
+      "name": "Kerzen für die Toten",
+      "erstellt": "2026-05-15T19:00:00.000Z",
+      "geaendert": "2026-05-29T21:20:00.000Z",
+      "tags": ["nebelfurt"],
+      "dmOnly": false,
+      "kampagnenLog": [
+        {
+          "sessionNr": 2,
+          "text": "Angenommen. Sieben von dreizehn Gräbern sind versorgt."
+        }
+      ],
+      "typ": "quest",
+      "status": "aktiv",
+      "questgeberId": "gregor-der-kerzenmacher",
+      "ortId": "nebelfurt",
+      "auftrag": "Auf jedes der dreizehn Gräber am Friedhof eine geweihte Kerze stellen – vor Neumond.",
+      "belohnung": "Gregors Dank, drei silbergefasste Kerzen und ein Winterquartier im Gasthaus.",
+      "fortschritt": [
+        {
+          "text": "Kerzen bei Gregor abholen",
+          "erledigt": true
+        },
+        {
+          "text": "Die sieben Gräber an der Furt versorgen",
+          "erledigt": true
+        },
+        {
+          "text": "Die sechs Gräber am Hang versorgen",
+          "erledigt": false
+        },
+        {
+          "text": "Vor Neumond bei Gregor Bericht erstatten",
+          "erledigt": false
+        }
+      ]
+    },
+    {
+      "id": "nebelfurt",
+      "name": "Nebelfurt",
+      "erstellt": "2026-04-20T18:00:00.000Z",
+      "geaendert": "2026-05-29T21:10:00.000Z",
+      "tags": ["dorf", "startgebiet"],
+      "dmOnly": false,
+      "kampagnenLog": [
+        {
+          "sessionNr": 1,
+          "text": "Die Party erreicht Nebelfurt im Morgengrauen."
+        },
+        {
+          "sessionNr": 2,
+          "text": "Begräbnis auf dem Friedhof – der bleiche Fremde erschien am Tor."
+        }
+      ],
+      "typ": "ort",
+      "region": "Wildnis & Straßen",
+      "besucht": true,
+      "empfohlenesLevel": "1–3",
+      "was": "Ein durchnässtes Dorf an der Furt eines schwarzen Flusses",
+      "stimmung": "Nasser Torf, Glockenläuten hinter Nebel, irgendwo weint ein Kind",
+      "bereiche": "- **Gasthaus „Zur Tropfenden Kerze“** – einziges warmes Licht im Dorf, geführt von [[Mara Wachsherz]]\n- **Werkstatt des Kerzenmachers** – [[Gregor der Kerzenmacher]] gießt hier seine Wachslichter\n- **Friedhof an der Furt** – die Gräber liegen auffällig dicht beieinander",
+      "bewohner": "- [[Gregor der Kerzenmacher]]\n- [[Mara Wachsherz]]"
+    },
+    {
+      "id": "lyra-vom-hohlweg",
+      "name": "Lyra vom Hohlweg",
+      "erstellt": "2026-04-20T18:25:00.000Z",
+      "geaendert": "2026-05-29T21:15:00.000Z",
+      "tags": [],
+      "dmOnly": false,
+      "kampagnenLog": [
+        {
+          "sessionNr": 2,
+          "text": "Lehnte das Geschenk des Fremden am Friedhofstor ab."
+        }
+      ],
+      "typ": "sc",
+      "spieler": "Alex",
+      "klasseVolk": "Waldläuferin (Mensch)",
+      "level": 3,
+      "status": "aktiv",
+      "ac": 15,
+      "hp": 25,
+      "passiveWahrnehmung": 16,
+      "ziele": "Lyra sucht ihre Schwester, die vor Jahren im Nebel verschwand. Sie trägt die [[Wachslaterne der Wahrheit]] und gibt sie nicht mehr her.",
+      "beziehungen": "- [[Mara Wachsherz]] – vertraut ihr seit Session 2 blind\n- [[Gregor der Kerzenmacher]] – kauft bei ihm, redet aber kaum",
+      "besonderes": "Die Laterne brennt in Gegenwart von Lügen **blau** – das weiß bisher nur sie."
+    },
+    {
+      "id": "session-1-ankunft-im-nebel",
+      "name": "Ankunft im Nebel",
+      "erstellt": "2026-05-16T22:30:00.000Z",
+      "geaendert": "2026-05-16T22:30:00.000Z",
+      "tags": [],
+      "dmOnly": false,
+      "kampagnenLog": [],
+      "typ": "session",
+      "nummer": 1,
+      "datum": "2026-05-15",
+      "ingameDatum": "Tag 1–3 seit dem Nebel",
+      "zusammenfassung": "Die Party folgt einem Hilferuf in den Nebel und findet statt des erwarteten Dorfes [[Nebelfurt]] – ein Ort, der auf keiner ihrer Karten steht. Der Rückweg ist verschwunden. [[Mara Wachsherz]] nimmt die Gestrandeten auf.",
+      "ereignisse": "- Der Nebel schließt sich hinter der Party – kein Zurück\n- Erste Nacht in der „Tropfenden Kerze“\n- [[Gregor der Kerzenmacher]] verkauft „Lichter gegen das Flüstern“",
+      "nscsGetroffen": "- [[Mara Wachsherz]]\n- [[Gregor der Kerzenmacher]]",
+      "gegenstaende": "- Drei Kerzen von Gregor (eine bereits abgebrannt)",
+      "offeneFaeden": "- Warum stand Nebelfurt auf keiner Karte?\n- Das Wiegenlied, das die Wache nachts gehört haben will"
+    },
+    {
+      "id": "session-2-der-fremde-am-tor",
+      "name": "Der Fremde am Tor",
+      "erstellt": "2026-05-29T22:45:00.000Z",
+      "geaendert": "2026-05-29T22:45:00.000Z",
+      "tags": [],
+      "dmOnly": false,
+      "kampagnenLog": [],
+      "typ": "session",
+      "nummer": 2,
+      "datum": "2026-05-29",
+      "ingameDatum": "Tag 4–9 seit dem Nebel",
+      "zusammenfassung": "Beim Begräbnis des alten Fischers erscheint ein bleicher Fremder am Friedhofstor von [[Nebelfurt]], macht [[Lyra vom Hohlweg]] ein Geschenk – und verschwindet, als die Glocke schlägt. Die Party übernimmt [[Kerzen für die Toten]].",
+      "ereignisse": "- Begräbnis am Friedhof, das ganze Dorf schweigt\n- Der Fremde nennt Lyra **beim Namen**\n- [[Mara Wachsherz]] stellt sich dazwischen – er lächelt nur\n- Quest [[Kerzen für die Toten]] angenommen, 7/13 Gräber versorgt",
+      "nscsGetroffen": "- [[Gregor der Kerzenmacher]]\n- [[Mara Wachsherz]]\n- der Fremde (Name unbekannt)",
+      "gegenstaende": "- [[Wachslaterne der Wahrheit]] brannte am Tor plötzlich blau",
+      "offeneFaeden": "- Wer ist der Fremde, und woher kennt er Lyras Namen?\n- Die restlichen sechs Gräber **vor Neumond**\n- Das ungeöffnete Geschenk vor Lyras Tür"
+    },
+    {
+      "id": "wachslaterne-der-wahrheit",
+      "name": "Wachslaterne der Wahrheit",
+      "erstellt": "2026-04-20T18:30:00.000Z",
+      "geaendert": "2026-05-29T21:30:00.000Z",
+      "tags": ["artefakt"],
+      "dmOnly": false,
+      "kampagnenLog": [
+        {
+          "sessionNr": 2,
+          "text": "Brannte am Friedhofstor plötzlich blau."
+        }
+      ],
+      "typ": "gegenstand",
+      "gefunden": true,
+      "besitzerId": "lyra-vom-hohlweg",
+      "fundortId": "nebelfurt",
+      "eigenschaften": "Eine Sturmlaterne aus grünem Glas. Ihr Licht erlischt nie von selbst, solange die Trägerin wacht.",
+      "geschichte": "Lyra trägt die Laterne, seit ihre Schwester verschwand. Sie behauptet, sie habe sie „im Nebel gefunden“."
+    },
+    {
+      "id": "zirkel-der-kerzenwaechter",
+      "name": "Zirkel der Kerzenwächter",
+      "erstellt": "2026-04-20T18:20:00.000Z",
+      "geaendert": "2026-05-29T21:00:00.000Z",
+      "tags": ["nebelfurt"],
+      "dmOnly": false,
+      "kampagnenLog": [
+        {
+          "sessionNr": 2,
+          "text": "Nahm die Party inoffiziell unter ihren Schutz."
+        }
+      ],
+      "typ": "fraktion",
+      "haltung": "freundlich",
+      "ziele": "Jede Nacht in jedem Fenster Nebelfurts ein brennendes Licht – der Zirkel glaubt, dass das Dunkel zählt, wer wacht.",
+      "mitglieder": "- [[Gregor der Kerzenmacher]] (Ältester)\n- [[Mara Wachsherz]]\n- ein gutes Dutzend stiller Dorfbewohner",
+      "stand": "Wohlwollend gegenüber der Party, seit sie [[Kerzen für die Toten]] angenommen hat."
+    },
+    {
+      "id": "hausregeln",
+      "name": "Hausregeln",
+      "erstellt": "2026-04-20T18:40:00.000Z",
+      "geaendert": "2026-04-20T18:40:00.000Z",
+      "tags": ["regeln"],
+      "dmOnly": false,
+      "kampagnenLog": [],
+      "typ": "notiz",
+      "inhalt": "## Tischregeln\n\n1. **Kritische Treffer:** Maximalschaden + Würfelwurf\n2. **Trank trinken:** Bonusaktion, einflößen bleibt eine Aktion\n3. **Tod:** Bei 0 TP zählt jede Runde – wir spielen die Rettungswürfe offen\n\n## Lichtregel (kampagnenspezifisch)\n\nWer **ohne Lichtquelle** übernachtet, würfelt morgens mit Nachteil auf den ersten Wurf des Tages. Die Dorfbewohner haben recht: Das Dunkel zählt, wer wacht."
+    }
+  ],
+  "kampagnenstand": {
+    "partyLevel": 3,
+    "ingameTag": 9,
+    "ingameDatumText": "9. Tag seit dem Nebel – grauer Morgen, Krähen auf den Dächern"
+  }
+}

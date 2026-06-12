@@ -55,7 +55,8 @@ export function QuestBoard() {
             onDrop={() => ablegen(status)}
           >
             <h2 className="mb-2.5 px-1 text-xs uppercase tracking-[0.15em] text-text-schwach">
-              {SPALTEN_TITEL[status]} <span className="text-text-schwach/60">({spalte.length})</span>
+              {SPALTEN_TITEL[status]}{' '}
+              <span className="text-text-schwach/60">({spalte.length})</span>
             </h2>
             <div className="space-y-2">
               {spalte.map((quest) => (

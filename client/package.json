@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "build:player": "vite build --mode player --base ./",
+    "build:player": "vite build --mode player --base ./ --outDir dist-player",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
   },

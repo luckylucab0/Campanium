@@ -73,10 +73,7 @@ const FELD_WHITELIST: Partial<Record<EntityTyp, readonly string[]>> = {
 const KAMPAGNENSTAND_WHITELIST = ['partyLevel', 'ingameTag', 'ingameDatumText'] as const;
 
 /** Gefilterter Kampagnenstand für Spieler. */
-export type PlayerKampagnenstand = Pick<
-  Kampagnenstand,
-  (typeof KAMPAGNENSTAND_WHITELIST)[number]
->;
+export type PlayerKampagnenstand = Pick<Kampagnenstand, (typeof KAMPAGNENSTAND_WHITELIST)[number]>;
 
 /** Das komplette Datenpaket des Spieler-Builds. */
 export interface PlayerDaten {

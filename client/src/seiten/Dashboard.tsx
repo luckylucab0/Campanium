@@ -20,7 +20,9 @@ export function Dashboard() {
   const navigate = useNavigate();
   const { erstellen } = useStore();
 
-  const aktiveQuests = entitaeten.filter((e): e is Quest => e.typ === 'quest' && e.status === 'aktiv');
+  const aktiveQuests = entitaeten.filter(
+    (e): e is Quest => e.typ === 'quest' && e.status === 'aktiv',
+  );
   const sessions = entitaeten
     .filter((e): e is Session => e.typ === 'session')
     .sort((a, b) => b.nummer - a.nummer);
@@ -94,7 +96,11 @@ export function Dashboard() {
               <TrackerTitel>
                 <Droplets size={12} className="inline text-blut-hell" aria-hidden /> Ireenas Bisse
               </TrackerTitel>
-              <div className="flex items-center gap-2" role="group" aria-label="Ireenas Bisse setzen">
+              <div
+                className="flex items-center gap-2"
+                role="group"
+                aria-label="Ireenas Bisse setzen"
+              >
                 {[1, 2, 3].map((n) => (
                   <button
                     key={n}
@@ -147,7 +153,9 @@ export function Dashboard() {
                   aria-label={`Tracker „${tracker.name}“ löschen`}
                   onClick={() =>
                     setzeWert({
-                      customTracker: kampagnenstand.customTracker.filter((t) => t.id !== tracker.id),
+                      customTracker: kampagnenstand.customTracker.filter(
+                        (t) => t.id !== tracker.id,
+                      ),
                     })
                   }
                 >
@@ -219,9 +227,7 @@ export function Dashboard() {
                   <span className="font-display text-text-stark">{quest.name}</span>
                   <Badge wert={quest.status} />
                 </div>
-                {quest.auftrag && (
-                  <p className="mt-1 text-sm text-text-schwach">{quest.auftrag}</p>
-                )}
+                {quest.auftrag && <p className="mt-1 text-sm text-text-schwach">{quest.auftrag}</p>}
               </Link>
             ))}
           </div>

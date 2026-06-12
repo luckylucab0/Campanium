@@ -49,7 +49,8 @@ export function StrahdSeite() {
     });
   };
 
-  const zelle = 'rounded border border-transparent bg-transparent px-1.5 py-1 text-sm w-full hover:border-rand focus:border-gold';
+  const zelle =
+    'rounded border border-transparent bg-transparent px-1.5 py-1 text-sm w-full hover:border-rand focus:border-gold';
 
   return (
     <div>
@@ -64,16 +65,23 @@ export function StrahdSeite() {
         <table className="w-full min-w-[800px] text-sm">
           <thead>
             <tr className="border-b border-rand text-left">
-              {['Nr.', 'Session', 'Ort', 'Modus', 'Was er wollte', 'Was er bekam', 'Folgen', ''].map(
-                (titel, i) => (
-                  <th
-                    key={i}
-                    className="px-2 py-2 text-[11px] uppercase tracking-wider text-text-schwach"
-                  >
-                    {titel}
-                  </th>
-                ),
-              )}
+              {[
+                'Nr.',
+                'Session',
+                'Ort',
+                'Modus',
+                'Was er wollte',
+                'Was er bekam',
+                'Folgen',
+                '',
+              ].map((titel, i) => (
+                <th
+                  key={i}
+                  className="px-2 py-2 text-[11px] uppercase tracking-wider text-text-schwach"
+                >
+                  {titel}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -109,7 +117,12 @@ export function StrahdSeite() {
                     )}
                   </td>
                   <td className="px-2 py-1.5">
-                    <input className={zelle} value={b.ort} onChange={(e) => setzeBegegnung(i, { ort: e.target.value })} aria-label="Ort" />
+                    <input
+                      className={zelle}
+                      value={b.ort}
+                      onChange={(e) => setzeBegegnung(i, { ort: e.target.value })}
+                      aria-label="Ort"
+                    />
                   </td>
                   <td className="px-2 py-1.5">
                     <select
@@ -126,13 +139,28 @@ export function StrahdSeite() {
                     </select>
                   </td>
                   <td className="px-2 py-1.5">
-                    <input className={zelle} value={b.wollte} onChange={(e) => setzeBegegnung(i, { wollte: e.target.value })} aria-label="Was er wollte" />
+                    <input
+                      className={zelle}
+                      value={b.wollte}
+                      onChange={(e) => setzeBegegnung(i, { wollte: e.target.value })}
+                      aria-label="Was er wollte"
+                    />
                   </td>
                   <td className="px-2 py-1.5">
-                    <input className={zelle} value={b.bekam} onChange={(e) => setzeBegegnung(i, { bekam: e.target.value })} aria-label="Was er bekam" />
+                    <input
+                      className={zelle}
+                      value={b.bekam}
+                      onChange={(e) => setzeBegegnung(i, { bekam: e.target.value })}
+                      aria-label="Was er bekam"
+                    />
                   </td>
                   <td className="px-2 py-1.5">
-                    <input className={zelle} value={b.folgen} onChange={(e) => setzeBegegnung(i, { folgen: e.target.value })} aria-label="Folgen" />
+                    <input
+                      className={zelle}
+                      value={b.folgen}
+                      onChange={(e) => setzeBegegnung(i, { folgen: e.target.value })}
+                      aria-label="Folgen"
+                    />
                   </td>
                   <td className="px-2 py-1.5">
                     <button

@@ -1,0 +1,28 @@
+# CI: Lint, Typecheck, Tests, Builds (DM- und Spieler-Variante mit Demo-Daten).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Tests
+        run: npm test
+      - name: Build (DM-Client)
+        run: npm run build
+      - name: Spieler-Build mit Demo-Daten (inkl. Spoiler-Paranoia-Prüfung)
+        run: DATA_DIR=data.example npm run build:player

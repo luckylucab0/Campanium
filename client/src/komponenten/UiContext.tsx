@@ -2,14 +2,7 @@
  * UI-Context: globaler „Neu anlegen“-Dialog (auch von kaputten Wikilinks
  * aus erreichbar) und das Theme (dunkel ⇄ pergament, in localStorage).
  */
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ENTITY_TYPEN, entityConfigs, type EntityTyp } from '@ravenloft/shared';
 import { IST_SPIELER_MODUS } from '../api';
@@ -94,11 +87,12 @@ function NeuDialog({
       aria-modal="true"
       aria-label="Neue Entität anlegen"
     >
-      <div className="karte karte-ornament w-full max-w-md p-5" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="karte karte-ornament w-full max-w-md p-5"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2 className="mb-4 text-lg">Neu anlegen</h2>
-        <label className="mb-1 block text-xs uppercase tracking-wider text-text-schwach">
-          Art
-        </label>
+        <label className="mb-1 block text-xs uppercase tracking-wider text-text-schwach">Art</label>
         <select
           className="mb-3 w-full rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-text-stark"
           value={typ}
