@@ -8,7 +8,6 @@
 import { z } from 'zod';
 import type { Entitaet, EntityTyp, Kampagnenstand, StrahdTracker, TarokkaLesung } from './types';
 import {
-  ENTITY_TYPEN,
   HALTUNGEN,
   NSC_STATUS,
   QUEST_STATUS,

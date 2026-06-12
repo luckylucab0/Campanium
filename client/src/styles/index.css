@@ -1,0 +1,344 @@
+/*
+ * Design-System „Gothic Barovia“.
+ *
+ * Alle Farben sind als Design-Tokens (CSS-Variablen) definiert und werden
+ * über @theme an Tailwind v4 durchgereicht. Zwei Themes:
+ *   [data-theme="dunkel"]    – Standard: Nachthimmel über Barovia
+ *   [data-theme="pergament"] – helles, warmes Pergament-Theme
+ */
+@import 'tailwindcss';
+
+/* Lokale Fonts (gebundelt via Fontsource – kein CDN, läuft offline). */
+@import '@fontsource/cinzel/400.css';
+@import '@fontsource/cinzel/600.css';
+@import '@fontsource/cinzel/700.css';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/cormorant-garamond/400.css';
+@import '@fontsource/cormorant-garamond/500.css';
+@import '@fontsource/cormorant-garamond/600.css';
+@import '@fontsource/cormorant-garamond/400-italic.css';
+
+/* ---- Design-Tokens ------------------------------------------------------ */
+
+:root,
+[data-theme='dunkel'] {
+  /* Flächen: dunkles Blauschwarz, leicht abgestuft statt reinem Schwarz */
+  --flaeche-0: #0b0d14; /* tiefste Ebene (Body) */
+  --flaeche-1: #111420; /* Panels, Sidebar */
+  --flaeche-2: #181c2b; /* Karten */
+  --flaeche-3: #212638; /* Hover, Eingabefelder */
+  --rand: #2c3145;
+  --rand-stark: #3d4359;
+
+  /* Text: Nebelgrau-Hierarchie */
+  --text-stark: #e8e6df;
+  --text: #b8b6ae;
+  --text-schwach: #7c7a74;
+
+  /* Akzente */
+  --blut: #9e2b25; /* Primär: tiefes Blutrot (Strahd) */
+  --blut-hell: #c4453d;
+  --blut-flaeche: rgba(158, 43, 37, 0.14);
+  --gold: #c9a227; /* Sekundär: Kerzengold/Bernstein */
+  --gold-hell: #e3c35c;
+  --gold-flaeche: rgba(201, 162, 39, 0.12);
+  --arkan: #8a6fc9; /* Magisches / Tarokka: kühles Violett */
+  --arkan-flaeche: rgba(138, 111, 201, 0.14);
+
+  /* Semantik (Haltung/Status) */
+  --gruen: #5d9e6c;
+  --gruen-flaeche: rgba(93, 158, 108, 0.14);
+  --rot: #c4453d;
+  --rot-flaeche: rgba(196, 69, 61, 0.14);
+  --grau-flaeche: rgba(124, 122, 116, 0.14);
+
+  --vignette: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.45) 100%);
+  --nebel: linear-gradient(180deg, rgba(138, 111, 201, 0.06), transparent 70%);
+}
+
+[data-theme='pergament'] {
+  --flaeche-0: #ece4d2;
+  --flaeche-1: #f3ecdc;
+  --flaeche-2: #f9f3e6;
+  --flaeche-3: #e7ddc8;
+  --rand: #d4c8ac;
+  --rand-stark: #b8a987;
+
+  --text-stark: #2a2118;
+  --text: #443a2d;
+  --text-schwach: #7d7159;
+
+  --blut: #8c2520;
+  --blut-hell: #a93a33;
+  --blut-flaeche: rgba(140, 37, 32, 0.1);
+  --gold: #94701c;
+  --gold-hell: #7a5c14;
+  --gold-flaeche: rgba(148, 112, 28, 0.12);
+  --arkan: #6a4fa9;
+  --arkan-flaeche: rgba(106, 79, 169, 0.12);
+
+  --gruen: #3f7a4e;
+  --gruen-flaeche: rgba(63, 122, 78, 0.14);
+  --rot: #a93a33;
+  --rot-flaeche: rgba(169, 58, 51, 0.12);
+  --grau-flaeche: rgba(125, 113, 89, 0.14);
+
+  --vignette: radial-gradient(ellipse at center, transparent 65%, rgba(94, 75, 42, 0.18) 100%);
+  --nebel: linear-gradient(180deg, rgba(106, 79, 169, 0.05), transparent 70%);
+}
+
+/* Tokens für Tailwind-Utilities verfügbar machen (bg-flaeche-2, text-gold, …). */
+@theme inline {
+  --color-flaeche-0: var(--flaeche-0);
+  --color-flaeche-1: var(--flaeche-1);
+  --color-flaeche-2: var(--flaeche-2);
+  --color-flaeche-3: var(--flaeche-3);
+  --color-rand: var(--rand);
+  --color-rand-stark: var(--rand-stark);
+  --color-text-stark: var(--text-stark);
+  --color-text-normal: var(--text);
+  --color-text-schwach: var(--text-schwach);
+  --color-blut: var(--blut);
+  --color-blut-hell: var(--blut-hell);
+  --color-blut-flaeche: var(--blut-flaeche);
+  --color-gold: var(--gold);
+  --color-gold-hell: var(--gold-hell);
+  --color-gold-flaeche: var(--gold-flaeche);
+  --color-arkan: var(--arkan);
+  --color-arkan-flaeche: var(--arkan-flaeche);
+  --color-gruen: var(--gruen);
+  --color-gruen-flaeche: var(--gruen-flaeche);
+  --color-rot: var(--rot);
+  --color-rot-flaeche: var(--rot-flaeche);
+  --color-grau-flaeche: var(--grau-flaeche);
+
+  --font-display: 'Cinzel', serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+}
+
+/* ---- Grundlayout --------------------------------------------------------- */
+
+body {
+  background-color: var(--flaeche-0);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 15px;
+}
+
+/* Feine Vignette über dem gesamten Viewport – reine Atmosphäre. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: var(--vignette);
+  z-index: 50;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  color: var(--text-stark);
+}
+
+::selection {
+  background: var(--blut);
+  color: #fff;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ---- Karten mit Ornament-Ecken ------------------------------------------ */
+
+.karte {
+  background: var(--flaeche-2);
+  border: 1px solid var(--rand);
+  border-radius: 4px;
+  position: relative;
+}
+
+/* Zarte Ornament-Ecken statt harter Schatten. */
+.karte-ornament::before,
+.karte-ornament::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: var(--rand-stark);
+  border-style: solid;
+  pointer-events: none;
+  transition: border-color 0.25s;
+}
+.karte-ornament::before {
+  top: -1px;
+  left: -1px;
+  border-width: 1px 0 0 1px;
+}
+.karte-ornament::after {
+  bottom: -1px;
+  right: -1px;
+  border-width: 0 1px 1px 0;
+}
+.karte-ornament:hover::before,
+.karte-ornament:hover::after {
+  border-color: var(--gold);
+}
+
+/* ---- Wikilinks ----------------------------------------------------------- */
+
+.wikilink {
+  color: var(--gold-hell);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--gold);
+  cursor: pointer;
+}
+.wikilink:hover {
+  color: var(--gold);
+  border-bottom-style: solid;
+}
+.wikilink-kaputt {
+  color: var(--blut-hell);
+  border-bottom: 1px dashed var(--blut);
+  cursor: pointer;
+}
+
+/* ---- Markdown-Inhalte ----------------------------------------------------- */
+
+.md-inhalt {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  line-height: 1.65;
+  color: var(--text);
+}
+.md-inhalt h1,
+.md-inhalt h2,
+.md-inhalt h3 {
+  font-family: var(--font-display);
+  font-size: 1.05em;
+  margin: 1em 0 0.4em;
+}
+.md-inhalt p {
+  margin: 0.5em 0;
+}
+.md-inhalt ul,
+.md-inhalt ol {
+  margin: 0.5em 0;
+  padding-left: 1.4em;
+}
+.md-inhalt ul {
+  list-style: disc;
+}
+.md-inhalt ol {
+  list-style: decimal;
+}
+.md-inhalt li {
+  margin: 0.2em 0;
+}
+.md-inhalt blockquote {
+  border-left: 2px solid var(--gold);
+  padding-left: 0.9em;
+  font-style: italic;
+  color: var(--text-schwach);
+  margin: 0.7em 0;
+}
+.md-inhalt strong {
+  color: var(--text-stark);
+}
+.md-inhalt code {
+  font-family: ui-monospace, monospace;
+  font-size: 0.85em;
+  background: var(--flaeche-3);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+}
+.md-inhalt table {
+  border-collapse: collapse;
+  margin: 0.7em 0;
+  font-size: 0.95em;
+}
+.md-inhalt th,
+.md-inhalt td {
+  border: 1px solid var(--rand);
+  padding: 0.3em 0.7em;
+  text-align: left;
+}
+.md-inhalt th {
+  font-family: var(--font-sans);
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-schwach);
+}
+.md-inhalt input[type='checkbox'] {
+  accent-color: var(--blut);
+  margin-right: 0.4em;
+}
+.md-inhalt hr {
+  border: none;
+  border-top: 1px solid var(--rand);
+  margin: 1em 0;
+}
+.md-inhalt a:not(.wikilink):not(.wikilink-kaputt) {
+  color: var(--arkan);
+  text-decoration: underline;
+}
+
+/* ---- DM-only-Markierung --------------------------------------------------- */
+
+/* DM-Inhalte bekommen im DM-Modus einen blutroten Seitenstreifen. */
+.dm-bereich {
+  border-left: 2px solid var(--blut);
+  background: linear-gradient(90deg, var(--blut-flaeche), transparent 30%);
+  border-radius: 2px;
+}
+
+/* ---- Kerzenflackern (nur als dezentes Hover-Detail) ----------------------- */
+
+@keyframes kerzenflackern {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.82;
+  }
+  55% {
+    opacity: 0.95;
+  }
+  70% {
+    opacity: 0.87;
+  }
+}
+.kerze:hover {
+  animation: kerzenflackern 1.6s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kerze:hover {
+    animation: none;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Dezenter Scrollbalken */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--rand-stark);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
