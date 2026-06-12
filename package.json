@@ -1,0 +1,35 @@
+{
+  "name": "ravenloft-companion",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lokales Kampagnen-Tool für Curse of Strahd (D&D 5e) – DM-Modus mit Server, Spieler-Modus als statischer Build.",
+  "license": "MIT",
+  "type": "module",
+  "workspaces": [
+    "shared",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,client -c red,yellow \"npm run dev -w server\" \"npm run dev -w client\"",
+    "seed": "node scripts/seed.mjs",
+    "build": "npm run build -w client",
+    "build:player": "tsx scripts/build-player.ts",
+    "test": "vitest run",
+    "typecheck": "npm run typecheck -w shared && npm run typecheck -w server && npm run typecheck -w client && tsc --noEmit -p scripts",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@types/node": "^22.0.0",
+    "concurrently": "^9.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "prettier": "^3.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^3.0.0"
+  }
+}

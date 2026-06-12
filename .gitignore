@@ -1,0 +1,17 @@
+# Abhängigkeiten
+node_modules/
+
+# Echte Kampagnendaten – bleiben privat! Nur data.example/ wird versioniert.
+data/
+
+# Build-Artefakte
+client/dist/
+dist/
+*.tsbuildinfo
+
+# Spieler-Build-Zwischendaten
+client/public/player-data.json
+
+# Logs & OS-Dateien
+*.log
+.DS_Store
