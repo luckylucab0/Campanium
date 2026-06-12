@@ -4,6 +4,20 @@ A self-hosted campaign management tool for running **Curse of Strahd** (D&D 5e) 
 
 > **UI language: German.** The interface, seed data and in-code documentation are written in German; this README is in English for the wider community.
 
+![Dashboard](docs/screenshots/dashboard.png)
+
+<p align="center">
+  <img src="docs/screenshots/quest-board.png" alt="Quest-Kanban" width="49%" />
+  <img src="docs/screenshots/tarokka.png" alt="Tarokka-Lesung" width="49%" />
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/nsc-detail.png" alt="NSC-Detailseite mit DM-Abschnitten und Backlinks" width="49%" />
+  <img src="docs/screenshots/spielabend.png" alt="Spielabend-Ansicht" width="49%" />
+</p>
+
+*Screenshots show the fictional demo campaign from `data.example/` (DM mode, dark theme).*
+
 ## What it does
 
 The tool runs in two modes:
