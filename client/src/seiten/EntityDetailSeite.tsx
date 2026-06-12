@@ -63,7 +63,10 @@ function Detail({ config, entitaet }: { config: EntityConfig; entitaet: Entitaet
             <Badge key={f.feld} wert={String(werte[f.feld])} />
           ))}
         {entitaet.tags.map((tag) => (
-          <span key={tag} className="rounded-sm bg-flaeche-3 px-1.5 py-0.5 text-[11px] text-text-schwach">
+          <span
+            key={tag}
+            className="rounded-sm bg-flaeche-3 px-1.5 py-0.5 text-[11px] text-text-schwach"
+          >
             #{tag}
           </span>
         ))}

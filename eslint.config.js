@@ -5,7 +5,15 @@ import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
-  { ignores: ['**/dist/**', '**/dist-player/**', '**/node_modules/**', 'data/**', 'data.example/**'] },
+  {
+    ignores: [
+      '**/dist/**',
+      '**/dist-player/**',
+      '**/node_modules/**',
+      'data/**',
+      'data.example/**',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   prettier,

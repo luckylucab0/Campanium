@@ -45,11 +45,14 @@ export function ersetzeWikilinks(
   text: string,
   ersetzer: (treffer: WikilinkTreffer) => string,
 ): string {
-  return text.replace(WIKILINK_REGEX, (roh, zielRaw: string, anzeigeRaw: string | undefined, index: number) => {
-    const ziel = zielRaw.trim();
-    if (!ziel) return roh;
-    return ersetzer({ roh, ziel, anzeige: (anzeigeRaw ?? '').trim() || ziel, index });
-  });
+  return text.replace(
+    WIKILINK_REGEX,
+    (roh, zielRaw: string, anzeigeRaw: string | undefined, index: number) => {
+      const ziel = zielRaw.trim();
+      if (!ziel) return roh;
+      return ersetzer({ roh, ziel, anzeige: (anzeigeRaw ?? '').trim() || ziel, index });
+    },
+  );
 }
 
 /**

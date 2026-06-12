@@ -1,0 +1,55 @@
+# Pages-Deploy des Spieler-Builds.
+#
+# Bewusst NUR manuell auslösbar (workflow_dispatch): Der DM entscheidet,
+# wann Inhalte öffentlich gehen. Gebaut wird aus der committeten,
+# bereits spoiler-gefilterten client/public/player-data.json.
+# Fehlt sie, wird als Fallback die Demo-Kampagne (data.example/) gebaut.
+name: Spieler-Build auf GitHub Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Sicherheitsnetz – keine DM-Schlüssel im committeten Export
+        run: |
+          if [ -f client/public/player-data.json ]; then
+            if grep -Eq '"[a-zA-Z]+Dm"[[:space:]]*:' client/public/player-data.json; then
+              echo '::error::client/public/player-data.json enthält DM-Felder – Abbruch.'
+              exit 1
+            fi
+          fi
+      - name: Spieler-Build
+        run: |
+          if [ -f client/public/player-data.json ]; then
+            # Statischer Build aus der committeten, gefilterten Daten-Datei.
+            npm run build:player -w client
+          else
+            echo '::warning::Keine player-data.json committet – baue Demo-Daten.'
+            DATA_DIR=data.example npm run build:player
+          fi
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: client/dist-player
+      - id: deployment
+        uses: actions/deploy-pages@v4

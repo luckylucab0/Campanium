@@ -66,7 +66,10 @@ export function Layout({ children }: { children: ReactNode }) {
             </div>
           </NavLink>
 
-          <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3" aria-label="Hauptnavigation">
+          <nav
+            className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3"
+            aria-label="Hauptnavigation"
+          >
             <NavLink to="/" end className={navKlasse} onClick={() => setMenueOffen(false)}>
               <Home size={16} /> Dashboard
             </NavLink>
@@ -130,7 +133,9 @@ export function Layout({ children }: { children: ReactNode }) {
             <button
               className="flex w-full items-center gap-2.5 rounded px-3 py-1.5 text-sm text-text-normal hover:bg-flaeche-3 hover:text-text-stark"
               onClick={wechsleTheme}
-              aria-label={theme === 'dunkel' ? 'Pergament-Theme aktivieren' : 'Dunkles Theme aktivieren'}
+              aria-label={
+                theme === 'dunkel' ? 'Pergament-Theme aktivieren' : 'Dunkles Theme aktivieren'
+              }
             >
               {theme === 'dunkel' ? <Sun size={16} /> : <Moon size={16} />}
               {theme === 'dunkel' ? 'Pergament' : 'Dunkel'}
@@ -155,7 +160,10 @@ export function Layout({ children }: { children: ReactNode }) {
 
       {/* Hauptbereich mit dezentem Nebel-Gradient im Kopf */}
       <div className="min-w-0 flex-1">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-(image:--nebel)" aria-hidden />
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-(image:--nebel)"
+          aria-hidden
+        />
         <header className="flex items-center gap-3 px-4 py-3 lg:hidden">
           <button
             className="rounded border border-rand p-1.5 text-text-normal"

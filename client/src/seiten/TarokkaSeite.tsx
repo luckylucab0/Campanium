@@ -45,10 +45,7 @@ export function TarokkaSeite() {
             ? entitaeten.find((e) => e.id === karte.aufgeloestId)
             : undefined;
           return (
-            <div
-              key={i}
-              className="karte karte-ornament border-t-2 border-t-(--arkan) p-4"
-            >
+            <div key={i} className="karte karte-ornament border-t-2 border-t-(--arkan) p-4">
               <p className="mb-2 text-[11px] uppercase tracking-[0.18em] text-arkan">
                 {karte.aspekt}
               </p>

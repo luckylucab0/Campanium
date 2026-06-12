@@ -38,9 +38,7 @@ export function SessionTimelineSeite() {
       </div>
 
       {sessions.length === 0 && (
-        <p className="py-12 text-center text-text-schwach">
-          Noch keine Sessions protokolliert.
-        </p>
+        <p className="py-12 text-center text-text-schwach">Noch keine Sessions protokolliert.</p>
       )}
 
       {/* Timeline mit Mittellinie */}

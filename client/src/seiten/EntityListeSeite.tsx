@@ -55,8 +55,8 @@ function Liste({ config }: { config: EntityConfig }) {
       liste = [...liste].sort((a, b) => {
         if (sortierung === 'geaendert') return b.geaendert.localeCompare(a.geaendert);
         if (sortierung === 'nummer') {
-          const na = (a as unknown as { nummer?: number; sessionNummer?: number });
-          const nb = (b as unknown as { nummer?: number; sessionNummer?: number });
+          const na = a as unknown as { nummer?: number; sessionNummer?: number };
+          const nb = b as unknown as { nummer?: number; sessionNummer?: number };
           return (nb.nummer ?? nb.sessionNummer ?? 0) - (na.nummer ?? na.sessionNummer ?? 0);
         }
         return a.name.localeCompare(b.name, 'de');
@@ -273,7 +273,11 @@ function Tabelle({
                       {s.art === 'select' && typeof wert === 'string' ? (
                         <Badge wert={wert} />
                       ) : s.art === 'boolean' ? (
-                        wert ? 'Ja' : 'Nein'
+                        wert ? (
+                          'Ja'
+                        ) : (
+                          'Nein'
+                        )
                       ) : s.art === 'ref' && typeof wert === 'string' ? (
                         (perId(wert)?.name ?? '–')
                       ) : (

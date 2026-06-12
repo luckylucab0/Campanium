@@ -53,7 +53,12 @@ function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entita
   };
 
   const entfernen = async () => {
-    if (!window.confirm(`„${entitaet.name}“ wirklich löschen? Das kann nicht rückgängig gemacht werden.`)) return;
+    if (
+      !window.confirm(
+        `„${entitaet.name}“ wirklich löschen? Das kann nicht rückgängig gemacht werden.`,
+      )
+    )
+      return;
     await loeschen(config.typ, entitaet.id);
     navigate(`/${config.route}`);
   };

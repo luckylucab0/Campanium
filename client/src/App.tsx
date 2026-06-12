@@ -49,9 +49,7 @@ function Inhalt() {
   if (!geladen) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="font-serif text-lg italic text-text-schwach">
-          Die Nebel lichten sich …
-        </p>
+        <p className="font-serif text-lg italic text-text-schwach">Die Nebel lichten sich …</p>
       </div>
     );
   }

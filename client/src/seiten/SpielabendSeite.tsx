@@ -25,7 +25,12 @@ export function SpielabendSeite() {
   // Alle [[Links]] aus dem Prep auflösen → Schnellzugriffsleiste.
   const verknuepfte = useMemo(() => {
     if (!prep) return [];
-    const ziele = sammleLinkZiele([prep.zieleDm, prep.szenenDm, prep.benoetigtDm, prep.notfallIdeenDm]);
+    const ziele = sammleLinkZiele([
+      prep.zieleDm,
+      prep.szenenDm,
+      prep.benoetigtDm,
+      prep.notfallIdeenDm,
+    ]);
     return [...ziele]
       .map((name) => perName(name))
       .filter((e): e is NonNullable<typeof e> => Boolean(e));
@@ -85,9 +90,7 @@ export function SpielabendSeite() {
               Benötigte NSCs & Orte
             </h2>
             {verknuepfte.length === 0 && (
-              <p className="text-sm text-text-schwach">
-                Keine [[Verknüpfungen]] im Prep gefunden.
-              </p>
+              <p className="text-sm text-text-schwach">Keine [[Verknüpfungen]] im Prep gefunden.</p>
             )}
             <div className="space-y-2">
               {verknuepfte.map((e) => {

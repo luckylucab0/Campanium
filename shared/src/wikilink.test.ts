@@ -35,7 +35,10 @@ describe('parseWikilinks', () => {
 
 describe('ersetzeWikilinks', () => {
   it('ersetzt Links über den Callback', () => {
-    const html = ersetzeWikilinks('Hallo [[Mara|du]]!', (t) => `<a href="#${t.ziel}">${t.anzeige}</a>`);
+    const html = ersetzeWikilinks(
+      'Hallo [[Mara|du]]!',
+      (t) => `<a href="#${t.ziel}">${t.anzeige}</a>`,
+    );
     expect(html).toBe('Hallo <a href="#Mara">du</a>!');
   });
 

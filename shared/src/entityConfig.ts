@@ -83,9 +83,25 @@ export const entityConfigs: Record<EntityTyp, EntityConfig> = {
       { feld: 'haltung', label: 'Haltung zur Party', art: 'select', optionen: HALTUNGEN },
       { feld: 'ortId', label: 'Ort', art: 'ref', refTypen: ['ort'] },
       { feld: 'fraktionId', label: 'Fraktion', art: 'ref', refTypen: ['fraktion'] },
-      { feld: 'wer', label: 'Wer? (eine Zeile)', art: 'text', hinweis: 'z. B. „Mürrischer Kerzenmacher mit goldenem Herzen“' },
-      { feld: 'will', label: 'Will (Motivation)', art: 'text', hinweis: 'Was treibt diese Figur an?' },
-      { feld: 'statblockRefDm', label: 'Statblock-Referenz', art: 'text', dm: true, hinweis: 'z. B. „MM S. 25“ – nur für dich' },
+      {
+        feld: 'wer',
+        label: 'Wer? (eine Zeile)',
+        art: 'text',
+        hinweis: 'z. B. „Mürrischer Kerzenmacher mit goldenem Herzen“',
+      },
+      {
+        feld: 'will',
+        label: 'Will (Motivation)',
+        art: 'text',
+        hinweis: 'Was treibt diese Figur an?',
+      },
+      {
+        feld: 'statblockRefDm',
+        label: 'Statblock-Referenz',
+        art: 'text',
+        dm: true,
+        hinweis: 'z. B. „MM S. 25“ – nur für dich',
+      },
       { feld: 'buchSeiteDm', label: 'Buchseite', art: 'text', dm: true },
     ],
     abschnitte: [
@@ -139,7 +155,12 @@ export const entityConfigs: Record<EntityTyp, EntityConfig> = {
       { feld: 'besucht', label: 'Besucht', art: 'boolean' },
       { feld: 'empfohlenesLevel', label: 'Empfohlenes Level', art: 'text' },
       { feld: 'was', label: 'Was? (eine Zeile)', art: 'text' },
-      { feld: 'stimmung', label: 'Stimmung (Sinneseindrücke)', art: 'text', hinweis: 'Gerüche, Geräusche, Licht – fürs Erzählen' },
+      {
+        feld: 'stimmung',
+        label: 'Stimmung (Sinneseindrücke)',
+        art: 'text',
+        hinweis: 'Gerüche, Geräusche, Licht – fürs Erzählen',
+      },
       { feld: 'buchSeiteDm', label: 'Buchseite', art: 'text', dm: true },
     ],
     abschnitte: [
@@ -212,7 +233,12 @@ export const entityConfigs: Record<EntityTyp, EntityConfig> = {
     abschnitte: [
       { feld: 'zieleDm', titel: 'Ziele des Abends', dm: true },
       { feld: 'szenenDm', titel: 'Geplante Szenen', dm: true },
-      { feld: 'benoetigtDm', titel: 'Benötigte NSCs / Orte', dm: true, hinweis: 'Mit [[Name]] verlinken' },
+      {
+        feld: 'benoetigtDm',
+        titel: 'Benötigte NSCs / Orte',
+        dm: true,
+        hinweis: 'Mit [[Name]] verlinken',
+      },
       { feld: 'notfallIdeenDm', titel: 'Notfall-Ideen', dm: true },
     ],
     filter: [],

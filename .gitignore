@@ -10,8 +10,9 @@ client/dist-player/
 dist/
 *.tsbuildinfo
 
-# Spieler-Build-Zwischendaten
-client/public/player-data.json
+# Hinweis: client/public/player-data.json wird bewusst NICHT ignoriert.
+# Sie enthält ausschließlich den spoiler-gefilterten Spieler-Export und ist
+# der Mechanismus, über den Inhalte für den Pages-Deploy veröffentlicht werden.
 
 # Logs & OS-Dateien
 *.log
