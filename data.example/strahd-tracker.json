@@ -1,0 +1,18 @@
+{
+  "begegnungen": [
+    {
+      "nr": 1,
+      "sessionNr": 2,
+      "ort": "Friedhof von Nebelfurt",
+      "modus": "Charme",
+      "wollte": "Die Party einschätzen und Lyra ein Geschenk anbieten",
+      "bekam": "Lyras Namen – und ihre offene Ablehnung",
+      "folgen": "Er lächelte. Das Geschenk liegt seither vor ihrer Tür."
+    }
+  ],
+  "ideen": [
+    { "text": "Strahd schickt eine Einladung per Krähenschwarm", "erledigt": false },
+    { "text": "Er rettet die Party demonstrativ vor Wölfen – und geht wortlos", "erledigt": false },
+    { "text": "Ein Spiegel im Gasthaus zeigt kurz sein Gesicht", "erledigt": true }
+  ]
+}

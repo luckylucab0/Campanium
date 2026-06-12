@@ -1,0 +1,19 @@
+{
+  "id": "wachslaterne-der-wahrheit",
+  "typ": "gegenstand",
+  "name": "Wachslaterne der Wahrheit",
+  "erstellt": "2026-04-20T18:30:00.000Z",
+  "geaendert": "2026-05-29T21:30:00.000Z",
+  "tags": ["artefakt"],
+  "dmOnly": false,
+  "kampagnenLog": [
+    { "sessionNr": 2, "text": "Brannte am Friedhofstor plötzlich blau." }
+  ],
+  "gefunden": true,
+  "besitzerId": "lyra-vom-hohlweg",
+  "fundortId": "nebelfurt",
+  "buchSeiteDm": "Eigenes Artefakt",
+  "eigenschaften": "Eine Sturmlaterne aus grünem Glas. Ihr Licht erlischt nie von selbst, solange die Trägerin wacht.",
+  "geschichte": "Lyra trägt die Laterne, seit ihre Schwester verschwand. Sie behauptet, sie habe sie „im Nebel gefunden“.",
+  "geschichteDm": "Die Laterne brennt **blau in Gegenwart von Lügen**. Sie gehörte Lyras Schwester – und der Docht ist ein geflochtenes Haar. Wenn er abbrennt, erlischt mehr als nur Licht."
+}

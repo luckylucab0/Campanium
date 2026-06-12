@@ -1,0 +1,17 @@
+{
+  "id": "das-verlorene-medaillon",
+  "typ": "gegenstand",
+  "name": "Das verlorene Medaillon",
+  "erstellt": "2026-04-20T18:32:00.000Z",
+  "geaendert": "2026-04-20T18:32:00.000Z",
+  "tags": [],
+  "dmOnly": false,
+  "kampagnenLog": [],
+  "gefunden": false,
+  "besitzerId": null,
+  "fundortId": "alte-windmuehle",
+  "buchSeiteDm": "Eigenes Artefakt",
+  "eigenschaften": "Ein angelaufenes Silbermedaillon mit Wachssiegel – noch nicht entdeckt.",
+  "geschichte": "",
+  "geschichteDm": "Liegt im Mehlkasten der [[Alte Windmühle|Alten Windmühle]]. Das Siegel stammt aus Gregors Werkstatt – Beweis, dass sein Bruder dort war."
+}

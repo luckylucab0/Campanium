@@ -1,0 +1,23 @@
+{
+  "id": "lyra-vom-hohlweg",
+  "typ": "sc",
+  "name": "Lyra vom Hohlweg",
+  "erstellt": "2026-04-20T18:25:00.000Z",
+  "geaendert": "2026-05-29T21:15:00.000Z",
+  "tags": [],
+  "dmOnly": false,
+  "kampagnenLog": [
+    { "sessionNr": 2, "text": "Lehnte das Geschenk des Fremden am Friedhofstor ab." }
+  ],
+  "spieler": "Alex",
+  "klasseVolk": "Waldläuferin (Mensch)",
+  "level": 3,
+  "status": "aktiv",
+  "ac": 15,
+  "hp": 25,
+  "passiveWahrnehmung": 16,
+  "ziele": "Lyra sucht ihre Schwester, die vor Jahren im Nebel verschwand. Sie trägt die [[Wachslaterne der Wahrheit]] und gibt sie nicht mehr her.",
+  "hooksDm": "**Hook:** Die verschwundene Schwester eignet sich perfekt als Druckmittel – ein Brief in ihrer Handschrift würde Lyra alles riskieren lassen.\n\n**Schwäche:** Lyra lügt nie. Auch nicht, wenn sie sollte.",
+  "beziehungen": "- [[Mara Wachsherz]] – vertraut ihr seit Session 2 blind\n- [[Gregor der Kerzenmacher]] – kauft bei ihm, redet aber kaum",
+  "besonderes": "Die Laterne brennt in Gegenwart von Lügen **blau** – das weiß bisher nur sie."
+}

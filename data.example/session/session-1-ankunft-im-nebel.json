@@ -1,0 +1,19 @@
+{
+  "id": "session-1-ankunft-im-nebel",
+  "typ": "session",
+  "name": "Ankunft im Nebel",
+  "erstellt": "2026-05-16T22:30:00.000Z",
+  "geaendert": "2026-05-16T22:30:00.000Z",
+  "tags": [],
+  "dmOnly": false,
+  "kampagnenLog": [],
+  "nummer": 1,
+  "datum": "2026-05-15",
+  "ingameDatum": "Tag 1–3 seit dem Nebel",
+  "zusammenfassung": "Die Party folgt einem Hilferuf in den Nebel und findet statt des erwarteten Dorfes [[Nebelfurt]] – ein Ort, der auf keiner ihrer Karten steht. Der Rückweg ist verschwunden. [[Mara Wachsherz]] nimmt die Gestrandeten auf.",
+  "ereignisse": "- Der Nebel schließt sich hinter der Party – kein Zurück\n- Erste Nacht in der „Tropfenden Kerze“\n- [[Gregor der Kerzenmacher]] verkauft „Lichter gegen das Flüstern“",
+  "nscsGetroffen": "- [[Mara Wachsherz]]\n- [[Gregor der Kerzenmacher]]",
+  "gegenstaende": "- Drei Kerzen von Gregor (eine bereits abgebrannt)",
+  "offeneFaeden": "- Warum stand Nebelfurt auf keiner Karte?\n- Das Wiegenlied, das die Wache nachts gehört haben will",
+  "notizenDm": "XP: je 300. Tempo gut, mehr Dorfszenen einplanen. **Nicht vergessen:** Lyras Spielerin will die Schwester-Geschichte aktiv verfolgen."
+}

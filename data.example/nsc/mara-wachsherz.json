@@ -1,0 +1,24 @@
+{
+  "id": "mara-wachsherz",
+  "typ": "nsc",
+  "name": "Mara Wachsherz",
+  "erstellt": "2026-04-20T18:12:00.000Z",
+  "geaendert": "2026-05-29T21:05:00.000Z",
+  "tags": ["nebelfurt", "verbuendete"],
+  "dmOnly": false,
+  "kampagnenLog": [
+    { "sessionNr": 1, "text": "Gab der Party Quartier und warnte sie vor dem Moorpfad." },
+    { "sessionNr": 2, "text": "Stellte sich schützend vor [[Lyra vom Hohlweg]], als der Fremde am Friedhofstor erschien." }
+  ],
+  "status": "lebendig",
+  "haltung": "verbündet",
+  "ortId": "nebelfurt",
+  "fraktionId": "zirkel-der-kerzenwaechter",
+  "buchSeiteDm": "Eigener NSC",
+  "wer": "Wirtin der „Tropfenden Kerze“, laut, warmherzig, unerschrocken",
+  "will": "Ihr Gasthaus als letzten sicheren Ort des Dorfes verteidigen",
+  "statblockRefDm": "Werte wie eine Veteranin, kämpft mit Bratspieß",
+  "beschreibung": "Mara füllt jeden Raum, den sie betritt. Sie schenkt heißen Met aus, merkt sich jeden Namen und duldet keinen Streit unter ihrem Dach.",
+  "weissVerbirgtDm": "Mara ist die **Verbündete aus der Tarokka-Lesung**. Sie ahnt nichts davon – noch nicht.",
+  "beziehungen": "- [[Gregor der Kerzenmacher]] – ihr Onkel\n- Die Party – „meine Leute“, seit Session 2"
+}
