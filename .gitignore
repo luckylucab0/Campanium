@@ -6,6 +6,7 @@ data/
 
 # Build-Artefakte
 client/dist/
+client/dist-player/
 dist/
 *.tsbuildinfo
 

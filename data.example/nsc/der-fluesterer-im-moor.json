@@ -1,0 +1,21 @@
+{
+  "id": "der-fluesterer-im-moor",
+  "typ": "nsc",
+  "name": "Der Flüsterer im Moor",
+  "erstellt": "2026-04-20T18:15:00.000Z",
+  "geaendert": "2026-04-20T18:15:00.000Z",
+  "tags": ["mysterium"],
+  "dmOnly": false,
+  "kampagnenLog": [],
+  "status": "unbekannt",
+  "haltung": "unbekannt",
+  "ortId": null,
+  "fraktionId": null,
+  "buchSeiteDm": "Eigener Schurke, Konzeptseite im Notizbuch",
+  "wer": "Eine Stimme im Moor, die Namen kennt, die sie nicht kennen dürfte",
+  "will": "Unbekannt – bisher nur Gerüchte",
+  "statblockRefDm": "Geplant: Geist-Variante mit Flüster-Aura",
+  "beschreibung": "Bisher nur in Gerüchten greifbar: Wer nachts den Moorpfad geht, hört angeblich seinen eigenen Namen.",
+  "weissVerbirgtDm": "Der Flüsterer ist der **tote Bruder Gregors** aus dem Beinhaus. Er will keine Opfer – er will gefunden werden. Tragik statt Monster.",
+  "beziehungen": "- [[Gregor der Kerzenmacher]] – Verbindung noch geheim"
+}

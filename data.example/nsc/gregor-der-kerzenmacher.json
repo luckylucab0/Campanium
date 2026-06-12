@@ -1,0 +1,24 @@
+{
+  "id": "gregor-der-kerzenmacher",
+  "typ": "nsc",
+  "name": "Gregor der Kerzenmacher",
+  "erstellt": "2026-04-20T18:10:00.000Z",
+  "geaendert": "2026-05-29T21:00:00.000Z",
+  "tags": ["nebelfurt", "handwerker"],
+  "dmOnly": false,
+  "kampagnenLog": [
+    { "sessionNr": 1, "text": "Verkaufte der Party drei „Lichter gegen das Flüstern“." },
+    { "sessionNr": 2, "text": "Bat die Party, [[Kerzen für die Toten]] zum Friedhof zu bringen." }
+  ],
+  "status": "lebendig",
+  "haltung": "freundlich",
+  "ortId": "nebelfurt",
+  "fraktionId": "zirkel-der-kerzenwaechter",
+  "buchSeiteDm": "Eigener NSC, Notizbuch S. 3",
+  "wer": "Mürrischer Kerzenmacher mit wachsverbrannten Händen und goldenem Herzen",
+  "will": "Dass in jedem Fenster von Nebelfurt nachts ein Licht brennt",
+  "statblockRefDm": "Werte wie ein gewöhnlicher Händler, aber WIS-Rettungswürfe mit Vorteil",
+  "beschreibung": "Gregor spricht langsam, als koste jedes Wort Wachs. Seine Werkstatt riecht nach Honig und Talg. Er verschenkt Kerzenstummel an Kinder – *„Damit das Dunkel weiß, dass es nicht willkommen ist.“*",
+  "weissVerbirgtDm": "Gregor war früher Mitglied einer Totengräber-Gilde und **weiß vom Beinhaus** unter dem Friedhof. Er verschweigt es, weil sein Bruder dort unten liegt.\n\nEr erkennt das Wachssiegel auf [[Das verlorene Medaillon|dem Medaillon]], falls man es ihm zeigt.",
+  "beziehungen": "- [[Mara Wachsherz]] – seine Nichte, er liefert ihr die Gasthauskerzen\n- [[Lyra vom Hohlweg]] – misstraut ihrer Laterne, respektiert ihren Mut"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "zirkel-der-kerzenwaechter",
+  "typ": "fraktion",
+  "name": "Zirkel der Kerzenwächter",
+  "erstellt": "2026-04-20T18:20:00.000Z",
+  "geaendert": "2026-05-29T21:00:00.000Z",
+  "tags": ["nebelfurt"],
+  "dmOnly": false,
+  "kampagnenLog": [
+    { "sessionNr": 2, "text": "Nahm die Party inoffiziell unter ihren Schutz." }
+  ],
+  "haltung": "freundlich",
+  "ziele": "Jede Nacht in jedem Fenster Nebelfurts ein brennendes Licht – der Zirkel glaubt, dass das Dunkel zählt, wer wacht.",
+  "zieleDm": "Der Zirkel hortet seit Generationen **Wachs mit Silberanteil**. Sie bereiten in Wahrheit eine einzige große Bannkerze vor – für die Nacht, in der *er* persönlich kommt.",
+  "mitglieder": "- [[Gregor der Kerzenmacher]] (Ältester)\n- [[Mara Wachsherz]]\n- ein gutes Dutzend stiller Dorfbewohner",
+  "stand": "Wohlwollend gegenüber der Party, seit sie [[Kerzen für die Toten]] angenommen hat."
+}

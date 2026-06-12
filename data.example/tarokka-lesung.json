@@ -1,0 +1,39 @@
+{
+  "karten": [
+    {
+      "aspekt": "Artefakt: Tome of Strahd",
+      "karte": "Der Bergfried",
+      "aufgeloestId": "alte-windmuehle",
+      "aufgeloestText": "",
+      "status": "geheim"
+    },
+    {
+      "aspekt": "Artefakt: Heiliges Symbol",
+      "karte": "Die Kerzenzieherin",
+      "aufgeloestId": "gregor-der-kerzenmacher",
+      "aufgeloestText": "",
+      "status": "hinweis gegeben"
+    },
+    {
+      "aspekt": "Artefakt: Sonnenschwert",
+      "karte": "Sechs der Schwerter",
+      "aufgeloestId": null,
+      "aufgeloestText": "Noch nicht festgelegt – Idee: versunkener Brunnen im Moor",
+      "status": "geheim"
+    },
+    {
+      "aspekt": "Verbündeter",
+      "karte": "Die Wirtin",
+      "aufgeloestId": "mara-wachsherz",
+      "aufgeloestText": "",
+      "status": "von Party entdeckt"
+    },
+    {
+      "aspekt": "Ort der finalen Konfrontation",
+      "karte": "Der Thron",
+      "aufgeloestId": null,
+      "aufgeloestText": "Die große Halle – Details offen",
+      "status": "geheim"
+    }
+  ]
+}

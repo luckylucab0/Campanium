@@ -1,0 +1,19 @@
+{
+  "id": "session-2-der-fremde-am-tor",
+  "typ": "session",
+  "name": "Der Fremde am Tor",
+  "erstellt": "2026-05-29T22:45:00.000Z",
+  "geaendert": "2026-05-29T22:45:00.000Z",
+  "tags": [],
+  "dmOnly": false,
+  "kampagnenLog": [],
+  "nummer": 2,
+  "datum": "2026-05-29",
+  "ingameDatum": "Tag 4–9 seit dem Nebel",
+  "zusammenfassung": "Beim Begräbnis des alten Fischers erscheint ein bleicher Fremder am Friedhofstor von [[Nebelfurt]], macht [[Lyra vom Hohlweg]] ein Geschenk – und verschwindet, als die Glocke schlägt. Die Party übernimmt [[Kerzen für die Toten]].",
+  "ereignisse": "- Begräbnis am Friedhof, das ganze Dorf schweigt\n- Der Fremde nennt Lyra **beim Namen**\n- [[Mara Wachsherz]] stellt sich dazwischen – er lächelt nur\n- Quest [[Kerzen für die Toten]] angenommen, 7/13 Gräber versorgt",
+  "nscsGetroffen": "- [[Gregor der Kerzenmacher]]\n- [[Mara Wachsherz]]\n- der Fremde (Name unbekannt)",
+  "gegenstaende": "- [[Wachslaterne der Wahrheit]] brannte am Tor plötzlich blau",
+  "offeneFaeden": "- Wer ist der Fremde, und woher kennt er Lyras Namen?\n- Die restlichen sechs Gräber **vor Neumond**\n- Das ungeöffnete Geschenk vor Lyras Tür",
+  "notizenDm": "XP: je 450. Strahd-Auftritt saß perfekt – Eskalation auf Stufe 2. Geschenk: Spiegel-Anhänger (Scrying-Fokus!)."
+}

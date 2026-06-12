@@ -1,0 +1,11 @@
+{
+  "id": "zufallsbegegnungen-im-moor",
+  "typ": "notiz",
+  "name": "Zufallsbegegnungen im Moor",
+  "erstellt": "2026-04-20T18:45:00.000Z",
+  "geaendert": "2026-06-10T10:00:00.000Z",
+  "tags": ["referenz", "tabellen"],
+  "dmOnly": true,
+  "kampagnenLog": [],
+  "inhalt": "Bei Reisen durchs Moor: 1× pro Wegstunde **W8** würfeln.\n\n| W8 | Begegnung |\n|---|---|\n| 1 | Nichts – aber das Gefühl, beobachtet zu werden |\n| 2 | Irrlichter (führen zu Tabelle, nicht zu Schätzen) |\n| 3 | 1W4 Moorwölfe, hungrig, feige |\n| 4 | Ein versunkener Karren, Ladung würfelbar |\n| 5 | Das Wiegenlied, sehr leise ([[Das Lied im Nebel]]) |\n| 6 | Ein Fischer, der zu lange lächelt |\n| 7 | Frischer Grabhügel ohne Markierung |\n| 8 | Krähenschwarm – *er* schaut zu |"
+}

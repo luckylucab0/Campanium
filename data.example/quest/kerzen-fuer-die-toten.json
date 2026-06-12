@@ -1,0 +1,26 @@
+{
+  "id": "kerzen-fuer-die-toten",
+  "typ": "quest",
+  "name": "Kerzen für die Toten",
+  "erstellt": "2026-05-15T19:00:00.000Z",
+  "geaendert": "2026-05-29T21:20:00.000Z",
+  "tags": ["nebelfurt"],
+  "dmOnly": false,
+  "kampagnenLog": [
+    { "sessionNr": 2, "text": "Angenommen. Sieben von dreizehn Gräbern sind versorgt." }
+  ],
+  "status": "aktiv",
+  "questgeberId": "gregor-der-kerzenmacher",
+  "ortId": "nebelfurt",
+  "buchSeiteDm": "Eigene Quest",
+  "auftrag": "Auf jedes der dreizehn Gräber am Friedhof eine geweihte Kerze stellen – vor Neumond.",
+  "hintergrundDm": "Die Kerzen sind Gregors Versuch, das Beinhaus **versiegelt zu halten**. Jede fehlende Kerze in der Neumondnacht ist eine offene Tür.",
+  "ausgaengeDm": "**Erfolg:** Das Flüstern verstummt für einen Monat; der Zirkel schenkt der Party die Bannkerzen-Gunst (+1 Tracker).\n\n**Scheitern:** In der Neumondnacht steht ein Grab offen. [[Der Flüsterer im Moor]] hat einen Namen mehr.",
+  "belohnung": "Gregors Dank, drei silbergefasste Kerzen und ein Winterquartier im Gasthaus.",
+  "fortschritt": [
+    { "text": "Kerzen bei Gregor abholen", "erledigt": true },
+    { "text": "Die sieben Gräber an der Furt versorgen", "erledigt": true },
+    { "text": "Die sechs Gräber am Hang versorgen", "erledigt": false },
+    { "text": "Vor Neumond bei Gregor Bericht erstatten", "erledigt": false }
+  ]
+}

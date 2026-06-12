@@ -1,0 +1,19 @@
+{
+  "id": "alte-windmuehle",
+  "typ": "ort",
+  "name": "Alte Windmühle",
+  "erstellt": "2026-04-20T18:05:00.000Z",
+  "geaendert": "2026-04-20T18:05:00.000Z",
+  "tags": ["ruine"],
+  "dmOnly": false,
+  "kampagnenLog": [],
+  "region": "Wildnis & Straßen",
+  "besucht": false,
+  "empfohlenesLevel": "4–5",
+  "buchSeiteDm": "Eigenes Material",
+  "was": "Eine windschiefe Mühle auf dem Hügelkamm, deren Flügel sich ohne Wind drehen",
+  "stimmung": "Knarzendes Holz, Mehlstaub, der nach Asche riecht",
+  "bereiche": "- Mahlkammer mit dem stillstehenden Mühlstein\n- Speicher unter dem Dach",
+  "bewohner": "",
+  "geheimnisseDm": "Im Mehlkasten liegt das versteckte **Tagebuch** – ein Köder. Die Mühle ist nachts nicht leer."
+}

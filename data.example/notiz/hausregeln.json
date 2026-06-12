@@ -1,0 +1,11 @@
+{
+  "id": "hausregeln",
+  "typ": "notiz",
+  "name": "Hausregeln",
+  "erstellt": "2026-04-20T18:40:00.000Z",
+  "geaendert": "2026-04-20T18:40:00.000Z",
+  "tags": ["regeln"],
+  "dmOnly": false,
+  "kampagnenLog": [],
+  "inhalt": "## Tischregeln\n\n1. **Kritische Treffer:** Maximalschaden + Würfelwurf\n2. **Trank trinken:** Bonusaktion, einflößen bleibt eine Aktion\n3. **Tod:** Bei 0 TP zählt jede Runde – wir spielen die Rettungswürfe offen\n\n## Lichtregel (kampagnenspezifisch)\n\nWer **ohne Lichtquelle** übernachtet, würfelt morgens mit Nachteil auf den ersten Wurf des Tages. Die Dorfbewohner haben recht: Das Dunkel zählt, wer wacht."
+}

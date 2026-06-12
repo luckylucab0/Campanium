@@ -1,0 +1,21 @@
+{
+  "id": "das-lied-im-nebel",
+  "typ": "quest",
+  "name": "Das Lied im Nebel",
+  "erstellt": "2026-05-29T20:00:00.000Z",
+  "geaendert": "2026-05-29T20:00:00.000Z",
+  "tags": ["moor"],
+  "dmOnly": false,
+  "kampagnenLog": [],
+  "status": "offen",
+  "questgeberId": "mara-wachsherz",
+  "ortId": null,
+  "buchSeiteDm": "Eigene Quest",
+  "auftrag": "Herausfinden, wer (oder was) nachts im Moor die alten Wiegenlieder singt.",
+  "hintergrundDm": "Das Lied führt zur [[Alte Windmühle|Alten Windmühle]] – und ist ein Köder. Wer der Melodie bis zum Ende folgt, steht vor der Mühlentür.",
+  "ausgaengeDm": "**Erfolg:** Die Party findet die Mühle aus eigener Kraft (Vorteil: vorbereitet).\n\n**Scheitern/Ignorieren:** Das Lied kommt näher. Irgendwann singt es vor dem Gasthaus.",
+  "belohnung": "Mara verspricht freie Kost und Logis „bis zum Frühling – falls der kommt“.",
+  "fortschritt": [
+    { "text": "Mit den Fischern über das Lied sprechen", "erledigt": false }
+  ]
+}

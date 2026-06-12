@@ -1,0 +1,15 @@
+{
+  "id": "prep-session-3",
+  "typ": "sessionPrep",
+  "name": "Prep Session 3 – Neumondnacht",
+  "erstellt": "2026-06-05T10:00:00.000Z",
+  "geaendert": "2026-06-10T10:00:00.000Z",
+  "tags": [],
+  "dmOnly": true,
+  "kampagnenLog": [],
+  "sessionNummer": 3,
+  "zieleDm": "1. Die Neumond-Deadline von [[Kerzen für die Toten]] spürbar machen\n2. Erster Hinweis auf [[Der Flüsterer im Moor]]\n3. Das Geschenk vor Lyras Tür eskalieren, falls es ungeöffnet bleibt",
+  "szenenDm": "**Kalter Auftakt:** Die Dorfglocke läutet um Mitternacht – von selbst.\n\n**Friedhof:** Die sechs Gräber am Hang; bei Grab 11 fehlt der Grabstein. Wer gräbt, findet die Treppe ins Beinhaus.\n\n**Optional:** [[Mara Wachsherz]] erzählt vom Wiegenlied ihrer Großmutter → Brücke zu [[Das Lied im Nebel]].",
+  "benoetigtDm": "- [[Gregor der Kerzenmacher]] (gesteht die Beinhaus-Geschichte, wenn man ihn drängt)\n- [[Nebelfurt]] (Friedhof-Skizze ausdrucken)\n- [[Der Flüsterer im Moor]]",
+  "notfallIdeenDm": "- Falls die Party trödelt: Ein Kind folgt dem Lied Richtung Moor\n- Falls TPK droht: Der Zirkel zündet die Notkerzen – einmalige Rettung, danach ist das Silberwachs verbraucht"
+}
