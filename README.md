@@ -16,7 +16,7 @@ A self-hosted campaign management tool for running **Curse of Strahd** (D&D 5e) 
   <img src="docs/screenshots/spielabend.png" alt="Spielabend-Ansicht" width="49%" />
 </p>
 
-*Screenshots show the fictional demo campaign from `data.example/` (DM mode, dark theme).*
+_Screenshots show the fictional demo campaign from `data.example/` (DM mode, dark theme)._
 
 ## What it does
 
@@ -102,4 +102,6 @@ This is an unofficial fan-made tool and is **not affiliated with or endorsed by 
 
 ## License
 
-[MIT](LICENSE) — contributions welcome, see [CONTRIBUTING.md](CONTRIBUTING.md).
+[CC BY-NC 4.0](LICENSE) — forks and adaptations are welcome, **but you must credit the original author** ([luckylucab0](https://github.com/luckylucab0)) and link back to this repository. **Commercial use is not permitted.** Full terms: <https://creativecommons.org/licenses/by-nc/4.0/>
+
+Contributions welcome, see [CONTRIBUTING.md](CONTRIBUTING.md).

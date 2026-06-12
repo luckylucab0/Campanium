@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Lokales Kampagnen-Tool für Curse of Strahd (D&D 5e) – DM-Modus mit Server, Spieler-Modus als statischer Build.",
-  "license": "MIT",
+  "license": "CC-BY-NC-4.0",
   "type": "module",
   "workspaces": [
     "shared",
