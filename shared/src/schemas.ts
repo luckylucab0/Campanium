@@ -6,16 +6,14 @@
  * DEFAULT_*-Konstanten die Templates für neu angelegte Einträge.
  */
 import { z } from 'zod';
-import type { Entitaet, EntityTyp, Kampagnenstand, StrahdTracker, TarokkaLesung } from './types';
+import type { Entitaet, EntityTyp, Kampagnenstand, Lesung, WidersacherTracker } from './types';
 import {
   HALTUNGEN,
+  LESUNG_KARTEN_STATUS,
   NSC_STATUS,
   QUEST_STATUS,
-  REGIONEN,
   SC_STATUS,
-  STRAHD_MODI,
-  TAROKKA_ASPEKTE,
-  TAROKKA_KARTEN_STATUS,
+  WIDERSACHER_MODI,
 } from './types';
 
 const kampagnenLogEintragSchema = z.object({
@@ -72,7 +70,7 @@ export const questSchema = basisSchema.extend({
 
 export const ortSchema = basisSchema.extend({
   typ: z.literal('ort'),
-  region: z.enum(REGIONEN),
+  region: z.string(),
   besucht: z.boolean(),
   empfohlenesLevel: z.string(),
   buchSeiteDm: z.string(),
@@ -166,16 +164,31 @@ export function validiereEntitaet(typ: EntityTyp, daten: unknown): Entitaet {
 }
 
 // ---------------------------------------------------------------------------
-// Singletons
+// Kampagnen-Manifest & Singletons
 // ---------------------------------------------------------------------------
+
+export const kampagneSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1, 'Name darf nicht leer sein'),
+  beschreibung: z.string(),
+  erstellt: z.string(),
+});
 
 export const kampagnenstandSchema = z.object({
   partyLevel: z.number().int().min(1).max(20),
   ingameTag: z.number().int().nonnegative(),
   ingameDatumText: z.string(),
-  ireenasBisse: z.number().int().min(0).max(3),
-  strahdEskalation: z.number().int().min(1).max(5),
-  eskalationsStufen: z.tuple([z.string(), z.string(), z.string(), z.string(), z.string()]),
+  eskalation: z
+    .object({
+      titel: z.string(),
+      stufe: z.number().int().min(1),
+      stufen: z.array(z.string()).min(1),
+    })
+    // Stufe darf nie größer sein als die Anzahl definierter Stufen.
+    .refine((e) => e.stufe <= e.stufen.length, {
+      message: 'stufe liegt außerhalb der definierten Stufen',
+    })
+    .nullable(),
   customTracker: z.array(
     z.object({
       id: z.string().min(1),
@@ -186,13 +199,14 @@ export const kampagnenstandSchema = z.object({
   ),
 });
 
-export const strahdTrackerSchema = z.object({
+export const widersacherTrackerSchema = z.object({
+  name: z.string(),
   begegnungen: z.array(
     z.object({
       nr: z.number().int().positive(),
       sessionNr: z.number().int().nonnegative().nullable(),
       ort: z.string(),
-      modus: z.enum(STRAHD_MODI),
+      modus: z.enum(WIDERSACHER_MODI),
       wollte: z.string(),
       bekam: z.string(),
       folgen: z.string(),
@@ -201,14 +215,15 @@ export const strahdTrackerSchema = z.object({
   ideen: z.array(checklistEintragSchema),
 });
 
-export const tarokkaLesungSchema = z.object({
+export const lesungSchema = z.object({
+  titel: z.string(),
   karten: z.array(
     z.object({
       aspekt: z.string(),
       karte: z.string(),
       aufgeloestId: refSchema,
       aufgeloestText: z.string(),
-      status: z.enum(TAROKKA_KARTEN_STATUS),
+      status: z.enum(LESUNG_KARTEN_STATUS),
     }),
   ),
 });
@@ -264,7 +279,7 @@ export function neueEntitaet(typ: EntityTyp, id: string, name: string): Entitaet
       return {
         ...basis,
         typ,
-        region: 'Sonstiges',
+        region: '',
         besucht: false,
         empfohlenesLevel: '',
         buchSeiteDm: '',
@@ -342,33 +357,17 @@ export function neueEntitaet(typ: EntityTyp, id: string, name: string): Entitaet
   }
 }
 
-/** Default-Kampagnenstand für eine frische Kampagne. */
+/** Default-Kampagnenstand für eine frische Kampagne (ohne Eskalations-Tracker). */
 export const DEFAULT_KAMPAGNENSTAND: Kampagnenstand = {
   partyLevel: 1,
   ingameTag: 1,
   ingameDatumText: '',
-  ireenasBisse: 0,
-  strahdEskalation: 1,
-  eskalationsStufen: [
-    'Stufe 1 – Beobachten: Strahd schickt Spione und beobachtet die Neuankömmlinge.',
-    'Stufe 2 – Spielen: Erste persönliche Auftritte, Einladungen, Charme.',
-    'Stufe 3 – Testen: Gezielte Proben der Stärke, Druck auf Verbündete.',
-    'Stufe 4 – Strafen: Offene Konsequenzen, Verluste für die Party.',
-    'Stufe 5 – Endspiel: Strahd zieht alle Register, die Jagd ist eröffnet.',
-  ],
+  eskalation: null,
   customTracker: [],
 };
 
-/** Default-Strahd-Tracker (leer). */
-export const DEFAULT_STRAHD_TRACKER: StrahdTracker = { begegnungen: [], ideen: [] };
+/** Default-Widersacher-Tracker (leer, Name noch unbenannt). */
+export const DEFAULT_WIDERSACHER: WidersacherTracker = { name: '', begegnungen: [], ideen: [] };
 
-/** Default-Tarokka-Lesung: fünf leere Karten, eine pro Aspekt. */
-export const DEFAULT_TAROKKA: TarokkaLesung = {
-  karten: TAROKKA_ASPEKTE.map((aspekt) => ({
-    aspekt,
-    karte: '',
-    aufgeloestId: null,
-    aufgeloestText: '',
-    status: 'geheim' as const,
-  })),
-};
+/** Default-Lesung (leer – Karten legt der DM je nach Kampagne selbst an). */
+export const DEFAULT_LESUNG: Lesung = { titel: '', karten: [] };

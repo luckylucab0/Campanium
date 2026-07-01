@@ -1,13 +1,14 @@
 /**
- * Dashboard: Tracker-Widgets aus dem Kampagnenstand (direkt editierbar),
- * aktive Quests, letzte Sessions, verbündete NSCs, offene Fäden und
+ * Dashboard: Tracker-Widgets aus dem Kampagnenstand (direkt editierbar,
+ * inkl. optionalem Eskalations-Tracker mit editierbaren Stufen), aktive
+ * Quests, letzte Sessions, verbündete NSCs, offene Fäden und
  * Schnellzugriff auf die Spezialmodule.
  */
 import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Castle, Droplets, Minus, Plus, Sparkles, Tent, Trash2 } from 'lucide-react';
-import type { Entitaet, Nsc, Quest, Session } from '@ravenloft/shared';
-import { slugify } from '@ravenloft/shared';
+import { Castle, Minus, Pencil, Plus, Sparkles, Tent, Trash2 } from 'lucide-react';
+import type { Entitaet, Nsc, Quest, Session } from '@grimoire/shared';
+import { slugify } from '@grimoire/shared';
 import { IST_SPIELER_MODUS } from '../api';
 import { formatDatum, pfadFuer } from '../hilfen';
 import { useStore } from '../store';
@@ -16,7 +17,7 @@ import { Markdown } from '../komponenten/Markdown';
 import { Trennlinie } from '../komponenten/Ornament';
 
 export function Dashboard() {
-  const { entitaeten, kampagnenstand, setzeKampagnenstand } = useStore();
+  const { entitaeten, kampagne, kampagnenstand, setzeKampagnenstand } = useStore();
   const navigate = useNavigate();
   const { erstellen } = useStore();
 
@@ -48,9 +49,9 @@ export function Dashboard() {
 
   return (
     <div>
-      <h1 className="mb-1 text-3xl">Kampagnen-Übersicht</h1>
+      <h1 className="mb-1 text-3xl">{kampagne?.name ?? 'Kampagnen-Übersicht'}</h1>
       <p className="mb-6 font-serif text-lg italic text-text-schwach">
-        Die Nebel von Barovia haben euch fest im Griff …
+        {kampagne?.beschreibung || 'Ein neues Kapitel wartet darauf, geschrieben zu werden …'}
       </p>
 
       {/* Tracker-Widgets */}
@@ -90,59 +91,7 @@ export function Dashboard() {
             />
           )}
         </div>
-        {!IST_SPIELER_MODUS && (
-          <>
-            <div className="karte karte-ornament p-4">
-              <TrackerTitel>
-                <Droplets size={12} className="inline text-blut-hell" aria-hidden /> Ireenas Bisse
-              </TrackerTitel>
-              <div
-                className="flex items-center gap-2"
-                role="group"
-                aria-label="Ireenas Bisse setzen"
-              >
-                {[1, 2, 3].map((n) => (
-                  <button
-                    key={n}
-                    onClick={() =>
-                      setzeWert({ ireenasBisse: kampagnenstand.ireenasBisse === n ? n - 1 : n })
-                    }
-                    aria-label={`Biss ${n} ${kampagnenstand.ireenasBisse >= n ? 'entfernen' : 'setzen'}`}
-                    className={`h-7 w-7 rounded-full border transition-colors ${
-                      kampagnenstand.ireenasBisse >= n
-                        ? 'border-blut bg-blut text-white'
-                        : 'border-rand-stark text-text-schwach hover:border-blut'
-                    }`}
-                  >
-                    {kampagnenstand.ireenasBisse >= n ? '✦' : '·'}
-                  </button>
-                ))}
-                <span className="ml-1 text-sm text-text-schwach">
-                  {kampagnenstand.ireenasBisse}/3
-                </span>
-              </div>
-              {kampagnenstand.ireenasBisse >= 3 && (
-                <p className="mt-1.5 text-xs text-blut-hell">Dritter Biss – es ist so weit.</p>
-              )}
-            </div>
-            <div className="karte karte-ornament p-4">
-              <TrackerTitel>Strahds Eskalation</TrackerTitel>
-              <ZaehlerKnoepfe
-                wert={kampagnenstand.strahdEskalation}
-                min={1}
-                max={5}
-                onChange={(v) => setzeWert({ strahdEskalation: v })}
-              >
-                <span className="font-display text-2xl text-text-stark">
-                  Stufe {kampagnenstand.strahdEskalation}
-                </span>
-              </ZaehlerKnoepfe>
-              <p className="mt-1 line-clamp-2 text-xs text-text-schwach">
-                {kampagnenstand.eskalationsStufen[kampagnenstand.strahdEskalation - 1]}
-              </p>
-            </div>
-          </>
-        )}
+        {!IST_SPIELER_MODUS && <EskalationsKarte />}
         {kampagnenstand.customTracker.map((tracker) => (
           <div key={tracker.id} className="karte karte-ornament p-4">
             <TrackerTitel>
@@ -195,16 +144,16 @@ export function Dashboard() {
             <Tent size={15} /> Neue Session vorbereiten
           </button>
           <Link
-            to="/strahd"
+            to="/widersacher"
             className="flex items-center gap-2 rounded border border-rand px-3.5 py-2 text-sm hover:border-gold hover:text-gold"
           >
-            <Castle size={15} /> Strahd-Tracker
+            <Castle size={15} /> Widersacher-Tracker
           </Link>
           <Link
-            to="/tarokka"
+            to="/lesung"
             className="flex items-center gap-2 rounded border border-arkan/40 px-3.5 py-2 text-sm text-arkan hover:bg-arkan-flaeche"
           >
-            <Sparkles size={15} /> Tarokka-Lesung
+            <Sparkles size={15} /> Lesung
           </Link>
         </div>
       )}
@@ -262,7 +211,7 @@ export function Dashboard() {
           <h2 className="mb-3 text-lg">Verbündete NSCs</h2>
           {verbuendete.length === 0 && (
             <p className="text-sm text-text-schwach">
-              Noch keine Verbündeten – Barovia ist ein einsamer Ort.
+              Noch keine Verbündeten – die Welt ist ein einsamer Ort.
             </p>
           )}
           <ul className="flex flex-wrap gap-2">
@@ -366,6 +315,130 @@ function Zaehler({
       <ZaehlerKnoepfe wert={wert} min={min} max={max} onChange={onChange}>
         <span className="font-display text-2xl text-text-stark">{wert}</span>
       </ZaehlerKnoepfe>
+    </div>
+  );
+}
+
+/**
+ * Optionaler Eskalations-Tracker (DM-only): +/− für die Stufe, Stift-Icon
+ * öffnet den Editor für Titel und Stufenbeschreibungen. Ohne konfigurierten
+ * Tracker erscheint eine „hinzufügen“-Karte.
+ */
+function EskalationsKarte() {
+  const { kampagnenstand, setzeKampagnenstand } = useStore();
+  const [editorOffen, setEditorOffen] = useState(false);
+  const eskalation = kampagnenstand.eskalation;
+
+  const speichere = (neu: typeof eskalation) =>
+    void setzeKampagnenstand({ ...kampagnenstand, eskalation: neu });
+
+  if (!eskalation) {
+    return (
+      <button
+        className="karte flex min-h-24 items-center justify-center gap-2 border-dashed text-sm text-text-schwach hover:border-gold hover:text-gold"
+        onClick={() =>
+          speichere({
+            titel: 'Eskalation',
+            stufe: 1,
+            stufen: ['Stufe 1', 'Stufe 2', 'Stufe 3', 'Stufe 4', 'Stufe 5'],
+          })
+        }
+      >
+        <Plus size={15} /> Eskalations-Tracker
+      </button>
+    );
+  }
+
+  return (
+    <div className="karte karte-ornament p-4">
+      <TrackerTitel>
+        {eskalation.titel || 'Eskalation'}
+        <button
+          className="float-right text-text-schwach hover:text-gold"
+          aria-label="Eskalations-Tracker bearbeiten"
+          onClick={() => setEditorOffen((o) => !o)}
+        >
+          <Pencil size={13} />
+        </button>
+      </TrackerTitel>
+      <ZaehlerKnoepfe
+        wert={eskalation.stufe}
+        min={1}
+        max={eskalation.stufen.length}
+        onChange={(v) => speichere({ ...eskalation, stufe: v })}
+      >
+        <span className="font-display text-2xl text-text-stark">Stufe {eskalation.stufe}</span>
+      </ZaehlerKnoepfe>
+      <p className="mt-1 line-clamp-2 text-xs text-text-schwach">
+        {eskalation.stufen[eskalation.stufe - 1]}
+      </p>
+
+      {editorOffen && (
+        <div className="mt-3 border-t border-rand pt-3">
+          <input
+            className="mb-2 w-full rounded border border-rand bg-flaeche-3 px-2 py-1 text-sm"
+            value={eskalation.titel}
+            placeholder="Titel, z. B. „Strahds Eskalation“"
+            onChange={(e) => speichere({ ...eskalation, titel: e.target.value })}
+            aria-label="Titel des Eskalations-Trackers"
+          />
+          {eskalation.stufen.map((stufe, i) => (
+            <div key={i} className="mb-1.5 flex items-start gap-1.5">
+              <span className="mt-1.5 shrink-0 font-display text-xs text-gold">{i + 1}</span>
+              <textarea
+                className="w-full resize-y rounded border border-rand bg-flaeche-3 px-2 py-1 text-xs"
+                rows={2}
+                value={stufe}
+                onChange={(e) =>
+                  speichere({
+                    ...eskalation,
+                    stufen: eskalation.stufen.map((s, j) => (j === i ? e.target.value : s)),
+                  })
+                }
+                aria-label={`Beschreibung Stufe ${i + 1}`}
+              />
+              <button
+                className="mt-1.5 text-text-schwach hover:text-rot disabled:opacity-30"
+                disabled={eskalation.stufen.length <= 1}
+                aria-label={`Stufe ${i + 1} entfernen`}
+                onClick={() =>
+                  speichere({
+                    ...eskalation,
+                    stufe: Math.min(eskalation.stufe, eskalation.stufen.length - 1),
+                    stufen: eskalation.stufen.filter((_, j) => j !== i),
+                  })
+                }
+              >
+                <Trash2 size={12} />
+              </button>
+            </div>
+          ))}
+          <div className="flex justify-between">
+            <button
+              className="text-xs text-text-schwach hover:text-gold"
+              onClick={() =>
+                speichere({
+                  ...eskalation,
+                  stufen: [...eskalation.stufen, `Stufe ${eskalation.stufen.length + 1}`],
+                })
+              }
+            >
+              + Stufe
+            </button>
+            <button
+              className="text-xs text-text-schwach hover:text-rot"
+              onClick={() => {
+                if (window.confirm('Eskalations-Tracker wirklich entfernen?')) {
+                  speichere(null);
+                  setEditorOffen(false);
+                }
+              }}
+            >
+              Tracker entfernen
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -8,22 +8,30 @@ Vorgehen, um eine neue Entitätsart hinzuzufügen.
 ```
             DM-Modus (lokal)                          Spieler-Modus (statisch)
 ┌─────────────────────────────────────┐      ┌──────────────────────────────────┐
-│  data/*.json  (eine Datei/Entität)  │      │  npm run build:player            │
-│        ▲              │             │      │   1. data/ lesen + validieren    │
-│  Write-Through        │ laden       │      │   2. Whitelist-Spoiler-Filter    │
-│        │              ▼             │      │   3. Paranoia-Prüfung            │
-│  server/ (Express, Zod-validiert)   │      │   4. player-data.json schreiben  │
-│        ▲  REST /api/…               │      │   5. vite build --mode player    │
-│        │                            │      │        ▼                         │
-│  client/ (React, lädt ALLES beim    │      │  client/dist-player/ → Pages     │
-│  Start in den Store)                │      └──────────────────────────────────┘
-└─────────────────────────────────────┘
+│  data/<kampagne>/*.json             │      │  KAMPAGNE=<id>                   │
+│        ▲              │             │      │  npm run build:player            │
+│  Write-Through        │ laden       │      │   1. EINE Kampagne lesen         │
+│        │              ▼             │      │   2. Whitelist-Spoiler-Filter    │
+│  server/ (Express, Zod-validiert)   │      │   3. Paranoia-Prüfung            │
+│        ▲  REST /api/kampagnen/:kid  │      │   4. player-data.json schreiben  │
+│        │                            │      │   5. vite build --mode player    │
+│  client/ (React, lädt die aktive    │      │        ▼                         │
+│  Kampagne komplett in den Store)    │      │  client/dist-player/ → Pages     │
+└─────────────────────────────────────┘      └──────────────────────────────────┘
 ```
 
-Zentrale Idee: **Eine Kampagne ist klein** (hunderte, nicht Millionen
-Einträge). Der Client lädt deshalb beim Start den kompletten Datenbestand
-(`GET /api/alles` bzw. statisches `player-data.json`) in einen React-Context
-(`client/src/store.tsx`). Daraus werden Indizes abgeleitet:
+Zentrale Ideen:
+
+1. **Kampagnen sind die oberste Datenebene.** Jeder Unterordner von `data/`
+   mit einer `kampagne.json` ist eine Kampagne; der Client zeigt einen
+   Umschalter in der Sidebar. Alle API-Routen sind kampagnen-bezogen
+   (`/api/kampagnen/:kid/…`), Wikilinks/Backlinks/Suche wirken immer nur
+   innerhalb der aktiven Kampagne.
+2. **Eine Kampagne ist klein** (hunderte, nicht Millionen Einträge). Der
+   Client lädt deshalb beim Kampagnen-Wechsel den kompletten Datenbestand
+   (`GET /api/kampagnen/:kid/alles` bzw. statisches `player-data.json`) in
+   einen React-Context (`client/src/store.tsx`). Daraus werden Indizes
+   abgeleitet:
 
 - **Name-Index** (case-insensitiv) → Auflösung von `[[Wikilinks]]`
 - **Backlink-Index** → „Erwähnt in …“ auf jeder Detailseite; gespeist aus
@@ -45,16 +53,17 @@ shared/src/
   playerFilter.ts  Spoiler-Filter, WHITELIST-Prinzip (+ Tests)
 
 server/src/
-  storage.ts       Datei-Speicher: data/<typ>/<id>.json, Singletons
-  app.ts           Express-Routen, Zod-Validierung (+ CRUD-Tests)
+  storage.ts       Datei-Speicher pro Kampagne + KampagnenVerwaltung
+  app.ts           Express-Routen (/api/kampagnen/…), Zod-Validierung (+ Tests)
   index.ts         Einstiegspunkt (Port 3001, DATA_DIR überschreibbar)
 
 client/src/
   api.ts           REST-Aufrufe; im Spieler-Modus statisches JSON
   store.tsx        Daten-Context, Backlink-Index, Mutationen
-  komponenten/     Layout, Markdown(+Wikilinks), Editor, Suche, Badges, …
-  seiten/          Dashboard, generische Liste/Detail/Formular,
-                   QuestBoard, SessionTimeline, Spielabend, Strahd, Tarokka
+  komponenten/     Layout (inkl. Kampagnen-Umschalter), Markdown(+Wikilinks),
+                   Editor, Suche, Badges, …
+  seiten/          Dashboard, generische Liste/Detail/Formular, QuestBoard,
+                   SessionTimeline, Spielabend, Widersacher, Lesung
   styles/index.css Design-Tokens (CSS-Variablen) + Themes + Tailwind
 
 scripts/
@@ -64,12 +73,28 @@ scripts/
 
 ## Datenhaltung
 
-- `data/<typ>/<slug>.json` – eine Datei pro Entität, ID = Slug des Namens
-  (Kollisionen bekommen `-2`, `-3`, …). Menschenlesbar, git-versionierbar.
-- Singletons: `kampagnenstand.json`, `strahd-tracker.json`,
-  `tarokka-lesung.json` direkt in `data/`.
+- `data/<kampagne>/kampagne.json` – Manifest (ID, Name, Untertitel).
+  Jeder Ordner mit Manifest wird beim Serverstart als Kampagne geladen.
+- `data/<kampagne>/<typ>/<slug>.json` – eine Datei pro Entität, ID = Slug
+  des Namens (Kollisionen bekommen `-2`, `-3`, …). Menschenlesbar,
+  git-versionierbar.
+- Singletons pro Kampagne: `kampagnenstand.json`,
+  `widersacher-tracker.json`, `lesung.json`.
 - Jede Schreiboperation validiert die API gegen die Zod-Schemas; ungültige
   Daten werden mit HTTP 400 abgewiesen und erreichen die Platte nie.
+
+## Kampagnen-agnostische Spezialmodule
+
+Die früher CoS-spezifischen Module sind generisch und pro Kampagne
+konfigurierbar – die Curse-of-Strahd-Demo zeigt die Belegung:
+
+| Modul               | Generisch                           | In der CoS-Demo                |
+| ------------------- | ----------------------------------- | ------------------------------ |
+| Widersacher-Tracker | Name frei (`widersacher.name`)      | „Strahd von Zarovich“          |
+| Lesung              | Titel + beliebig viele Karten       | Tarokka-Lesung, 5 Karten       |
+| Eskalations-Tracker | optional, Titel + Stufen editierbar | „Strahds Eskalation“, 5 Stufen |
+| Custom-Tracker      | beliebige Zähler (`aktuell`/`max`)  | „Ireenas Bisse“ 1/3            |
+| Ort-Region          | Freitext, Filter aus Ist-Werten     | „Wildnis & Straßen“, …         |
 
 ## Spoiler-Trennung (wichtigste Invariante)
 
@@ -107,9 +132,10 @@ Registry).
 
 ## Spieler-Build & Deployment
 
-`npm run build:player` schreibt das gefilterte `player-data.json` nach
-`client/public/` und baut die SPA mit `--mode player --base ./` nach
-`client/dist-player/`. Der Client erkennt den Modus über
+`npm run build:player` exportiert genau EINE Kampagne (Auswahl über
+`KAMPAGNE=<id>`, bei nur einer Kampagne automatisch), schreibt das
+gefilterte `player-data.json` nach `client/public/` und baut die SPA mit
+`--mode player --base ./` nach `client/dist-player/`. Der Client erkennt den Modus über
 `import.meta.env.MODE === 'player'`: kein API-Zugriff, keine Edit-UI,
 keine DM-Navigation. `HashRouter` + relativer Base-Path machen den Build
 auf GitHub Pages ohne Server-Konfiguration lauffähig. Veröffentlicht wird

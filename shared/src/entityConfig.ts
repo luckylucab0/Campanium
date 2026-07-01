@@ -8,7 +8,7 @@
  * (Details siehe ARCHITECTURE.md).
  */
 import type { EntityTyp } from './types';
-import { HALTUNGEN, NSC_STATUS, QUEST_STATUS, REGIONEN, SC_STATUS } from './types';
+import { HALTUNGEN, NSC_STATUS, QUEST_STATUS, SC_STATUS } from './types';
 
 /** Art eines Kopffeldes (oberhalb der Markdown-Abschnitte). */
 export type FeldArt = 'text' | 'nummer' | 'boolean' | 'select' | 'ref' | 'datum';
@@ -43,8 +43,12 @@ export interface AbschnittConfig {
 export interface FilterConfig {
   feld: string;
   label: string;
-  /** 'select' filtert auf exakte Werte, 'boolean' auf ja/nein, 'ref' auf Verknüpfung. */
-  art: 'select' | 'boolean' | 'ref';
+  /**
+   * 'select' filtert auf feste Werte, 'boolean' auf ja/nein, 'ref' auf
+   * Verknüpfung, 'werte' auf die tatsächlich vorkommenden Werte des Feldes
+   * (dynamisch – z. B. die Regionen der jeweiligen Kampagne).
+   */
+  art: 'select' | 'boolean' | 'ref' | 'werte';
   optionen?: readonly string[];
   refTypen?: readonly EntityTyp[];
 }
@@ -148,10 +152,15 @@ export const entityConfigs: Record<EntityTyp, EntityConfig> = {
     labelPlural: 'Orte',
     route: 'orte',
     icon: 'MapPin',
-    beschreibung: 'Schauplätze in Barovia – vom Dorf bis zur Burg.',
+    beschreibung: 'Schauplätze der Kampagne – vom Dorf bis zum Dungeon.',
     untertitelFeld: 'was',
     felder: [
-      { feld: 'region', label: 'Region', art: 'select', optionen: REGIONEN },
+      {
+        feld: 'region',
+        label: 'Region',
+        art: 'text',
+        hinweis: 'Frei benennbar, z. B. „Küste“, „Hauptstadt“, „Unterreich“',
+      },
       { feld: 'besucht', label: 'Besucht', art: 'boolean' },
       { feld: 'empfohlenesLevel', label: 'Empfohlenes Level', art: 'text' },
       { feld: 'was', label: 'Was? (eine Zeile)', art: 'text' },
@@ -169,7 +178,7 @@ export const entityConfigs: Record<EntityTyp, EntityConfig> = {
       { feld: 'geheimnisseDm', titel: 'Geheimnisse & Gefahren', dm: true },
     ],
     filter: [
-      { feld: 'region', label: 'Region', art: 'select', optionen: REGIONEN },
+      { feld: 'region', label: 'Region', art: 'werte' },
       { feld: 'besucht', label: 'Besucht', art: 'boolean' },
     ],
   },

@@ -1,13 +1,15 @@
 /**
- * App-Rahmen: Sidebar-Navigation, Kopfzeile mit Nebel-Gradient,
- * Theme-Umschalter und globale Suche. Im Spieler-Modus werden alle
- * DM-Bereiche (Preps, Strahd, Tarokka, Spielabend, „Neu“) ausgeblendet.
+ * App-Rahmen: Sidebar-Navigation mit Kampagnen-Umschalter, Kopfzeile mit
+ * Nebel-Gradient, Theme-Umschalter und globale Suche. Im Spieler-Modus
+ * werden alle DM-Bereiche (Preps, Widersacher, Lesung, Spielabend, „Neu“)
+ * und der Kampagnen-Wechsel ausgeblendet.
  */
 import { useEffect, useState, type ReactNode } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Castle, Home, Menu, Moon, Plus, Search, Sun, Sparkles, Tent, X } from 'lucide-react';
-import { ENTITY_TYPEN, entityConfigs } from '@ravenloft/shared';
+import { ENTITY_TYPEN, entityConfigs } from '@grimoire/shared';
 import { IST_SPIELER_MODUS } from '../api';
+import { useStore } from '../store';
 import { entityIcon } from './icons';
 import { Fledermaus } from './Ornament';
 import { SearchPalette } from './SearchPalette';
@@ -58,13 +60,15 @@ export function Layout({ children }: { children: ReactNode }) {
             <Fledermaus size={22} className="text-blut-hell" />
             <div>
               <div className="font-display text-base font-semibold tracking-wide text-text-stark">
-                Ravenloft
+                Grimoire
               </div>
               <div className="text-[10px] uppercase tracking-[0.25em] text-text-schwach">
-                Companion
+                Kampagnen-Companion
               </div>
             </div>
           </NavLink>
+
+          <KampagnenWahl schliesseMenue={() => setMenueOffen(false)} />
 
           <nav
             className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3"
@@ -102,11 +106,15 @@ export function Layout({ children }: { children: ReactNode }) {
                 <div className="px-3 pt-3 pb-1 text-[10px] uppercase tracking-[0.2em] text-text-schwach">
                   DM-Module
                 </div>
-                <NavLink to="/strahd" className={navKlasse} onClick={() => setMenueOffen(false)}>
-                  <Castle size={16} /> Strahd-Tracker
+                <NavLink
+                  to="/widersacher"
+                  className={navKlasse}
+                  onClick={() => setMenueOffen(false)}
+                >
+                  <Castle size={16} /> Widersacher
                 </NavLink>
-                <NavLink to="/tarokka" className={navKlasse} onClick={() => setMenueOffen(false)}>
-                  <Sparkles size={16} /> Tarokka-Lesung
+                <NavLink to="/lesung" className={navKlasse} onClick={() => setMenueOffen(false)}>
+                  <Sparkles size={16} /> Lesung
                 </NavLink>
               </>
             )}
@@ -172,12 +180,129 @@ export function Layout({ children }: { children: ReactNode }) {
           >
             {menueOffen ? <X size={18} /> : <Menu size={18} />}
           </button>
-          <span className="font-display text-text-stark">Ravenloft Companion</span>
+          <span className="font-display text-text-stark">Grimoire</span>
         </header>
         <main className="relative mx-auto max-w-6xl px-4 py-6 lg:px-8">{children}</main>
       </div>
 
       {sucheOffen && <SearchPalette schliessen={() => setSucheOffen(false)} />}
+    </div>
+  );
+}
+
+/**
+ * Kampagnen-Umschalter in der Sidebar: Dropdown über alle Kampagnen plus
+ * „Neue Kampagne …“. Im Spieler-Modus (genau eine Kampagne) nur Anzeige.
+ */
+function KampagnenWahl({ schliesseMenue }: { schliesseMenue: () => void }) {
+  const { kampagnen, kampagne, wechsleKampagne, neueKampagne } = useStore();
+  const navigate = useNavigate();
+  const [dialogOffen, setDialogOffen] = useState(false);
+  const [name, setName] = useState('');
+  const [beschreibung, setBeschreibung] = useState('');
+  const [fehler, setFehler] = useState<string | null>(null);
+
+  if (IST_SPIELER_MODUS || !kampagne) {
+    return kampagne ? (
+      <div className="border-b border-rand px-4 py-2.5 text-sm text-gold-hell">{kampagne.name}</div>
+    ) : null;
+  }
+
+  const anlegen = async () => {
+    if (!name.trim()) return;
+    try {
+      await neueKampagne(name.trim(), beschreibung.trim());
+      setDialogOffen(false);
+      setName('');
+      setBeschreibung('');
+      navigate('/');
+    } catch (e) {
+      setFehler(e instanceof Error ? e.message : 'Anlegen fehlgeschlagen');
+    }
+  };
+
+  return (
+    <div className="border-b border-rand px-2 py-2">
+      <label className="px-2 text-[10px] uppercase tracking-[0.2em] text-text-schwach">
+        Kampagne
+        <select
+          className="mt-1 w-full rounded border border-rand bg-flaeche-2 px-2 py-1.5 text-sm normal-case tracking-normal text-gold-hell"
+          value={kampagne.id}
+          onChange={(e) => {
+            if (e.target.value === '__neu') {
+              setDialogOffen(true);
+            } else {
+              // Zurück zum Dashboard: IDs anderer Kampagnen wären auf der
+              // aktuellen Detailseite nicht auflösbar.
+              wechsleKampagne(e.target.value);
+              navigate('/');
+              schliesseMenue();
+            }
+          }}
+        >
+          {kampagnen.map((k) => (
+            <option key={k.id} value={k.id}>
+              {k.name}
+            </option>
+          ))}
+          <option value="__neu">＋ Neue Kampagne …</option>
+        </select>
+      </label>
+
+      {dialogOffen && (
+        <div
+          className="fixed inset-0 z-100 flex items-start justify-center bg-black/60 pt-[20vh]"
+          onClick={() => setDialogOffen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Neue Kampagne anlegen"
+        >
+          <div
+            className="karte karte-ornament w-full max-w-md p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="mb-4 text-lg">Neue Kampagne</h2>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-text-schwach">
+              Name
+            </label>
+            <input
+              autoFocus
+              className="mb-3 w-full rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-text-stark"
+              value={name}
+              placeholder="z. B. „Sturm über den Salzmarschen“"
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') void anlegen();
+                if (e.key === 'Escape') setDialogOffen(false);
+              }}
+            />
+            <label className="mb-1 block text-xs uppercase tracking-wider text-text-schwach">
+              Untertitel (optional)
+            </label>
+            <input
+              className="mb-3 w-full rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-text-stark"
+              value={beschreibung}
+              onChange={(e) => setBeschreibung(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && void anlegen()}
+            />
+            {fehler && <p className="mb-3 text-sm text-rot">{fehler}</p>}
+            <div className="flex justify-end gap-2">
+              <button
+                className="rounded border border-rand px-3 py-1.5 text-sm hover:bg-flaeche-3"
+                onClick={() => setDialogOffen(false)}
+              >
+                Abbrechen
+              </button>
+              <button
+                className="rounded bg-blut px-3 py-1.5 text-sm font-medium text-white hover:bg-blut-hell"
+                onClick={() => void anlegen()}
+              >
+                Anlegen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

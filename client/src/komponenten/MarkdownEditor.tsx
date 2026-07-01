@@ -7,7 +7,7 @@
  */
 import { useMemo, useRef, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { entityConfigs, fuzzyFilter } from '@ravenloft/shared';
+import { entityConfigs, fuzzyFilter } from '@grimoire/shared';
 import { useStore } from '../store';
 import { Markdown } from './Markdown';
 

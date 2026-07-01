@@ -7,8 +7,8 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Save, Trash2 } from 'lucide-react';
-import type { ChecklistEintrag, Entitaet, KampagnenLogEintrag } from '@ravenloft/shared';
-import { configVonRoute, type EntityConfig, type FeldConfig } from '@ravenloft/shared';
+import type { ChecklistEintrag, Entitaet, KampagnenLogEintrag } from '@grimoire/shared';
+import { configVonRoute, type EntityConfig, type FeldConfig } from '@grimoire/shared';
 import { pfadFuer } from '../hilfen';
 import { useStore } from '../store';
 import { Checkliste } from '../komponenten/Checkliste';

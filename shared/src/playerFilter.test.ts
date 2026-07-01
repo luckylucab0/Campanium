@@ -4,9 +4,16 @@
  * und keine DM-Entität im Spieler-Export landet.
  */
 import { describe, expect, it } from 'vitest';
-import type { Entitaet, Kampagnenstand, Nsc, Ort } from './types';
+import type { Entitaet, Kampagne, Kampagnenstand, Nsc, Ort } from './types';
 import { DEFAULT_KAMPAGNENSTAND, neueEntitaet } from './schemas';
 import { filterFuerSpieler, istSpielerSichtbar } from './playerFilter';
+
+const kampagne: Kampagne = {
+  id: 'test-kampagne',
+  name: 'Testkampagne',
+  beschreibung: 'Eine Kampagne für Tests',
+  erstellt: '2026-01-01T00:00:00.000Z',
+};
 
 /** Hilfsfunktion: NSC, den die Party bereits getroffen hat. */
 function getroffenerNsc(name: string, extra: Partial<Nsc> = {}): Nsc {
@@ -28,8 +35,11 @@ function besuchterOrt(name: string, extra: Partial<Ort> = {}): Ort {
 
 const stand: Kampagnenstand = {
   ...DEFAULT_KAMPAGNENSTAND,
-  ireenasBisse: 2,
-  strahdEskalation: 4,
+  eskalation: {
+    titel: 'Strahds Eskalation',
+    stufe: 4,
+    stufen: ['ruhig', 'neugierig', 'fordernd', 'Geheimplan: Er will Lyra brechen'],
+  },
 };
 
 describe('istSpielerSichtbar (Sichtbarkeitsregeln)', () => {
@@ -83,7 +93,7 @@ describe('filterFuerSpieler (Whitelist)', () => {
       neueEntitaet('notiz', 'hausregeln', 'Hausregeln'),
     ];
 
-    const ergebnis = filterFuerSpieler(alle, stand);
+    const ergebnis = filterFuerSpieler(kampagne, alle, stand);
 
     // Alle 8 spielersichtbaren Entitäten sind enthalten …
     expect(ergebnis.entitaeten).toHaveLength(8);
@@ -111,14 +121,14 @@ describe('filterFuerSpieler (Whitelist)', () => {
   it('whitelistet unbekannte Zusatzfelder NICHT (Whitelist statt Blacklist)', () => {
     const nsc = getroffenerNsc('Gregor') as Nsc & { geheimesNeuesFeld?: string };
     nsc.geheimesNeuesFeld = 'Streng geheim';
-    const ergebnis = filterFuerSpieler([nsc], stand);
+    const ergebnis = filterFuerSpieler(kampagne, [nsc], stand);
     expect(JSON.stringify(ergebnis)).not.toContain('Streng geheim');
   });
 
   it('nullt Verknüpfungen auf nicht exportierte Entitäten', () => {
     const geheimerOrt = besuchterOrt('Geheime Gruft', { besucht: false });
     const nsc = getroffenerNsc('Gregor', { ortId: geheimerOrt.id });
-    const ergebnis = filterFuerSpieler([nsc, geheimerOrt], stand);
+    const ergebnis = filterFuerSpieler(kampagne, [nsc, geheimerOrt], stand);
     expect(ergebnis.entitaeten).toHaveLength(1);
     expect((ergebnis.entitaeten[0] as Nsc).ortId).toBeNull();
     expect(JSON.stringify(ergebnis)).not.toContain('geheime-gruft');
@@ -127,20 +137,28 @@ describe('filterFuerSpieler (Whitelist)', () => {
   it('behält gültige Verknüpfungen zwischen exportierten Entitäten', () => {
     const ort = besuchterOrt('Dorfplatz');
     const nsc = getroffenerNsc('Gregor', { ortId: ort.id });
-    const ergebnis = filterFuerSpieler([nsc, ort], stand);
+    const ergebnis = filterFuerSpieler(kampagne, [nsc, ort], stand);
     const exportierterNsc = ergebnis.entitaeten.find((e) => e.typ === 'nsc') as Nsc;
     expect(exportierterNsc.ortId).toBe(ort.id);
   });
 
-  it('exportiert vom Kampagnenstand nur die Whitelist-Felder', () => {
-    const ergebnis = filterFuerSpieler([], stand);
+  it('exportiert vom Kampagnenstand nur die Whitelist-Felder (keine Eskalation)', () => {
+    const ergebnis = filterFuerSpieler(kampagne, [], stand);
     expect(ergebnis.kampagnenstand).toEqual({
       partyLevel: stand.partyLevel,
       ingameTag: stand.ingameTag,
       ingameDatumText: stand.ingameDatumText,
     });
-    const json = JSON.stringify(ergebnis.kampagnenstand);
-    expect(json).not.toContain('ireenasBisse');
-    expect(json).not.toContain('strahdEskalation');
+    const json = JSON.stringify(ergebnis);
+    expect(json).not.toContain('eskalation');
+    expect(json).not.toContain('Geheimplan');
+  });
+
+  it('exportiert von der Kampagne nur Name und Beschreibung', () => {
+    const ergebnis = filterFuerSpieler(kampagne, [], stand);
+    expect(ergebnis.kampagne).toEqual({
+      name: 'Testkampagne',
+      beschreibung: 'Eine Kampagne für Tests',
+    });
   });
 });

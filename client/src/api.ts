@@ -1,26 +1,32 @@
 /**
  * API-Schicht mit zwei Betriebsmodi:
- *  - DM-Modus (Standard): spricht die REST-API des lokalen Servers an.
+ *  - DM-Modus (Standard): spricht die kampagnen-bezogene REST-API des
+ *    lokalen Servers an (/api/kampagnen/:kid/…).
  *  - Spieler-Modus (vite build --mode player): lädt ein statisches,
- *    bereits spoiler-gefiltertes player-data.json; Schreiben ist unmöglich.
+ *    bereits spoiler-gefiltertes player-data.json mit genau EINER
+ *    Kampagne; Schreiben ist unmöglich.
  */
 import type {
   Entitaet,
   EntityTyp,
+  Kampagne,
   Kampagnenstand,
-  StrahdTracker,
-  TarokkaLesung,
-} from '@ravenloft/shared';
-import { DEFAULT_KAMPAGNENSTAND, DEFAULT_STRAHD_TRACKER, DEFAULT_TAROKKA } from '@ravenloft/shared';
+  Lesung,
+  WidersacherTracker,
+} from '@grimoire/shared';
+import { DEFAULT_KAMPAGNENSTAND, DEFAULT_LESUNG, DEFAULT_WIDERSACHER } from '@grimoire/shared';
 
 /** true, wenn dieser Build der read-only Spieler-Build ist. */
 export const IST_SPIELER_MODUS = import.meta.env.MODE === 'player';
 
-export interface AlleDaten {
+/** Kennung der Spieler-Kampagne im Store (es gibt im Spieler-Build nur eine). */
+export const SPIELER_KAMPAGNE_ID = 'spieler';
+
+export interface KampagnenDaten {
   entitaeten: Entitaet[];
   kampagnenstand: Kampagnenstand;
-  strahdTracker: StrahdTracker;
-  tarokka: TarokkaLesung;
+  widersacher: WidersacherTracker;
+  lesung: Lesung;
 }
 
 async function pruefe(antwort: Response): Promise<Response> {
@@ -37,31 +43,89 @@ async function pruefe(antwort: Response): Promise<Response> {
   return antwort;
 }
 
-/** Lädt den kompletten Datenbestand (DM: API, Spieler: statisches JSON). */
-export async function ladeAlles(): Promise<AlleDaten> {
+/** Liste aller Kampagnen (Spieler-Modus: genau eine, aus dem statischen JSON). */
+export async function ladeKampagnen(): Promise<Kampagne[]> {
+  if (IST_SPIELER_MODUS) {
+    const daten = await ladeSpielerDaten();
+    return [
+      {
+        id: SPIELER_KAMPAGNE_ID,
+        name: daten.kampagne?.name ?? 'Kampagne',
+        beschreibung: daten.kampagne?.beschreibung ?? '',
+        erstellt: '',
+      },
+    ];
+  }
+  const antwort = await pruefe(await fetch('/api/kampagnen'));
+  return antwort.json();
+}
+
+export async function erstelleKampagne(name: string, beschreibung: string): Promise<Kampagne> {
+  const antwort = await pruefe(
+    await fetch('/api/kampagnen', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, beschreibung }),
+    }),
+  );
+  return antwort.json();
+}
+
+export async function aktualisiereKampagne(
+  kid: string,
+  aenderung: { name?: string; beschreibung?: string },
+): Promise<Kampagne> {
+  const antwort = await pruefe(
+    await fetch(`/api/kampagnen/${kid}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(aenderung),
+    }),
+  );
+  return antwort.json();
+}
+
+/** Struktur des von scripts/build-player.ts erzeugten player-data.json. */
+interface SpielerJson {
+  kampagne?: { name?: string; beschreibung?: string };
+  entitaeten?: Entitaet[];
+  kampagnenstand?: Partial<Kampagnenstand>;
+}
+
+/** Das statische Spieler-JSON wird nur einmal geladen und dann gecacht. */
+let spielerDatenCache: Promise<SpielerJson> | null = null;
+function ladeSpielerDaten(): Promise<SpielerJson> {
+  spielerDatenCache ??= fetch(`${import.meta.env.BASE_URL}player-data.json`)
+    .then(pruefe)
+    .then((antwort) => antwort.json());
+  return spielerDatenCache;
+}
+
+/** Lädt den kompletten Datenbestand einer Kampagne. */
+export async function ladeAlles(kid: string): Promise<KampagnenDaten> {
   if (IST_SPIELER_MODUS) {
     // BASE_URL berücksichtigt den relativen Base-Path für GitHub Pages.
-    const antwort = await pruefe(await fetch(`${import.meta.env.BASE_URL}player-data.json`));
-    const daten = await antwort.json();
+    const daten = await ladeSpielerDaten();
     return {
-      entitaeten: daten.entitaeten,
+      entitaeten: daten.entitaeten ?? [],
       // Spieler-Daten enthalten nur die Whitelist-Felder; der Rest wird mit
       // neutralen Defaults aufgefüllt, damit die UI-Typen stimmen.
       kampagnenstand: { ...DEFAULT_KAMPAGNENSTAND, ...daten.kampagnenstand },
-      strahdTracker: DEFAULT_STRAHD_TRACKER,
-      tarokka: DEFAULT_TAROKKA,
+      widersacher: DEFAULT_WIDERSACHER,
+      lesung: DEFAULT_LESUNG,
     };
   }
-  const antwort = await pruefe(await fetch('/api/alles'));
+  const antwort = await pruefe(await fetch(`/api/kampagnen/${kid}/alles`));
   return antwort.json();
 }
 
 export async function erstelleEntitaet(
+  kid: string,
   typ: EntityTyp,
   daten: Partial<Entitaet> & { name: string },
 ): Promise<Entitaet> {
   const antwort = await pruefe(
-    await fetch(`/api/entitaeten/${typ}`, {
+    await fetch(`/api/kampagnen/${kid}/entitaeten/${typ}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(daten),
@@ -71,12 +135,13 @@ export async function erstelleEntitaet(
 }
 
 export async function aktualisiereEntitaet(
+  kid: string,
   typ: EntityTyp,
   id: string,
   daten: Partial<Entitaet>,
 ): Promise<Entitaet> {
   const antwort = await pruefe(
-    await fetch(`/api/entitaeten/${typ}/${id}`, {
+    await fetch(`/api/kampagnen/${kid}/entitaeten/${typ}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(daten),
@@ -85,13 +150,16 @@ export async function aktualisiereEntitaet(
   return antwort.json();
 }
 
-export async function loescheEntitaet(typ: EntityTyp, id: string): Promise<void> {
-  await pruefe(await fetch(`/api/entitaeten/${typ}/${id}`, { method: 'DELETE' }));
+export async function loescheEntitaet(kid: string, typ: EntityTyp, id: string): Promise<void> {
+  await pruefe(await fetch(`/api/kampagnen/${kid}/entitaeten/${typ}/${id}`, { method: 'DELETE' }));
 }
 
-export async function speichereKampagnenstand(stand: Kampagnenstand): Promise<Kampagnenstand> {
+export async function speichereKampagnenstand(
+  kid: string,
+  stand: Kampagnenstand,
+): Promise<Kampagnenstand> {
   const antwort = await pruefe(
-    await fetch('/api/kampagnenstand', {
+    await fetch(`/api/kampagnen/${kid}/kampagnenstand`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(stand),
@@ -100,9 +168,12 @@ export async function speichereKampagnenstand(stand: Kampagnenstand): Promise<Ka
   return antwort.json();
 }
 
-export async function speichereStrahdTracker(tracker: StrahdTracker): Promise<StrahdTracker> {
+export async function speichereWidersacher(
+  kid: string,
+  tracker: WidersacherTracker,
+): Promise<WidersacherTracker> {
   const antwort = await pruefe(
-    await fetch('/api/strahd-tracker', {
+    await fetch(`/api/kampagnen/${kid}/widersacher`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(tracker),
@@ -111,9 +182,9 @@ export async function speichereStrahdTracker(tracker: StrahdTracker): Promise<St
   return antwort.json();
 }
 
-export async function speichereTarokka(lesung: TarokkaLesung): Promise<TarokkaLesung> {
+export async function speichereLesung(kid: string, lesung: Lesung): Promise<Lesung> {
   const antwort = await pruefe(
-    await fetch('/api/tarokka', {
+    await fetch(`/api/kampagnen/${kid}/lesung`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(lesung),

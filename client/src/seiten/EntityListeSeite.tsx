@@ -7,8 +7,8 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Columns3, LayoutGrid, Plus, Table2 } from 'lucide-react';
-import type { Entitaet, Session } from '@ravenloft/shared';
-import { fuzzyFilter, type EntityConfig, configVonRoute } from '@ravenloft/shared';
+import type { Entitaet, Session } from '@grimoire/shared';
+import { fuzzyFilter, type EntityConfig, configVonRoute } from '@grimoire/shared';
 import { IST_SPIELER_MODUS } from '../api';
 import { formatDatum, pfadFuer } from '../hilfen';
 import { useStore } from '../store';
@@ -114,6 +114,25 @@ function Liste({ config }: { config: EntityConfig }) {
                   {o}
                 </option>
               ))}
+            {/* 'werte': Optionen sind die tatsächlich vorkommenden Werte
+                des Feldes (z. B. die Regionen dieser Kampagne). */}
+            {filter.art === 'werte' &&
+              [
+                ...new Set(
+                  entitaeten
+                    .filter((e) => e.typ === config.typ)
+                    .map((e) =>
+                      String((e as unknown as Record<string, unknown>)[filter.feld] ?? ''),
+                    )
+                    .filter(Boolean),
+                ),
+              ]
+                .sort((a, b) => a.localeCompare(b, 'de'))
+                .map((wert) => (
+                  <option key={wert} value={wert}>
+                    {wert}
+                  </option>
+                ))}
             {filter.art === 'ref' &&
               entitaeten
                 .filter((e) => filter.refTypen?.includes(e.typ))

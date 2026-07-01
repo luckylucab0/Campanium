@@ -1,46 +1,80 @@
 /**
- * Spieler-Build: erzeugt die statische, read-only Spieler-Version.
+ * Spieler-Build: erzeugt die statische, read-only Spieler-Version für
+ * genau EINE Kampagne.
  *
  * Ablauf:
- *  1. data/ einlesen (Entitäten + Kampagnenstand), gegen die Zod-Schemas
- *     validieren – kaputte Dateien brechen den Build ab.
- *  2. Spoiler-Filter anwenden (shared/playerFilter.ts, Whitelist-Prinzip).
- *  3. Paranoia-Prüfung: Das Ergebnis darf keine *Dm-Schlüssel, keine
+ *  1. Kampagne wählen: KAMPAGNE=<id> (Ordnername unter data/); gibt es nur
+ *     eine Kampagne, wird sie automatisch genommen.
+ *  2. Daten einlesen und gegen die Zod-Schemas validieren – kaputte
+ *     Dateien brechen den Build ab.
+ *  3. Spoiler-Filter anwenden (shared/playerFilter.ts, Whitelist-Prinzip).
+ *  4. Paranoia-Prüfung: Das Ergebnis darf keine *Dm-Schlüssel, keine
  *     dmOnly-Entitäten und keine DM-only-Typen enthalten – sonst Abbruch.
- *  4. Gefilterte Daten nach client/public/player-data.json schreiben und
+ *  5. Gefilterte Daten nach client/public/player-data.json schreiben und
  *     den Client mit --mode player und relativem Base-Path bauen
  *     (GitHub-Pages-tauglich). Ergebnis: client/dist-player/.
  *
- * Aufruf:  npm run build:player   (Datenordner via DATA_DIR überschreibbar)
+ * Aufruf:  npm run build:player            (eine Kampagne in data/)
+ *          KAMPAGNE=curse-of-strahd npm run build:player
+ *          DATA_DIR=data.example KAMPAGNE=curse-of-strahd npm run build:player
  */
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  DEFAULT_KAMPAGNENSTAND,
   ENTITY_TYPEN,
   filterFuerSpieler,
+  kampagneSchema,
   kampagnenstandSchema,
-  DEFAULT_KAMPAGNENSTAND,
   validiereEntitaet,
   type Entitaet,
+  type Kampagne,
   type Kampagnenstand,
-} from '@ravenloft/shared';
+} from '@grimoire/shared';
 
 const wurzel = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const datenOrdner = process.env.DATA_DIR ?? path.join(wurzel, 'data');
+const datenWurzel = process.env.DATA_DIR ?? path.join(wurzel, 'data');
 
-// ---- Schritt 1: Daten laden & validieren ----------------------------------
+// ---- Schritt 1: Kampagne wählen --------------------------------------------
 
-if (!fs.existsSync(datenOrdner)) {
-  console.error(`✗ Datenordner nicht gefunden: ${datenOrdner}`);
+if (!fs.existsSync(datenWurzel)) {
+  console.error(`✗ Datenordner nicht gefunden: ${datenWurzel}`);
   console.error('  Tipp: npm run seed kopiert die Beispieldaten nach data/.');
   process.exit(1);
 }
 
+const kampagnenIds = fs
+  .readdirSync(datenWurzel, { withFileTypes: true })
+  .filter((e) => e.isDirectory() && fs.existsSync(path.join(datenWurzel, e.name, 'kampagne.json')))
+  .map((e) => e.name);
+
+if (kampagnenIds.length === 0) {
+  console.error(`✗ Keine Kampagne in ${datenWurzel} gefunden (kein Ordner mit kampagne.json).`);
+  process.exit(1);
+}
+
+const gewaehlt = process.env.KAMPAGNE ?? (kampagnenIds.length === 1 ? kampagnenIds[0] : null);
+if (!gewaehlt || !kampagnenIds.includes(gewaehlt)) {
+  console.error(
+    `✗ Mehrere Kampagnen gefunden – bitte eine wählen: KAMPAGNE=<id> npm run build:player`,
+  );
+  console.error(`  Verfügbar: ${kampagnenIds.join(', ')}`);
+  process.exit(1);
+}
+
+const kampagnenOrdner = path.join(datenWurzel, gewaehlt);
+
+// ---- Schritt 2: Daten laden & validieren ------------------------------------
+
+const kampagne: Kampagne = kampagneSchema.parse(
+  JSON.parse(fs.readFileSync(path.join(kampagnenOrdner, 'kampagne.json'), 'utf-8')),
+);
+
 const entitaeten: Entitaet[] = [];
 for (const typ of ENTITY_TYPEN) {
-  const ordner = path.join(datenOrdner, typ);
+  const ordner = path.join(kampagnenOrdner, typ);
   if (!fs.existsSync(ordner)) continue;
   for (const datei of fs.readdirSync(ordner).filter((d) => d.endsWith('.json'))) {
     const voll = path.join(ordner, datei);
@@ -50,19 +84,19 @@ for (const typ of ENTITY_TYPEN) {
   }
 }
 
-const standDatei = path.join(datenOrdner, 'kampagnenstand.json');
+const standDatei = path.join(kampagnenOrdner, 'kampagnenstand.json');
 const kampagnenstand: Kampagnenstand = fs.existsSync(standDatei)
   ? kampagnenstandSchema.parse(JSON.parse(fs.readFileSync(standDatei, 'utf-8')))
   : DEFAULT_KAMPAGNENSTAND;
 
-console.log(`→ ${entitaeten.length} Entitäten geladen aus ${datenOrdner}`);
+console.log(`→ Kampagne „${kampagne.name}“: ${entitaeten.length} Entitäten geladen`);
 
-// ---- Schritt 2: Spoiler-Filter ---------------------------------------------
+// ---- Schritt 3: Spoiler-Filter -----------------------------------------------
 
-const spielerDaten = filterFuerSpieler(entitaeten, kampagnenstand);
+const spielerDaten = filterFuerSpieler(kampagne, entitaeten, kampagnenstand);
 console.log(`→ ${spielerDaten.entitaeten.length} Entitäten sind spielersicher`);
 
-// ---- Schritt 3: Paranoia-Prüfung -------------------------------------------
+// ---- Schritt 4: Paranoia-Prüfung ---------------------------------------------
 
 const json = JSON.stringify(spielerDaten, null, 2);
 const dmSchluessel = json.match(/"[a-zA-Z]+Dm"\s*:/g);
@@ -76,7 +110,7 @@ if (spielerDaten.entitaeten.some((e) => e.dmOnly || e.typ === 'sessionPrep')) {
 }
 console.log('→ Paranoia-Prüfung bestanden: keine DM-Inhalte im Export');
 
-// ---- Schritt 4: Schreiben & Client bauen -----------------------------------
+// ---- Schritt 5: Schreiben & Client bauen -------------------------------------
 
 const zielJson = path.join(wurzel, 'client', 'public', 'player-data.json');
 fs.mkdirSync(path.dirname(zielJson), { recursive: true });
@@ -89,6 +123,6 @@ execSync('npx vite build --mode player --base ./ --outDir dist-player', {
 });
 
 console.log('');
-console.log('✓ Spieler-Build fertig: client/dist-player/');
+console.log(`✓ Spieler-Build fertig: client/dist-player/ (Kampagne „${kampagne.name}“)`);
 console.log('  Lokal testen:  npx vite preview --outDir dist-player  (im Ordner client/)');
 console.log('  Deploy: Inhalt von client/dist-player/ auf GitHub Pages veröffentlichen.');
