@@ -7,8 +7,8 @@
 import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Castle, Minus, Pencil, Plus, Sparkles, Tent, Trash2 } from 'lucide-react';
-import type { Entitaet, Nsc, Quest, Session } from '@grimoire/shared';
-import { slugify } from '@grimoire/shared';
+import type { Entitaet, Nsc, Quest, Session } from '@campanium/shared';
+import { slugify } from '@campanium/shared';
 import { IST_SPIELER_MODUS } from '../api';
 import { formatDatum, pfadFuer } from '../hilfen';
 import { useStore } from '../store';

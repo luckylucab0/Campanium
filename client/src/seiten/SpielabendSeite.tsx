@@ -6,8 +6,8 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Tent } from 'lucide-react';
-import type { Notiz, SessionPrep } from '@grimoire/shared';
-import { entityConfigs, sammleLinkZiele } from '@grimoire/shared';
+import type { Notiz, SessionPrep } from '@campanium/shared';
+import { entityConfigs, sammleLinkZiele } from '@campanium/shared';
 import { pfadFuer } from '../hilfen';
 import { useStore } from '../store';
 import { Badge, DmBadge } from '../komponenten/Badge';

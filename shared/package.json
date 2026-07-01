@@ -1,5 +1,5 @@
 {
-  "name": "@grimoire/shared",
+  "name": "@campanium/shared",
   "version": "1.0.0",
   "private": true,
   "description": "Gemeinsame Typen, Zod-Schemas und Kernlogik (Wikilinks, Spoiler-Filter, Suche) für Client, Server und Skripte.",

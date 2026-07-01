@@ -101,7 +101,7 @@ function ErsteKampagneAnlegen() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
       <Fledermaus size={40} className="mb-4 text-blut-hell" />
-      <h1 className="mb-1 text-2xl">Willkommen im Grimoire</h1>
+      <h1 className="mb-1 text-2xl">Willkommen bei Campanium</h1>
       <p className="mb-6 max-w-md text-center text-sm text-text-schwach">
         Noch keine Kampagne vorhanden. Lege deine erste an – oder kopiere die Beispieldaten mit{' '}
         <code className="rounded bg-flaeche-3 px-1">npm run seed</code>.

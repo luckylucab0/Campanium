@@ -32,7 +32,7 @@ import {
   type Entitaet,
   type Kampagne,
   type Kampagnenstand,
-} from '@grimoire/shared';
+} from '@campanium/shared';
 
 const wurzel = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const datenWurzel = process.env.DATA_DIR ?? path.join(wurzel, 'data');

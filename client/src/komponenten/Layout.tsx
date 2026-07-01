@@ -7,7 +7,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Castle, Home, Menu, Moon, Plus, Search, Sun, Sparkles, Tent, X } from 'lucide-react';
-import { ENTITY_TYPEN, entityConfigs } from '@grimoire/shared';
+import { ENTITY_TYPEN, entityConfigs } from '@campanium/shared';
 import { IST_SPIELER_MODUS } from '../api';
 import { useStore } from '../store';
 import { entityIcon } from './icons';
@@ -60,7 +60,7 @@ export function Layout({ children }: { children: ReactNode }) {
             <Fledermaus size={22} className="text-blut-hell" />
             <div>
               <div className="font-display text-base font-semibold tracking-wide text-text-stark">
-                Grimoire
+                Campanium
               </div>
               <div className="text-[10px] uppercase tracking-[0.25em] text-text-schwach">
                 Kampagnen-Companion
@@ -180,7 +180,7 @@ export function Layout({ children }: { children: ReactNode }) {
           >
             {menueOffen ? <X size={18} /> : <Menu size={18} />}
           </button>
-          <span className="font-display text-text-stark">Grimoire</span>
+          <span className="font-display text-text-stark">Campanium</span>
         </header>
         <main className="relative mx-auto max-w-6xl px-4 py-6 lg:px-8">{children}</main>
       </div>

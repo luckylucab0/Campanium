@@ -1,4 +1,4 @@
-# 🦇 Grimoire
+# 🦇 Campanium
 
 A self-hosted **campaign management tool for D&D** (and similar tabletop RPGs), built to replace an Obsidian vault with something purpose-made: **multiple campaigns with an in-app switcher**, linked entities, spoiler-safe player exports, and a dashboard with the trackers that matter at your table.
 

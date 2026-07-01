@@ -18,7 +18,7 @@ let datenOrdner: string;
 let kid: string;
 
 beforeAll(async () => {
-  datenOrdner = fs.mkdtempSync(path.join(os.tmpdir(), 'grimoire-test-'));
+  datenOrdner = fs.mkdtempSync(path.join(os.tmpdir(), 'campanium-test-'));
   const verwaltung = new KampagnenVerwaltung(datenOrdner);
   verwaltung.laden();
   const app = erstelleApp(verwaltung);
