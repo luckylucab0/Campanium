@@ -1,5 +1,5 @@
 {
-  "name": "@ravenloft/server",
+  "name": "@grimoire/server",
   "version": "1.0.0",
   "private": true,
   "description": "Lokaler API-Server für den DM-Modus: REST-CRUD über JSON-Dateien in data/.",
@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ravenloft/shared": "*",
+    "@grimoire/shared": "*",
     "express": "^4.21.0",
     "zod": "^3.24.0"
   },

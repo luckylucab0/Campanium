@@ -5,7 +5,7 @@
  */
 import { Link } from 'react-router-dom';
 import { BookOpen, ClipboardList, Plus } from 'lucide-react';
-import type { Session, SessionPrep } from '@ravenloft/shared';
+import type { Session, SessionPrep } from '@grimoire/shared';
 import { IST_SPIELER_MODUS } from '../api';
 import { formatDatum, pfadFuer } from '../hilfen';
 import { useStore } from '../store';

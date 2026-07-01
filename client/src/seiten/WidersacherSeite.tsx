@@ -1,43 +1,44 @@
 /**
- * Spezialmodul (DM-only): Strahd-Begegnungs-Tracker.
- * Tabelle aller bisherigen Strahd-Auftritte plus abhakbarer Ideen-Vorrat.
+ * Spezialmodul (DM-only): Widersacher-Begegnungs-Tracker.
+ * Protokolliert jeden Auftritt des großen Gegenspielers der Kampagne
+ * (Name frei konfigurierbar) plus abhakbarer Ideen-Vorrat.
  */
 import { Castle, Plus, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import type { Session, StrahdBegegnung, StrahdModus } from '@ravenloft/shared';
-import { STRAHD_MODI } from '@ravenloft/shared';
+import type { Session, WidersacherBegegnung, WidersacherModus } from '@grimoire/shared';
+import { WIDERSACHER_MODI } from '@grimoire/shared';
 import { pfadFuer } from '../hilfen';
 import { useStore } from '../store';
 import { Checkliste } from '../komponenten/Checkliste';
 import { DmBadge } from '../komponenten/Badge';
 import { Trennlinie } from '../komponenten/Ornament';
 
-const MODUS_FARBE: Record<StrahdModus, string> = {
+const MODUS_FARBE: Record<WidersacherModus, string> = {
   Charme: 'text-arkan',
   Drohung: 'text-gold-hell',
   Gewalt: 'text-rot',
 };
 
-export function StrahdSeite() {
-  const { strahdTracker, setzeStrahdTracker, entitaeten } = useStore();
+export function WidersacherSeite() {
+  const { widersacher, setzeWidersacher, entitaeten } = useStore();
   const sessions = entitaeten.filter((e): e is Session => e.typ === 'session');
 
-  const setzeBegegnung = (index: number, aenderung: Partial<StrahdBegegnung>) => {
-    void setzeStrahdTracker({
-      ...strahdTracker,
-      begegnungen: strahdTracker.begegnungen.map((b, i) =>
+  const setzeBegegnung = (index: number, aenderung: Partial<WidersacherBegegnung>) => {
+    void setzeWidersacher({
+      ...widersacher,
+      begegnungen: widersacher.begegnungen.map((b, i) =>
         i === index ? { ...b, ...aenderung } : b,
       ),
     });
   };
 
   const neueBegegnung = () => {
-    void setzeStrahdTracker({
-      ...strahdTracker,
+    void setzeWidersacher({
+      ...widersacher,
       begegnungen: [
-        ...strahdTracker.begegnungen,
+        ...widersacher.begegnungen,
         {
-          nr: strahdTracker.begegnungen.length + 1,
+          nr: widersacher.begegnungen.length + 1,
           sessionNr: null,
           ort: '',
           modus: 'Charme',
@@ -55,10 +56,18 @@ export function StrahdSeite() {
   return (
     <div>
       <h1 className="mb-1 flex items-center gap-2.5 text-2xl">
-        <Castle size={22} className="text-blut-hell" aria-hidden /> Strahd-Begegnungen <DmBadge />
+        <Castle size={22} className="text-blut-hell" aria-hidden />
+        <input
+          className="min-w-0 border-b border-transparent bg-transparent font-display text-2xl text-text-stark hover:border-rand focus:border-gold focus:outline-none"
+          value={widersacher.name}
+          placeholder="Name des Widersachers …"
+          onChange={(e) => void setzeWidersacher({ ...widersacher, name: e.target.value })}
+          aria-label="Name des Widersachers"
+        />
+        <DmBadge />
       </h1>
       <p className="mb-6 text-sm text-text-schwach">
-        Jeder Auftritt des Grafen – damit er berechenbar unberechenbar bleibt.
+        Jeder Auftritt des großen Gegenspielers – damit er berechenbar unberechenbar bleibt.
       </p>
 
       <div className="karte overflow-x-auto">
@@ -70,8 +79,8 @@ export function StrahdSeite() {
                 'Session',
                 'Ort',
                 'Modus',
-                'Was er wollte',
-                'Was er bekam',
+                'Was er/sie wollte',
+                'Was er/sie bekam',
                 'Folgen',
                 '',
               ].map((titel, i) => (
@@ -85,7 +94,7 @@ export function StrahdSeite() {
             </tr>
           </thead>
           <tbody>
-            {strahdTracker.begegnungen.map((b, i) => {
+            {widersacher.begegnungen.map((b, i) => {
               const session = sessions.find((s) => s.nummer === b.sessionNr);
               return (
                 <tr key={i} className="border-b border-rand/50 align-top">
@@ -128,10 +137,12 @@ export function StrahdSeite() {
                     <select
                       className={`rounded border border-transparent bg-transparent px-1 py-1 text-sm hover:border-rand ${MODUS_FARBE[b.modus]}`}
                       value={b.modus}
-                      onChange={(e) => setzeBegegnung(i, { modus: e.target.value as StrahdModus })}
+                      onChange={(e) =>
+                        setzeBegegnung(i, { modus: e.target.value as WidersacherModus })
+                      }
                       aria-label="Modus"
                     >
-                      {STRAHD_MODI.map((m) => (
+                      {WIDERSACHER_MODI.map((m) => (
                         <option key={m} value={m}>
                           {m}
                         </option>
@@ -143,7 +154,7 @@ export function StrahdSeite() {
                       className={zelle}
                       value={b.wollte}
                       onChange={(e) => setzeBegegnung(i, { wollte: e.target.value })}
-                      aria-label="Was er wollte"
+                      aria-label="Was er/sie wollte"
                     />
                   </td>
                   <td className="px-2 py-1.5">
@@ -151,7 +162,7 @@ export function StrahdSeite() {
                       className={zelle}
                       value={b.bekam}
                       onChange={(e) => setzeBegegnung(i, { bekam: e.target.value })}
-                      aria-label="Was er bekam"
+                      aria-label="Was er/sie bekam"
                     />
                   </td>
                   <td className="px-2 py-1.5">
@@ -167,9 +178,9 @@ export function StrahdSeite() {
                       className="text-text-schwach hover:text-rot"
                       aria-label={`Begegnung ${b.nr} löschen`}
                       onClick={() =>
-                        void setzeStrahdTracker({
-                          ...strahdTracker,
-                          begegnungen: strahdTracker.begegnungen
+                        void setzeWidersacher({
+                          ...widersacher,
+                          begegnungen: widersacher.begegnungen
                             .filter((_, j) => j !== i)
                             .map((rest, j) => ({ ...rest, nr: j + 1 })),
                         })
@@ -183,9 +194,9 @@ export function StrahdSeite() {
             })}
           </tbody>
         </table>
-        {strahdTracker.begegnungen.length === 0 && (
+        {widersacher.begegnungen.length === 0 && (
           <p className="px-4 py-6 text-center text-sm text-text-schwach">
-            Noch keine Begegnung – der Graf lässt auf sich warten.
+            Noch keine Begegnung – {widersacher.name || 'der Widersacher'} lässt auf sich warten.
           </p>
         )}
       </div>
@@ -204,8 +215,8 @@ export function StrahdSeite() {
       </p>
       <div className="karte karte-ornament max-w-2xl p-4">
         <Checkliste
-          eintraege={strahdTracker.ideen}
-          onChange={(ideen) => void setzeStrahdTracker({ ...strahdTracker, ideen })}
+          eintraege={widersacher.ideen}
+          onChange={(ideen) => void setzeWidersacher({ ...widersacher, ideen })}
           bearbeitbar
         />
       </div>

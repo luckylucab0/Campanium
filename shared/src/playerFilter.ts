@@ -9,7 +9,7 @@
  *
  * Sichtbarkeitsregeln (dokumentiert, siehe auch README):
  *  1. Entitäten mit `dmOnly: true` werden komplett entfernt.
- *  2. Session-Preps sowie die Spezialmodule (Strahd-Tracker, Tarokka)
+ *  2. Session-Preps sowie die Spezialmodule (Widersacher-Tracker, Lesung)
  *     werden nie exportiert.
  *  3. Orte erscheinen nur, wenn `besucht: true`.
  *  4. NSCs erscheinen nur, wenn die Party sie nachweislich getroffen hat:
@@ -20,7 +20,7 @@
  *     auf null gesetzt, damit der Spieler-Build keine toten IDs enthält,
  *     deren Slug bereits Namen verraten könnte.
  */
-import type { Entitaet, EntityTyp, Kampagnenstand } from './types';
+import type { Entitaet, EntityTyp, Kampagne, Kampagnenstand } from './types';
 
 /** Basisfelder, die für jede exportierte Entität spielersicher sind. */
 const BASIS_WHITELIST = [
@@ -69,14 +69,21 @@ const FELD_WHITELIST: Partial<Record<EntityTyp, readonly string[]>> = {
   notiz: ['inhalt'],
 };
 
-/** Spielersichere Felder des Kampagnenstands (bewusst ohne Strahd-Interna). */
+/** Spielersichere Felder des Kampagnenstands (bewusst ohne Eskalations-Interna). */
 const KAMPAGNENSTAND_WHITELIST = ['partyLevel', 'ingameTag', 'ingameDatumText'] as const;
+
+/** Spielersichere Felder des Kampagnen-Manifests (bewusst ohne interne IDs/Daten). */
+const KAMPAGNE_WHITELIST = ['name', 'beschreibung'] as const;
 
 /** Gefilterter Kampagnenstand für Spieler. */
 export type PlayerKampagnenstand = Pick<Kampagnenstand, (typeof KAMPAGNENSTAND_WHITELIST)[number]>;
 
-/** Das komplette Datenpaket des Spieler-Builds. */
+/** Gefilterte Kampagnen-Metadaten für Spieler. */
+export type PlayerKampagne = Pick<Kampagne, (typeof KAMPAGNE_WHITELIST)[number]>;
+
+/** Das komplette Datenpaket des Spieler-Builds (immer genau EINE Kampagne). */
 export interface PlayerDaten {
+  kampagne: PlayerKampagne;
   entitaeten: Entitaet[];
   kampagnenstand: PlayerKampagnenstand;
 }
@@ -118,6 +125,7 @@ function bereinigeRefs(e: Entitaet, exportierteIds: ReadonlySet<string>): Entita
  * zum Filtern verwendet – Single Source of Truth.
  */
 export function filterFuerSpieler(
+  kampagne: Kampagne,
   entitaeten: readonly Entitaet[],
   kampagnenstand: Kampagnenstand,
 ): PlayerDaten {
@@ -130,7 +138,13 @@ export function filterFuerSpieler(
     standGefiltert[key] = kampagnenstand[key];
   }
 
+  const kampagneGefiltert: Record<string, unknown> = {};
+  for (const key of KAMPAGNE_WHITELIST) {
+    kampagneGefiltert[key] = kampagne[key];
+  }
+
   return {
+    kampagne: kampagneGefiltert as unknown as PlayerKampagne,
     entitaeten: gefiltert,
     kampagnenstand: standGefiltert as unknown as PlayerKampagnenstand,
   };

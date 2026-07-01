@@ -1,5 +1,5 @@
 {
-  "name": "@ravenloft/client",
+  "name": "@grimoire/client",
   "version": "1.0.0",
   "private": true,
   "description": "React-Frontend des Ravenloft Companion – DM-Modus (mit API) und Spieler-Modus (statisch).",
@@ -15,7 +15,7 @@
     "@fontsource/cinzel": "^5.0.0",
     "@fontsource/cormorant-garamond": "^5.0.0",
     "@fontsource/inter": "^5.0.0",
-    "@ravenloft/shared": "*",
+    "@grimoire/shared": "*",
     "dompurify": "^3.2.0",
     "lucide-react": "^0.510.0",
     "marked": "^15.0.0",

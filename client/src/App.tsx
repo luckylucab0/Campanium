@@ -3,6 +3,7 @@
  * HashRouter statt BrowserRouter, damit der statische Spieler-Build auf
  * GitHub Pages ohne Server-Rewrites funktioniert.
  */
+import { useState } from 'react';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { IST_SPIELER_MODUS } from './api';
 import { useStore, StoreProvider } from './store';
@@ -13,10 +14,10 @@ import { Dashboard } from './seiten/Dashboard';
 import { EntityDetailSeite } from './seiten/EntityDetailSeite';
 import { EntityFormSeite } from './seiten/EntityFormSeite';
 import { EntityListeSeite } from './seiten/EntityListeSeite';
+import { LesungSeite } from './seiten/LesungSeite';
 import { SessionTimelineSeite } from './seiten/SessionTimelineSeite';
 import { SpielabendSeite } from './seiten/SpielabendSeite';
-import { StrahdSeite } from './seiten/StrahdSeite';
-import { TarokkaSeite } from './seiten/TarokkaSeite';
+import { WidersacherSeite } from './seiten/WidersacherSeite';
 
 export default function App() {
   return (
@@ -31,7 +32,7 @@ export default function App() {
 }
 
 function Inhalt() {
-  const { geladen, ladeFehler } = useStore();
+  const { geladen, ladeFehler, kampagne } = useStore();
 
   if (ladeFehler) {
     return (
@@ -54,6 +55,11 @@ function Inhalt() {
     );
   }
 
+  // Noch keine Kampagne vorhanden: Willkommens-/Anlegen-Bildschirm.
+  if (!kampagne) {
+    return <ErsteKampagneAnlegen />;
+  }
+
   return (
     <Layout>
       <Routes>
@@ -63,8 +69,8 @@ function Inhalt() {
         {!IST_SPIELER_MODUS && (
           <>
             <Route path="/spielabend" element={<SpielabendSeite />} />
-            <Route path="/strahd" element={<StrahdSeite />} />
-            <Route path="/tarokka" element={<TarokkaSeite />} />
+            <Route path="/widersacher" element={<WidersacherSeite />} />
+            <Route path="/lesung" element={<LesungSeite />} />
             <Route path="/:route/:id/bearbeiten" element={<EntityFormSeite />} />
           </>
         )}
@@ -73,5 +79,63 @@ function Inhalt() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
+  );
+}
+
+/** Willkommens-Bildschirm, wenn data/ noch keine Kampagne enthält. */
+function ErsteKampagneAnlegen() {
+  const { neueKampagne } = useStore();
+  const [name, setName] = useState('');
+  const [beschreibung, setBeschreibung] = useState('');
+  const [fehler, setFehler] = useState<string | null>(null);
+
+  const anlegen = async () => {
+    if (!name.trim()) return;
+    try {
+      await neueKampagne(name.trim(), beschreibung.trim());
+    } catch (e) {
+      setFehler(e instanceof Error ? e.message : 'Anlegen fehlgeschlagen');
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center px-4">
+      <Fledermaus size={40} className="mb-4 text-blut-hell" />
+      <h1 className="mb-1 text-2xl">Willkommen im Grimoire</h1>
+      <p className="mb-6 max-w-md text-center text-sm text-text-schwach">
+        Noch keine Kampagne vorhanden. Lege deine erste an – oder kopiere die Beispieldaten mit{' '}
+        <code className="rounded bg-flaeche-3 px-1">npm run seed</code>.
+      </p>
+      <div className="karte karte-ornament w-full max-w-md p-5">
+        <label className="mb-1 block text-xs uppercase tracking-wider text-text-schwach">
+          Name der Kampagne
+        </label>
+        <input
+          autoFocus
+          className="mb-3 w-full rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-text-stark"
+          value={name}
+          placeholder="z. B. „Curse of Strahd“"
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && void anlegen()}
+        />
+        <label className="mb-1 block text-xs uppercase tracking-wider text-text-schwach">
+          Untertitel (optional)
+        </label>
+        <input
+          className="mb-4 w-full rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-text-stark"
+          value={beschreibung}
+          placeholder="z. B. „Die Nebel von Barovia haben euch fest im Griff …“"
+          onChange={(e) => setBeschreibung(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && void anlegen()}
+        />
+        {fehler && <p className="mb-3 text-sm text-rot">{fehler}</p>}
+        <button
+          className="w-full rounded bg-blut px-3 py-2 text-sm font-medium text-white hover:bg-blut-hell"
+          onClick={() => void anlegen()}
+        >
+          Kampagne anlegen
+        </button>
+      </div>
+    </div>
   );
 }

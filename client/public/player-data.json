@@ -1,11 +1,18 @@
 {
+  "kampagne": {
+    "name": "Curse of Strahd",
+    "beschreibung": "Die Nebel von Barovia haben euch fest im Griff …"
+  },
   "entitaeten": [
     {
       "id": "gregor-der-kerzenmacher",
       "name": "Gregor der Kerzenmacher",
       "erstellt": "2026-04-20T18:10:00.000Z",
       "geaendert": "2026-05-29T21:00:00.000Z",
-      "tags": ["nebelfurt", "handwerker"],
+      "tags": [
+        "nebelfurt",
+        "handwerker"
+      ],
       "dmOnly": false,
       "kampagnenLog": [
         {
@@ -32,7 +39,10 @@
       "name": "Mara Wachsherz",
       "erstellt": "2026-04-20T18:12:00.000Z",
       "geaendert": "2026-05-29T21:05:00.000Z",
-      "tags": ["nebelfurt", "verbuendete"],
+      "tags": [
+        "nebelfurt",
+        "verbuendete"
+      ],
       "dmOnly": false,
       "kampagnenLog": [
         {
@@ -59,7 +69,9 @@
       "name": "Das Lied im Nebel",
       "erstellt": "2026-05-29T20:00:00.000Z",
       "geaendert": "2026-05-29T20:00:00.000Z",
-      "tags": ["moor"],
+      "tags": [
+        "moor"
+      ],
       "dmOnly": false,
       "kampagnenLog": [],
       "typ": "quest",
@@ -80,7 +92,9 @@
       "name": "Kerzen für die Toten",
       "erstellt": "2026-05-15T19:00:00.000Z",
       "geaendert": "2026-05-29T21:20:00.000Z",
-      "tags": ["nebelfurt"],
+      "tags": [
+        "nebelfurt"
+      ],
       "dmOnly": false,
       "kampagnenLog": [
         {
@@ -118,7 +132,10 @@
       "name": "Nebelfurt",
       "erstellt": "2026-04-20T18:00:00.000Z",
       "geaendert": "2026-05-29T21:10:00.000Z",
-      "tags": ["dorf", "startgebiet"],
+      "tags": [
+        "dorf",
+        "startgebiet"
+      ],
       "dmOnly": false,
       "kampagnenLog": [
         {
@@ -205,7 +222,9 @@
       "name": "Wachslaterne der Wahrheit",
       "erstellt": "2026-04-20T18:30:00.000Z",
       "geaendert": "2026-05-29T21:30:00.000Z",
-      "tags": ["artefakt"],
+      "tags": [
+        "artefakt"
+      ],
       "dmOnly": false,
       "kampagnenLog": [
         {
@@ -225,7 +244,9 @@
       "name": "Zirkel der Kerzenwächter",
       "erstellt": "2026-04-20T18:20:00.000Z",
       "geaendert": "2026-05-29T21:00:00.000Z",
-      "tags": ["nebelfurt"],
+      "tags": [
+        "nebelfurt"
+      ],
       "dmOnly": false,
       "kampagnenLog": [
         {
@@ -244,7 +265,9 @@
       "name": "Hausregeln",
       "erstellt": "2026-04-20T18:40:00.000Z",
       "geaendert": "2026-04-20T18:40:00.000Z",
-      "tags": ["regeln"],
+      "tags": [
+        "regeln"
+      ],
       "dmOnly": false,
       "kampagnenLog": [],
       "typ": "notiz",

@@ -1,0 +1,19 @@
+{
+  "id": "session-1-ankunft-bei-ebbe",
+  "typ": "session",
+  "name": "Ankunft bei Ebbe",
+  "erstellt": "2026-06-08T22:30:00.000Z",
+  "geaendert": "2026-06-08T22:30:00.000Z",
+  "tags": [],
+  "dmOnly": false,
+  "kampagnenLog": [],
+  "nummer": 1,
+  "datum": "2026-06-08",
+  "ingameDatum": "Tag 1–2, ablaufendes Wasser",
+  "zusammenfassung": "Die Party erreicht den [[Hafen von Graukamm]] mit der letzten Fähre vor dem Sturm. [[Kaja Teerhand]] heuert sie noch am Kai an: [[Das Wrack der Salzkrone]] muss vor der Springflut gefunden werden.",
+  "ereignisse": "- Ankunft bei Ebbe, die Kais hängen auf Stelzen in der Luft\n- Kajas Angebot – und ihre Handschuhe, die sie nie auszieht\n- Erster Blick auf die Salzmarschen bei Sonnenuntergang",
+  "nscsGetroffen": "- [[Kaja Teerhand]]",
+  "gegenstaende": "- Anzahlung: 10 Goldstücke",
+  "offeneFaeden": "- Warum zieht Kaja die Handschuhe nie aus?\n- Die Flutuhr tickt: drei Tage bis zur Springflut",
+  "notizenDm": "XP: je 150. Die Flutuhr (Custom-Tracker) jede Session um 1 erhöhen."
+}

@@ -4,7 +4,7 @@
  */
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ENTITY_TYPEN, entityConfigs, type EntityTyp } from '@ravenloft/shared';
+import { ENTITY_TYPEN, entityConfigs, type EntityTyp } from '@grimoire/shared';
 import { IST_SPIELER_MODUS } from '../api';
 import { useStore } from '../store';
 

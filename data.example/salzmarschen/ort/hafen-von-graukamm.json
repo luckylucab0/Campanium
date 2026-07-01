@@ -1,0 +1,19 @@
+{
+  "id": "hafen-von-graukamm",
+  "typ": "ort",
+  "name": "Hafen von Graukamm",
+  "erstellt": "2026-06-01T10:05:00.000Z",
+  "geaendert": "2026-06-08T21:00:00.000Z",
+  "tags": ["hafen", "startgebiet"],
+  "dmOnly": false,
+  "kampagnenLog": [{ "sessionNr": 1, "text": "Ankunft mit der Fähre bei ablaufendem Wasser." }],
+  "region": "Küste",
+  "besucht": true,
+  "empfohlenesLevel": "1–2",
+  "buchSeiteDm": "Homebrew, Skizze im Notizbuch",
+  "was": "Ein Gezeitenhafen, dessen Kais bei Ebbe auf Stelzen in der Luft hängen",
+  "stimmung": "Salz auf den Lippen, kreischende Möwen, Teergeruch und ferner Donner",
+  "bereiche": "- **Fährkontor** – einzige Verbindung zum Festland\n- **Taverne „Zum ersoffenen Anker“** – Treffpunkt von [[Kaja Teerhand]]",
+  "bewohner": "- [[Kaja Teerhand]]",
+  "geheimnisseDm": "Unter dem Fährkontor liegt eine geflutete Schmugglerkammer – die Karte dort zeigt, wo die Springflut das Wrack freilegen wird."
+}

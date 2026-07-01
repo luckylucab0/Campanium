@@ -1,0 +1,22 @@
+{
+  "id": "das-wrack-der-salzkrone",
+  "typ": "quest",
+  "name": "Das Wrack der Salzkrone",
+  "erstellt": "2026-06-08T20:00:00.000Z",
+  "geaendert": "2026-06-08T21:10:00.000Z",
+  "tags": [],
+  "dmOnly": false,
+  "kampagnenLog": [{ "sessionNr": 1, "text": "Von Kaja angenommen – drei Tage bis zur Springflut." }],
+  "status": "aktiv",
+  "questgeberId": "kaja-teerhand",
+  "ortId": "hafen-von-graukamm",
+  "buchSeiteDm": "Homebrew",
+  "auftrag": "Das Wrack der „Salzkrone“ finden, bevor die Springflut es wieder begräbt.",
+  "hintergrundDm": "Im Wrack liegt das Logbuch, das Kajas Meuterei beweist – **sie will es vernichten**, nicht bergen.",
+  "ausgaengeDm": "**Erfolg:** Die Party erreicht das Wrack vor der Flut; Konfrontation mit Kajas Geheimnis.\n\n**Scheitern:** Die Salzgilde birgt das Logbuch zuerst – Kaja verschwindet über Nacht.",
+  "belohnung": "50 Goldstücke, freie Überfahrten auf Lebenszeit – „und mein Wort, das mehr wert ist als beides“.",
+  "fortschritt": [
+    { "text": "Die Gezeitenkarte im Fährkontor einsehen", "erledigt": false },
+    { "text": "Ein Boot für die Marschen auftreiben", "erledigt": false }
+  ]
+}

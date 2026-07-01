@@ -5,8 +5,8 @@
  */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { Quest, QuestStatus } from '@ravenloft/shared';
-import { QUEST_STATUS } from '@ravenloft/shared';
+import type { Quest, QuestStatus } from '@grimoire/shared';
+import { QUEST_STATUS } from '@grimoire/shared';
 import { IST_SPIELER_MODUS } from '../api';
 import { pfadFuer } from '../hilfen';
 import { useStore } from '../store';

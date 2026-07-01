@@ -109,21 +109,11 @@ export interface Quest extends BasisEntitaet {
   fortschritt: ChecklistEintrag[];
 }
 
-export const REGIONEN = [
-  'Dorf Barovia',
-  'Vallaki',
-  'Krezk',
-  'Wildnis & Straßen',
-  'Amber Temple',
-  'Castle Ravenloft',
-  'Sonstiges',
-] as const;
-export type Region = (typeof REGIONEN)[number];
-
 /** Ort / Schauplatz. */
 export interface Ort extends BasisEntitaet {
   typ: 'ort';
-  region: Region;
+  /** Region/Gebiet als Freitext – jede Kampagne hat ihre eigenen Regionen. */
+  region: string;
   besucht: boolean;
   empfohlenesLevel: string;
   buchSeiteDm: string;
@@ -168,7 +158,7 @@ export interface Session extends BasisEntitaet {
   nummer: number;
   /** Reales Datum (ISO yyyy-mm-dd). */
   datum: string;
-  /** In-Game-Datum (Freitext, Barovianischer Kalender). */
+  /** In-Game-Datum (Freitext, Kalender der Spielwelt). */
   ingameDatum: string;
   /** Abschnitt: Zusammenfassung (Markdown). */
   zusammenfassung: string;
@@ -250,8 +240,20 @@ export type Entitaet =
   | Notiz;
 
 // ---------------------------------------------------------------------------
-// Singletons (genau eine Instanz pro Kampagne, eigene Dateien in data/)
+// Kampagnen & Singletons
+// (Jede Kampagne ist ein eigener Ordner in data/ mit einer kampagne.json
+//  als Manifest; die Singletons existieren genau einmal pro Kampagne.)
 // ---------------------------------------------------------------------------
+
+/** Manifest einer Kampagne (data/<id>/kampagne.json). */
+export interface Kampagne {
+  id: string;
+  name: string;
+  /** Untertitel/Tagline, erscheint auf dem Dashboard. */
+  beschreibung: string;
+  /** ISO-Zeitstempel */
+  erstellt: string;
+}
 
 /** Frei erweiterbarer Zähler auf dem Dashboard (z. B. „Heilige Symbole gefunden 1/3"). */
 export interface CustomTracker {
@@ -261,70 +263,82 @@ export interface CustomTracker {
   max: number;
 }
 
-/** Kampagnenstand – das Herzstück des Dashboards. */
+/**
+ * Optionaler Eskalations-Tracker mit frei benennbarem Titel und frei
+ * editierbaren Stufenbeschreibungen (in Curse of Strahd z. B.
+ * „Strahds Eskalation“ mit 5 Stufen).
+ */
+export interface EskalationsTracker {
+  titel: string;
+  /** Aktuelle Stufe, 1-basiert. */
+  stufe: number;
+  /** Beschreibungen der Stufen (Länge = Anzahl Stufen). */
+  stufen: string[];
+}
+
+/** Kampagnenstand – das Herzstück des Dashboards. Ein Singleton pro Kampagne. */
 export interface Kampagnenstand {
   partyLevel: number;
-  /** Tag-Zähler seit Ankunft in Barovia. */
+  /** Tag-Zähler seit Kampagnenbeginn. */
   ingameTag: number;
   /** Freitext, z. B. „3. Tag nach Neumond, nieseliger Morgen". */
   ingameDatumText: string;
-  /** Ireenas Bisse: 0–3. */
-  ireenasBisse: number;
-  /** Strahds Eskalationsstufe: 1–5. */
-  strahdEskalation: number;
-  /** Frei editierbare Beschreibungen der 5 Eskalationsstufen. */
-  eskalationsStufen: [string, string, string, string, string];
+  /** Optionaler Eskalations-Tracker (null = Kampagne nutzt keinen). */
+  eskalation: EskalationsTracker | null;
   customTracker: CustomTracker[];
 }
 
-export const STRAHD_MODI = ['Charme', 'Drohung', 'Gewalt'] as const;
-export type StrahdModus = (typeof STRAHD_MODI)[number];
+export const WIDERSACHER_MODI = ['Charme', 'Drohung', 'Gewalt'] as const;
+export type WidersacherModus = (typeof WIDERSACHER_MODI)[number];
 
-/** Eine Zeile im Strahd-Begegnungs-Tracker. */
-export interface StrahdBegegnung {
+/** Eine Zeile im Widersacher-Begegnungs-Tracker. */
+export interface WidersacherBegegnung {
   nr: number;
   /** Verknüpfte Session-Nummer (null = noch nicht zugeordnet). */
   sessionNr: number | null;
   ort: string;
-  modus: StrahdModus;
+  modus: WidersacherModus;
   wollte: string;
   bekam: string;
   folgen: string;
 }
 
-/** Spezialmodul: Strahd-Begegnungs-Tracker. Komplett DM-only. */
-export interface StrahdTracker {
-  begegnungen: StrahdBegegnung[];
+/**
+ * Spezialmodul: Widersacher-Tracker (DM-only). Protokolliert jeden Auftritt
+ * des großen Gegenspielers der Kampagne – in Curse of Strahd der Graf
+ * selbst, in anderen Kampagnen der jeweilige Erzschurke.
+ */
+export interface WidersacherTracker {
+  /** Name des Widersachers, frei konfigurierbar (z. B. „Strahd von Zarovich“). */
+  name: string;
+  begegnungen: WidersacherBegegnung[];
   /** „Ideen-Vorrat": abhakbare Szenen-Ideen. */
   ideen: ChecklistEintrag[];
 }
 
-export const TAROKKA_KARTEN_STATUS = ['geheim', 'hinweis gegeben', 'von Party entdeckt'] as const;
-export type TarokkaKartenStatus = (typeof TAROKKA_KARTEN_STATUS)[number];
+export const LESUNG_KARTEN_STATUS = ['geheim', 'hinweis gegeben', 'von Party entdeckt'] as const;
+export type LesungKartenStatus = (typeof LESUNG_KARTEN_STATUS)[number];
 
-/** Eine der fünf Karten der Tarokka-Lesung. */
-export interface TarokkaKarte {
-  /** Welcher Aspekt der Lesung (fest vorgegeben, siehe TAROKKA_ASPEKTE). */
+/** Eine Karte/Ein Omen einer Lesung. */
+export interface LesungsKarte {
+  /** Wofür steht diese Karte? (frei editierbar, z. B. „Artefakt: Sonnenschwert“) */
   aspekt: string;
-  /** Name der gezogenen Karte. */
+  /** Name der gezogenen Karte / des Omens. */
   karte: string;
   /** Aufgelöster Ort/NSC als Entitäts-ID (Verknüpfung), null = offen. */
   aufgeloestId: string | null;
   /** Freitext-Auflösung, falls (noch) keine Entität verknüpft ist. */
   aufgeloestText: string;
-  status: TarokkaKartenStatus;
+  status: LesungKartenStatus;
 }
 
-/** Die fünf festen Aspekte der Tarokka-Lesung in Curse of Strahd. */
-export const TAROKKA_ASPEKTE = [
-  'Artefakt: Tome of Strahd',
-  'Artefakt: Heiliges Symbol',
-  'Artefakt: Sonnenschwert',
-  'Verbündeter',
-  'Ort der finalen Konfrontation',
-] as const;
-
-/** Spezialmodul: Tarokka-Lesung. Komplett DM-only. */
-export interface TarokkaLesung {
-  karten: TarokkaKarte[];
+/**
+ * Spezialmodul: Lesung/Prophezeiung (DM-only). Generisches Orakel-Modul –
+ * in Curse of Strahd die Tarokka-Lesung, anderswo Prophezeiungen, Omen
+ * oder Visionen. Titel und Karten sind frei konfigurierbar.
+ */
+export interface Lesung {
+  /** Titel des Moduls, z. B. „Tarokka-Lesung“ oder „Prophezeiung der Salzmutter“. */
+  titel: string;
+  karten: LesungsKarte[];
 }

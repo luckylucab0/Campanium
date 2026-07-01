@@ -1,42 +1,54 @@
 /**
- * Dateibasierter Speicher: eine JSON-Datei pro Entität mit sprechendem
- * Dateinamen (data/<typ>/<id>.json), Singletons als einzelne Dateien.
+ * Dateibasierter Speicher mit Kampagnen als oberster Ebene:
+ *
+ *   data/
+ *     <kampagnen-id>/
+ *       kampagne.json          Manifest (Name, Beschreibung, …)
+ *       kampagnenstand.json    Singleton
+ *       widersacher-tracker.json
+ *       lesung.json
+ *       nsc/<id>.json          eine Datei pro Entität
+ *       quest/<id>.json …
  *
  * Bewusst ohne Datenbank: Die Dateien sind menschenlesbar, lassen sich
  * mit Git versionieren und notfalls von Hand reparieren. Beim Start wird
- * alles in den Speicher geladen; Schreibzugriffe gehen sofort auf die Platte
- * (Write-Through), damit nie Daten verloren gehen.
+ * alles in den Speicher geladen; Schreibzugriffe gehen sofort auf die
+ * Platte (Write-Through), damit nie Daten verloren gehen.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import {
   DEFAULT_KAMPAGNENSTAND,
-  DEFAULT_STRAHD_TRACKER,
-  DEFAULT_TAROKKA,
+  DEFAULT_LESUNG,
+  DEFAULT_WIDERSACHER,
+  eindeutigerSlug,
   ENTITY_TYPEN,
+  kampagneSchema,
+  validiereEntitaet,
   type Entitaet,
   type EntityTyp,
+  type Kampagne,
   type Kampagnenstand,
-  type StrahdTracker,
-  type TarokkaLesung,
-  validiereEntitaet,
-} from '@ravenloft/shared';
+  type Lesung,
+  type WidersacherTracker,
+} from '@grimoire/shared';
 
 const SINGLETON_DATEIEN = {
   kampagnenstand: 'kampagnenstand.json',
-  strahdTracker: 'strahd-tracker.json',
-  tarokka: 'tarokka-lesung.json',
+  widersacher: 'widersacher-tracker.json',
+  lesung: 'lesung.json',
 } as const;
 
+/** Speicher für genau EINE Kampagne (ein Unterordner von data/). */
 export class Storage {
   private entitaeten = new Map<string, Entitaet>();
   kampagnenstand: Kampagnenstand = DEFAULT_KAMPAGNENSTAND;
-  strahdTracker: StrahdTracker = DEFAULT_STRAHD_TRACKER;
-  tarokka: TarokkaLesung = DEFAULT_TAROKKA;
+  widersacher: WidersacherTracker = DEFAULT_WIDERSACHER;
+  lesung: Lesung = DEFAULT_LESUNG;
 
   constructor(public readonly datenOrdner: string) {}
 
-  /** Lädt alle Dateien aus data/ in den Speicher. Legt fehlende Strukturen an. */
+  /** Lädt alle Dateien der Kampagne in den Speicher. */
   laden(): void {
     fs.mkdirSync(this.datenOrdner, { recursive: true });
 
@@ -59,8 +71,8 @@ export class Storage {
     }
 
     this.kampagnenstand = this.ladeSingleton('kampagnenstand', DEFAULT_KAMPAGNENSTAND);
-    this.strahdTracker = this.ladeSingleton('strahdTracker', DEFAULT_STRAHD_TRACKER);
-    this.tarokka = this.ladeSingleton('tarokka', DEFAULT_TAROKKA);
+    this.widersacher = this.ladeSingleton('widersacher', DEFAULT_WIDERSACHER);
+    this.lesung = this.ladeSingleton('lesung', DEFAULT_LESUNG);
   }
 
   private ladeSingleton<T>(schluessel: keyof typeof SINGLETON_DATEIEN, fallback: T): T {
@@ -108,7 +120,7 @@ export class Storage {
 
   speichereSingleton(
     schluessel: keyof typeof SINGLETON_DATEIEN,
-    daten: Kampagnenstand | StrahdTracker | TarokkaLesung,
+    daten: Kampagnenstand | WidersacherTracker | Lesung,
   ): void {
     fs.mkdirSync(this.datenOrdner, { recursive: true });
     fs.writeFileSync(
@@ -118,14 +130,105 @@ export class Storage {
   }
 }
 
-/** Liest Entitäten + Singletons direkt aus einem Ordner (für Build-Skripte). */
-export function ladeDatenOrdner(datenOrdner: string): {
+/**
+ * Verwaltung aller Kampagnen: scannt data/ nach Unterordnern mit
+ * kampagne.json und hält pro Kampagne einen Storage.
+ */
+export class KampagnenVerwaltung {
+  private kampagnen = new Map<string, { kampagne: Kampagne; storage: Storage }>();
+
+  constructor(public readonly datenWurzel: string) {}
+
+  laden(): void {
+    fs.mkdirSync(this.datenWurzel, { recursive: true });
+
+    // Hinweis für Nutzer des alten, kampagnen-losen Layouts (Entitäts-Ordner
+    // direkt in data/): einmalig warnen statt still nichts zu laden.
+    const altesLayout = ENTITY_TYPEN.some((typ) => fs.existsSync(path.join(this.datenWurzel, typ)));
+    if (altesLayout) {
+      console.error(
+        '⚠ data/ nutzt noch das alte Layout ohne Kampagnen-Ordner.\n' +
+          '  Migration: Unterordner anlegen (z. B. data/meine-kampagne/), alle\n' +
+          '  Entitäts-Ordner und Singleton-Dateien hineinschieben und eine\n' +
+          '  kampagne.json ergänzen (siehe data.example/curse-of-strahd/).',
+      );
+    }
+
+    for (const eintrag of fs.readdirSync(this.datenWurzel, { withFileTypes: true })) {
+      if (!eintrag.isDirectory()) continue;
+      const manifestDatei = path.join(this.datenWurzel, eintrag.name, 'kampagne.json');
+      if (!fs.existsSync(manifestDatei)) continue;
+      try {
+        const kampagne = kampagneSchema.parse(
+          JSON.parse(fs.readFileSync(manifestDatei, 'utf-8')),
+        ) as Kampagne;
+        const storage = new Storage(path.join(this.datenWurzel, eintrag.name));
+        storage.laden();
+        this.kampagnen.set(kampagne.id, { kampagne, storage });
+      } catch (fehler) {
+        console.error(`⚠ Kampagne übersprungen (ungültiges Manifest): ${manifestDatei}`, fehler);
+      }
+    }
+  }
+
+  liste(): Kampagne[] {
+    return [...this.kampagnen.values()]
+      .map((k) => k.kampagne)
+      .sort((a, b) => a.name.localeCompare(b.name, 'de'));
+  }
+
+  holen(id: string): { kampagne: Kampagne; storage: Storage } | undefined {
+    return this.kampagnen.get(id);
+  }
+
+  /** Legt eine neue Kampagne an (Ordner + Manifest + leere Singletons). */
+  anlegen(name: string, beschreibung: string): Kampagne {
+    const id = eindeutigerSlug(name, new Set(this.kampagnen.keys()));
+    const kampagne: Kampagne = {
+      id,
+      name,
+      beschreibung,
+      erstellt: new Date().toISOString(),
+    };
+    const ordner = path.join(this.datenWurzel, id);
+    fs.mkdirSync(ordner, { recursive: true });
+    fs.writeFileSync(path.join(ordner, 'kampagne.json'), JSON.stringify(kampagne, null, 2) + '\n');
+    const storage = new Storage(ordner);
+    storage.laden();
+    this.kampagnen.set(id, { kampagne, storage });
+    return kampagne;
+  }
+
+  /** Aktualisiert Name/Beschreibung einer Kampagne (ID bleibt stabil). */
+  aktualisieren(id: string, aenderung: { name?: string; beschreibung?: string }): Kampagne {
+    const eintrag = this.kampagnen.get(id);
+    if (!eintrag) throw new Error(`Kampagne nicht gefunden: ${id}`);
+    const neu: Kampagne = {
+      ...eintrag.kampagne,
+      ...(aenderung.name !== undefined ? { name: aenderung.name } : {}),
+      ...(aenderung.beschreibung !== undefined ? { beschreibung: aenderung.beschreibung } : {}),
+    };
+    fs.writeFileSync(
+      path.join(this.datenWurzel, id, 'kampagne.json'),
+      JSON.stringify(neu, null, 2) + '\n',
+    );
+    this.kampagnen.set(id, { kampagne: neu, storage: eintrag.storage });
+    return neu;
+  }
+}
+
+/** Liest eine einzelne Kampagne direkt aus einem Ordner (für Build-Skripte). */
+export function ladeKampagnenOrdner(ordner: string): {
+  kampagne: Kampagne;
   entitaeten: Entitaet[];
   kampagnenstand: Kampagnenstand;
 } {
-  const storage = new Storage(datenOrdner);
+  const kampagne = kampagneSchema.parse(
+    JSON.parse(fs.readFileSync(path.join(ordner, 'kampagne.json'), 'utf-8')),
+  ) as Kampagne;
+  const storage = new Storage(ordner);
   storage.laden();
-  return { entitaeten: storage.alle(), kampagnenstand: storage.kampagnenstand };
+  return { kampagne, entitaeten: storage.alle(), kampagnenstand: storage.kampagnenstand };
 }
 
 /** Typ-Guard für Routen-Parameter. */

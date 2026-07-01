@@ -4,7 +4,7 @@
  */
 import { useState } from 'react';
 import { Plus, X } from 'lucide-react';
-import type { ChecklistEintrag } from '@ravenloft/shared';
+import type { ChecklistEintrag } from '@grimoire/shared';
 
 interface Props {
   eintraege: ChecklistEintrag[];

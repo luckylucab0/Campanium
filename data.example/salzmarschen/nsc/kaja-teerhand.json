@@ -1,0 +1,23 @@
+{
+  "id": "kaja-teerhand",
+  "typ": "nsc",
+  "name": "Kaja Teerhand",
+  "erstellt": "2026-06-01T10:10:00.000Z",
+  "geaendert": "2026-06-08T21:05:00.000Z",
+  "tags": ["graukamm"],
+  "dmOnly": false,
+  "kampagnenLog": [
+    { "sessionNr": 1, "text": "Bot der Party Arbeit an: das Wrack vor der Springflut finden." }
+  ],
+  "status": "lebendig",
+  "haltung": "freundlich",
+  "ortId": "hafen-von-graukamm",
+  "fraktionId": null,
+  "buchSeiteDm": "Eigener NSC",
+  "wer": "Wettergegerbte Fährfrau mit teerschwarzen Handschuhen, die sie nie auszieht",
+  "will": "Das Wrack der „Salzkrone“ finden, bevor es jemand anderes tut",
+  "statblockRefDm": "Werte wie eine Spionin, kämpft nur zur Not",
+  "beschreibung": "Kaja spricht knapp, zahlt pünktlich und schaut bei jeder Frage kurz aufs Meer, als hole sie sich dort die Erlaubnis zur Antwort.",
+  "weissVerbirgtDm": "Die Handschuhe verbergen **Brandmale der Salzgilde**. Kaja war an Bord der „Salzkrone“, als sie sank – als Meuterin.",
+  "beziehungen": "- Die Party – „meine Leute, solange die Rechnung stimmt“"
+}
