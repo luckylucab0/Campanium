@@ -1,53 +1,39 @@
-Grimoire – Source-Available License
+Grimoire
 Copyright (c) 2026 luckylucab0 (https://github.com/luckylucab0)
 
-Deutsche Zusammenfassung (verbindlich ist der englische Text unten):
-Die Nutzung dieses Programms ist kostenlos – privat wie am Spieltisch.
-Das Kopieren, Weiterverbreiten oder Veröffentlichen des Codes oder
-abgeleiteter Versionen (»Forks«) ist NICHT gestattet. Wer etwas
-verbessern möchte, ist herzlich eingeladen, Änderungen als Pull Request
-an das Original-Repository (https://github.com/luckylucab0/DnD-Tracker)
-zu schicken.
+This work is licensed under the Creative Commons
+Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).
+
+You are free to:
+
+  Share  — copy and redistribute the material in any medium or format
+  Adapt  — remix, transform, and build upon the material
+           (forking this repository is explicitly welcome)
+
+Under the following terms:
+
+  Attribution    — You must give appropriate credit to the original
+                   author (luckylucab0,
+                   https://github.com/luckylucab0/DnD-Tracker), provide
+                   a link to the license, and indicate if changes were
+                   made. You may do so in any reasonable manner, but not
+                   in any way that suggests the author endorses you or
+                   your use.
+
+  NonCommercial  — You may not use the material for commercial purposes.
+
+No additional restrictions — You may not apply legal terms or
+technological measures that legally restrict others from doing anything
+the license permits.
+
+Full legal text:
+https://creativecommons.org/licenses/by-nc/4.0/legalcode
 
 ---
 
-Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software (the "Software"), to:
-
-  1. USE the Software: download, install, run, and privately modify the
-     Software for their own use, at no cost.
-
-  2. CONTRIBUTE: propose changes to the Software exclusively by
-     submitting pull requests or issues to the original repository at
-     https://github.com/luckylucab0/DnD-Tracker. Temporary copies or
-     GitHub forks created for the sole technical purpose of preparing
-     and submitting such a pull request are permitted and must not be
-     used or advertised for any other purpose. By submitting a
-     contribution, the contributor grants the copyright holder a
-     perpetual, worldwide, irrevocable, royalty-free license to use,
-     modify, and distribute the contribution as part of the Software.
-
-The following is NOT permitted without prior written permission from
-the copyright holder:
-
-  - distributing, publishing, sublicensing, or selling copies of the
-    Software or of modified/derived versions ("forks"), in source or
-    binary form, on any platform;
-  - offering the Software, or a service substantially based on it, to
-    third parties, whether free of charge or for payment.
-
-All rights not expressly granted remain with the copyright holder.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-Note: For repositories hosted publicly on GitHub, GitHub's Terms of
-Service grant other GitHub users the technical ability to view and fork
-the repository within GitHub. This license does not grant any rights to
-use, modify, or distribute such forks beyond preparing contributions as
-described above.
+Hinweis (Deutsch): Open Source im Geiste – Nutzen, Forken und
+Weiterentwickeln sind ausdrücklich erlaubt und kostenlos. Bedingungen:
+Es muss auf das Original (luckylucab0,
+https://github.com/luckylucab0/DnD-Tracker) verwiesen werden, und
+kommerzielle Nutzung (Geld verdienen mit dem Tool oder Ablegern davon)
+ist nicht gestattet.
