@@ -1,11 +1,8 @@
 # Contributing
 
-Issues und Pull Requests sind willkommen! Beiträge laufen **ausschließlich
-über Pull Requests an dieses Repository** – dauerhafte öffentliche Forks
-erlaubt die [Lizenz](LICENSE) nicht (ein temporärer GitHub-Fork nur zum
-Vorbereiten eines PRs ist in Ordnung). Mit dem Einreichen eines PRs räumst
-du dem Projektinhaber die in der Lizenz beschriebenen Rechte an deinem
-Beitrag ein.
+Issues und Pull Requests sind willkommen! Das Projekt steht unter
+[CC BY-NC 4.0](LICENSE): Forks und Weiterentwicklungen sind erlaubt,
+solange auf das Original verwiesen wird und niemand Geld damit verdient.
 
 ## Setup
 

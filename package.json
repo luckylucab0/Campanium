@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Lokales D&D-Kampagnen-Tool mit mehreren Kampagnen – DM-Modus mit Server, Spieler-Modus als statischer Build.",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "CC-BY-NC-4.0",
   "type": "module",
   "workspaces": [
     "shared",
