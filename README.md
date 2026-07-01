@@ -111,6 +111,8 @@ This is an unofficial fan-made tool and is **not affiliated with or endorsed by 
 
 ## License
 
-[CC BY-NC 4.0](LICENSE) — forks and adaptations are welcome, **but you must credit the original author** ([luckylucab0](https://github.com/luckylucab0)) and link back to this repository. **Commercial use is not permitted.** Full terms: <https://creativecommons.org/licenses/by-nc/4.0/>
+**Source-available, free to use — no forks.** See [LICENSE](LICENSE) for the full terms:
 
-Contributions welcome, see [CONTRIBUTING.md](CONTRIBUTING.md).
+- Using and privately modifying the tool is **free of charge**.
+- **Redistributing or publishing** the code or derived versions (public forks, mirrors, paid or free) is **not permitted**.
+- Improvements are very welcome — please submit them as **pull requests to this repository** (temporary GitHub forks solely for preparing a PR are fine). See [CONTRIBUTING.md](CONTRIBUTING.md).
