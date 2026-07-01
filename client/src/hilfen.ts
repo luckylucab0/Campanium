@@ -2,8 +2,8 @@
  * Kleine UI-Hilfsfunktionen: Routen-Pfade, Datumsformatierung und die
  * Farbzuordnung für Status-/Haltungs-Badges.
  */
-import type { Entitaet } from '@grimoire/shared';
-import { entityConfigs } from '@grimoire/shared';
+import type { Entitaet } from '@campanium/shared';
+import { entityConfigs } from '@campanium/shared';
 
 /** Detailseiten-Pfad einer Entität, z. B. /nscs/gregor-der-kerzenmacher. */
 export function pfadFuer(e: Pick<Entitaet, 'typ' | 'id'>): string {

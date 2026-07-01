@@ -21,7 +21,7 @@ import {
   neueEntitaet,
   validiereEntitaet,
   widersacherTrackerSchema,
-} from '@grimoire/shared';
+} from '@campanium/shared';
 import { istEntityTyp, KampagnenVerwaltung, type Storage } from './storage';
 
 export function erstelleApp(verwaltung: KampagnenVerwaltung): express.Express {

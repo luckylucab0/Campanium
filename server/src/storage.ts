@@ -31,7 +31,7 @@ import {
   type Kampagnenstand,
   type Lesung,
   type WidersacherTracker,
-} from '@grimoire/shared';
+} from '@campanium/shared';
 
 const SINGLETON_DATEIEN = {
   kampagnenstand: 'kampagnenstand.json',

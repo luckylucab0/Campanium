@@ -29,8 +29,8 @@ import type {
   Kampagnenstand,
   Lesung,
   WidersacherTracker,
-} from '@grimoire/shared';
-import { parseWikilinks } from '@grimoire/shared';
+} from '@campanium/shared';
+import { parseWikilinks } from '@campanium/shared';
 import * as api from './api';
 
 const KAMPAGNE_STORAGE_KEY = 'aktuelleKampagne';

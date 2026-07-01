@@ -13,8 +13,8 @@ import type {
   Kampagnenstand,
   Lesung,
   WidersacherTracker,
-} from '@grimoire/shared';
-import { DEFAULT_KAMPAGNENSTAND, DEFAULT_LESUNG, DEFAULT_WIDERSACHER } from '@grimoire/shared';
+} from '@campanium/shared';
+import { DEFAULT_KAMPAGNENSTAND, DEFAULT_LESUNG, DEFAULT_WIDERSACHER } from '@campanium/shared';
 
 /** true, wenn dieser Build der read-only Spieler-Build ist. */
 export const IST_SPIELER_MODUS = import.meta.env.MODE === 'player';

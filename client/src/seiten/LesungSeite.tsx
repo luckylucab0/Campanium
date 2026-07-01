@@ -7,8 +7,8 @@
  */
 import { Plus, Sparkles, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import type { LesungKartenStatus, LesungsKarte } from '@grimoire/shared';
-import { LESUNG_KARTEN_STATUS } from '@grimoire/shared';
+import type { LesungKartenStatus, LesungsKarte } from '@campanium/shared';
+import { LESUNG_KARTEN_STATUS } from '@campanium/shared';
 import { pfadFuer } from '../hilfen';
 import { useStore } from '../store';
 import { DmBadge } from '../komponenten/Badge';

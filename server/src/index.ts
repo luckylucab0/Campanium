@@ -19,7 +19,7 @@ verwaltung.laden();
 const app = erstelleApp(verwaltung);
 app.listen(port, () => {
   const kampagnen = verwaltung.liste();
-  console.log(`🦇 Grimoire – DM-Server läuft auf http://localhost:${port}`);
+  console.log(`🦇 Campanium – DM-Server läuft auf http://localhost:${port}`);
   console.log(
     `   Datenordner: ${datenOrdner} (${kampagnen.length} Kampagne(n): ${
       kampagnen.map((k) => k.name).join(', ') || '–'

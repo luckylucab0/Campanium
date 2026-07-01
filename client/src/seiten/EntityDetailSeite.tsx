@@ -6,8 +6,8 @@
 import type { ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Pencil } from 'lucide-react';
-import type { ChecklistEintrag, Entitaet, Quest } from '@grimoire/shared';
-import { configVonRoute, entityConfigs, type EntityConfig } from '@grimoire/shared';
+import type { ChecklistEintrag, Entitaet, Quest } from '@campanium/shared';
+import { configVonRoute, entityConfigs, type EntityConfig } from '@campanium/shared';
 import { IST_SPIELER_MODUS } from '../api';
 import { formatDatum, pfadFuer } from '../hilfen';
 import { useStore } from '../store';

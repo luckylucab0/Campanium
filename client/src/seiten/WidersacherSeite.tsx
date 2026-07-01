@@ -5,8 +5,8 @@
  */
 import { Castle, Plus, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import type { Session, WidersacherBegegnung, WidersacherModus } from '@grimoire/shared';
-import { WIDERSACHER_MODI } from '@grimoire/shared';
+import type { Session, WidersacherBegegnung, WidersacherModus } from '@campanium/shared';
+import { WIDERSACHER_MODI } from '@campanium/shared';
 import { pfadFuer } from '../hilfen';
 import { useStore } from '../store';
 import { Checkliste } from '../komponenten/Checkliste';

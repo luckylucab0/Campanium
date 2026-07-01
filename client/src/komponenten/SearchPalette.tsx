@@ -6,8 +6,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
-import type { Entitaet, EntityTyp } from '@grimoire/shared';
-import { entityConfigs, fuzzyScore } from '@grimoire/shared';
+import type { Entitaet, EntityTyp } from '@campanium/shared';
+import { entityConfigs, fuzzyScore } from '@campanium/shared';
 import { pfadFuer } from '../hilfen';
 import { useStore } from '../store';
 import { entityIcon } from './icons';
