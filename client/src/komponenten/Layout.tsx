@@ -12,6 +12,7 @@ import { IST_SPIELER_MODUS } from '../api';
 import { useStore } from '../store';
 import { entityIcon } from './icons';
 import { Fledermaus } from './Ornament';
+import { KiChat } from './KiChat';
 import { SearchPalette } from './SearchPalette';
 import { useUi } from './UiContext';
 
@@ -186,6 +187,7 @@ export function Layout({ children }: { children: ReactNode }) {
       </div>
 
       {sucheOffen && <SearchPalette schliessen={() => setSucheOffen(false)} />}
+      {!IST_SPIELER_MODUS && <KiChat />}
     </div>
   );
 }

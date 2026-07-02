@@ -44,6 +44,8 @@ interface StoreWert {
   kampagne: Kampagne | null;
   /** Wechselt zur Kampagne mit der übergebenen ID und lädt deren Daten. */
   wechsleKampagne: (id: string) => void;
+  /** Lädt die aktive Kampagne still neu (z. B. nach Änderungen durch den KI-Assistenten). */
+  neuLaden: () => Promise<void>;
   neueKampagne: (name: string, beschreibung: string) => Promise<Kampagne>;
   benenneKampagneUm: (aenderung: { name?: string; beschreibung?: string }) => Promise<void>;
   entitaeten: Entitaet[];
@@ -123,6 +125,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     () => kampagnen.find((k) => k.id === aktuelleId) ?? null,
     [kampagnen, aktuelleId],
   );
+
+  const neuLaden = useCallback(async () => {
+    if (!aktuelleId) return;
+    // Bewusst ohne Lade-Zustand: stiller Refresh, die UI bleibt stehen.
+    const daten = await api.ladeAlles(aktuelleId);
+    setEntitaeten(daten.entitaeten);
+    setKampagnenstandState(daten.kampagnenstand);
+    setWidersacherState(daten.widersacher);
+    setLesungState(daten.lesung);
+  }, [aktuelleId]);
 
   const wechsleKampagne = useCallback((id: string) => {
     localStorage.setItem(KAMPAGNE_STORAGE_KEY, id);
@@ -254,6 +266,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     kampagnen,
     kampagne,
     wechsleKampagne,
+    neuLaden,
     neueKampagne,
     benenneKampagneUm,
     entitaeten,
