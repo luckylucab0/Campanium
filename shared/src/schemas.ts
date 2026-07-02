@@ -142,6 +142,20 @@ export const fraktionSchema = basisSchema.extend({
   stand: z.string(),
 });
 
+const kartenPinSchema = z.object({
+  id: z.string().min(1),
+  x: z.number().min(0).max(100),
+  y: z.number().min(0).max(100),
+  ortId: refSchema,
+  beschriftung: z.string(),
+});
+
+export const karteSchema = basisSchema.extend({
+  typ: z.literal('karte'),
+  beschreibung: z.string(),
+  pins: z.array(kartenPinSchema),
+});
+
 export const notizSchema = basisSchema.extend({
   typ: z.literal('notiz'),
   inhalt: z.string(),
@@ -157,6 +171,7 @@ export const entitySchemas: Record<EntityTyp, z.ZodTypeAny> = {
   sessionPrep: sessionPrepSchema,
   gegenstand: gegenstandSchema,
   fraktion: fraktionSchema,
+  karte: karteSchema,
   notiz: notizSchema,
 };
 
@@ -355,6 +370,8 @@ export function neueEntitaet(typ: EntityTyp, id: string, name: string): Entitaet
         mitglieder: '',
         stand: '',
       };
+    case 'karte':
+      return { ...basis, typ, beschreibung: '', pins: [] };
     case 'notiz':
       return { ...basis, typ, inhalt: '' };
   }

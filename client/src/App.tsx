@@ -14,6 +14,7 @@ import { Dashboard } from './seiten/Dashboard';
 import { EntityDetailSeite } from './seiten/EntityDetailSeite';
 import { EntityFormSeite } from './seiten/EntityFormSeite';
 import { EntityListeSeite } from './seiten/EntityListeSeite';
+import { KarteSeite } from './seiten/KarteSeite';
 import { LesungSeite } from './seiten/LesungSeite';
 import { SessionTimelineSeite } from './seiten/SessionTimelineSeite';
 import { SpielabendSeite } from './seiten/SpielabendSeite';
@@ -74,6 +75,8 @@ function Inhalt() {
             <Route path="/:route/:id/bearbeiten" element={<EntityFormSeite />} />
           </>
         )}
+        {/* Karten haben eine eigene Detailseite mit Pin-Overlay. */}
+        <Route path="/karten/:id" element={<KarteSeite />} />
         <Route path="/:route" element={<EntityListeSeite />} />
         <Route path="/:route/:id" element={<EntityDetailSeite />} />
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -7,6 +7,7 @@ import {
   ClipboardList,
   Flag,
   Gem,
+  Map,
   MapPin,
   Scroll,
   StickyNote,
@@ -18,6 +19,7 @@ import {
 const ICONS: Record<string, LucideIcon> = {
   Users,
   Scroll,
+  Map,
   MapPin,
   Swords,
   BookOpen,

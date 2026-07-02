@@ -17,6 +17,7 @@ export const ENTITY_TYPEN = [
   'sessionPrep',
   'gegenstand',
   'fraktion',
+  'karte',
   'notiz',
 ] as const;
 
@@ -225,6 +226,31 @@ export interface Fraktion extends BasisEntitaet {
   stand: string;
 }
 
+/** Ein Pin auf einer Karte. */
+export interface KartenPin {
+  id: string;
+  /** Position in Prozent der Bildbreite (0–100). */
+  x: number;
+  /** Position in Prozent der Bildhöhe (0–100). */
+  y: number;
+  /** Verknüpfter Ort (Entitäts-ID), null = freier Marker. */
+  ortId: string | null;
+  /** Freitext-Beschriftung (bei verknüpften Pins optional, sonst der Name). */
+  beschriftung: string;
+}
+
+/**
+ * Interaktive Karte: eine hochgeladene Kartengrafik (Basisfeld `bild`)
+ * mit klickbaren Pins, die auf Orte verlinken. Im Spieler-Build werden
+ * nur Pins exportierter (= besuchter) Orte übernommen.
+ */
+export interface Karte extends BasisEntitaet {
+  typ: 'karte';
+  /** Abschnitt: Beschreibung / Legende (Markdown). */
+  beschreibung: string;
+  pins: KartenPin[];
+}
+
 /** Freie Referenz-Notiz (Hausregeln, Kalender, Tabellen, …). */
 export interface Notiz extends BasisEntitaet {
   typ: 'notiz';
@@ -242,6 +268,7 @@ export type Entitaet =
   | SessionPrep
   | Gegenstand
   | Fraktion
+  | Karte
   | Notiz;
 
 // ---------------------------------------------------------------------------

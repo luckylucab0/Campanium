@@ -166,6 +166,29 @@ describe('filterFuerSpieler (Whitelist)', () => {
     expect(JSON.stringify(ergebnis)).not.toContain('geheim.png');
   });
 
+  it('exportiert von Karten nur Pins besuchter Orte – ohne DM-Beschriftung', () => {
+    const besucht = besuchterOrt('Dorfplatz');
+    const geheim = besuchterOrt('Geheime Gruft', { besucht: false });
+    const karte = {
+      ...neueEntitaet('karte', 'barovia', 'Barovia'),
+      pins: [
+        { id: 'p1', x: 10, y: 20, ortId: besucht.id, beschriftung: 'Hier lauert der Vampir!' },
+        { id: 'p2', x: 50, y: 60, ortId: geheim.id, beschriftung: '' },
+        { id: 'p3', x: 90, y: 10, ortId: null, beschriftung: 'DM-Marker: Hinterhalt' },
+      ],
+    } as Entitaet;
+
+    const ergebnis = filterFuerSpieler(kampagne, [karte, besucht, geheim], stand);
+    const exportierteKarte = ergebnis.entitaeten.find((e) => e.typ === 'karte');
+    expect(exportierteKarte?.typ === 'karte' && exportierteKarte.pins).toEqual([
+      { id: 'p1', x: 10, y: 20, ortId: besucht.id, beschriftung: '' },
+    ]);
+    const json = JSON.stringify(ergebnis);
+    expect(json).not.toContain('Vampir');
+    expect(json).not.toContain('Hinterhalt');
+    expect(json).not.toContain('geheime-gruft');
+  });
+
   it('exportiert von der Kampagne nur Name und Beschreibung', () => {
     const ergebnis = filterFuerSpieler(kampagne, [], stand);
     expect(ergebnis.kampagne).toEqual({
