@@ -41,6 +41,7 @@ The tool runs in two modes:
 - **Quest board** — list, table and Kanban view (open / active / done / failed) with drag & drop.
 - **Session timeline** — chronological log, each session linked to its prep; a dedicated **game-night view** shows tonight’s prep next to quick access to all linked NPCs/locations and table references (random encounter tables etc.).
 - **DM special modules** — a **nemesis tracker** for the campaign’s arch-villain (every appearance: mode, what they wanted, what they got, consequences + an idea stockpile; “Strahd von Zarovich” in the demo) and a **reading/oracle module** with freely configurable cards (the Tarokka reading in the demo — omens or prophecies anywhere else).
+- **Optional AI assistant (opt-in)** — a chat drawer for the DM that applies changes for you mid-session (“the party finished the candle quest and Gregor is now allied” → quest status, campaign logs and NPC attitude get updated). Bring your own provider: Anthropic (Claude), OpenAI, Google (Gemini), Mistral — or Ollama for a fully local setup. Disabled unless configured; see below.
 - **Spoiler-safe player build** — a whitelist-based filter (never a blacklist) exports only what is explicitly player-safe. Tests prove no DM field survives the export.
 - **Gothic Barovia design** — dark blue-black default theme with blood-red and candle-gold accents, optional parchment theme, locally bundled fonts (Cinzel, Inter, Cormorant Garamond), ornamental card corners, WCAG-AA contrast, `prefers-reduced-motion` support, tablet-friendly.
 
@@ -61,6 +62,28 @@ npm test           # Vitest: wikilink parser, spoiler filter, API CRUD, …
 npm run lint       # ESLint
 npm run typecheck  # strict TypeScript across all workspaces
 ```
+
+## Optional: AI assistant
+
+The AI assistant is **strictly opt-in** — without configuration the feature is completely absent from the UI. To enable it:
+
+```bash
+cp .env.example .env   # then edit .env
+```
+
+```ini
+AI_PROVIDER=anthropic   # anthropic | openai | google | mistral | ollama
+AI_API_KEY=sk-...       # not needed for ollama
+AI_MODEL=               # optional override, sensible default per provider
+```
+
+Restart `npm run dev` — a chat button appears bottom-right (DM mode only). The assistant works through the same Zod-validated storage layer as the REST API, so it cannot produce invalid data. Every change it makes is shown as a linked action card in the chat, and **it has no delete capability** — deletion stays a manual DM action.
+
+<p align="center">
+  <img src="docs/screenshots/ki-assistent.png" alt="KI-Assistent als Chat-Drawer im DM-Modus" width="80%" />
+</p>
+
+**Privacy:** with a cloud provider, your campaign data (including DM notes) is sent to that provider. If you don’t want that, use `AI_PROVIDER=ollama` with a locally running [Ollama](https://ollama.com) — everything stays on your machine. API keys live only in `.env` (gitignored) and never reach the browser or the player build.
 
 ## Player build & GitHub Pages
 

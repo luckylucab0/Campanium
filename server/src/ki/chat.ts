@@ -1,0 +1,91 @@
+/**
+ * Der Agent-Loop des KI-Assistenten.
+ *
+ * Ablauf pro Chat-Anfrage: Modell antwortet → fordert es Werkzeuge an,
+ * werden diese gegen den Kampagnen-Storage ausgeführt und die Ergebnisse
+ * zurückgereicht → das wiederholt sich, bis das Modell eine finale
+ * Text-Antwort gibt (oder das Schleifen-Limit greift). Alle
+ * durchgeführten Änderungen werden gesammelt und dem DM im Chat als
+ * Aktions-Karten angezeigt.
+ */
+import type { Kampagne } from '@campanium/shared';
+import type { Storage } from '../storage';
+import type { KiNachricht, KiProvider } from './provider';
+import { fuehreToolAus, KI_TOOLS, type KiAktion } from './tools';
+
+/** Obergrenze an Modell-Runden pro Anfrage (Schutz vor Endlosschleifen). */
+const MAX_RUNDEN = 8;
+
+export interface ChatErgebnis {
+  antwort: string;
+  aktionen: KiAktion[];
+}
+
+/** System-Prompt: Rolle, Datenmodell-Kurzreferenz und Arbeitsregeln. */
+export function systemPrompt(kampagne: Kampagne): string {
+  return `Du bist der Kampagnen-Assistent des Dungeon Masters in „Campanium“, \
+einem Verwaltungstool für D&D-Kampagnen. Aktive Kampagne: „${kampagne.name}“.
+
+Deine Aufgabe: Während der Spielsession schnell Änderungen einpflegen, wenn der \
+DM erzählt, was passiert ist – z. B. Quest-Status ändern, Kampagnen-Logs ergänzen, \
+NSC-Haltungen anpassen, neue Entitäten anlegen, den In-Game-Tag weiterzählen.
+
+Datenmodell (Entitätstypen): nsc, quest, ort, sc (Spielercharakter), session, \
+sessionPrep, gegenstand, fraktion, notiz. IDs sind Slugs (z. B. \
+"gregor-der-kerzenmacher"). Freitextfelder sind Markdown; [[Name]] erzeugt eine \
+Verknüpfung. Felder mit Dm-Suffix (z. B. geheimnisseDm) sind nur für den DM \
+sichtbar. Quest-Status: offen | aktiv | erledigt | fehlgeschlagen. \
+NSC-Haltung: verbündet | freundlich | neutral | misstrauisch | feindlich | unbekannt.
+
+Arbeitsregeln:
+1. Schlage IDs immer erst mit kompendium_auflisten nach, rate sie nie.
+2. Lies eine Entität, bevor du sie änderst – ändere nur die nötigen Felder.
+3. Mache minimale, präzise Änderungen. Erfinde keine Fakten, die der DM nicht genannt hat.
+4. Du kannst nichts löschen – bitte den DM, das selbst zu tun, falls nötig.
+5. Antworte auf Deutsch, kurz und tischtauglich: fasse am Ende in 1–3 Sätzen \
+zusammen, was du geändert hast.`;
+}
+
+/** Führt eine Chat-Anfrage inklusive Werkzeug-Schleife aus. */
+export async function fuehreChatAus(
+  provider: KiProvider,
+  kampagne: Kampagne,
+  storage: Storage,
+  verlauf: KiNachricht[],
+): Promise<ChatErgebnis> {
+  const nachrichten = [...verlauf];
+  const aktionen: KiAktion[] = [];
+  const system = systemPrompt(kampagne);
+
+  for (let runde = 0; runde < MAX_RUNDEN; runde++) {
+    const antwort = await provider.chat(system, nachrichten, KI_TOOLS);
+
+    if (antwort.toolAufrufe.length === 0) {
+      return { antwort: antwort.text, aktionen };
+    }
+
+    nachrichten.push({
+      rolle: 'assistent',
+      text: antwort.text,
+      toolAufrufe: antwort.toolAufrufe,
+    });
+    for (const aufruf of antwort.toolAufrufe) {
+      const ergebnis = fuehreToolAus(storage, aufruf);
+      if (ergebnis.aktion) aktionen.push(ergebnis.aktion);
+      nachrichten.push({
+        rolle: 'tool',
+        aufrufId: aufruf.id,
+        name: aufruf.name,
+        ergebnis: ergebnis.ergebnis,
+      });
+    }
+  }
+
+  return {
+    antwort:
+      'Ich habe das Rundenlimit erreicht, bevor ich fertig wurde – die bisher ' +
+      'durchgeführten Änderungen sind unten aufgeführt. Bitte formuliere den Rest ' +
+      'als neue, kleinere Anfrage.',
+    aktionen,
+  };
+}

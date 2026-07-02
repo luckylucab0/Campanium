@@ -23,8 +23,13 @@ import {
   widersacherTrackerSchema,
 } from '@campanium/shared';
 import { istEntityTyp, KampagnenVerwaltung, type Storage } from './storage';
+import { fuehreChatAus } from './ki/chat';
+import type { KiNachricht, KiProvider } from './ki/provider';
 
-export function erstelleApp(verwaltung: KampagnenVerwaltung): express.Express {
+export function erstelleApp(
+  verwaltung: KampagnenVerwaltung,
+  kiProvider: KiProvider | null = null,
+): express.Express {
   const app = express();
   app.use(express.json({ limit: '5mb' }));
 
@@ -176,6 +181,53 @@ export function erstelleApp(verwaltung: KampagnenVerwaltung): express.Express {
       } catch (fehler) {
         return sendeValidierungsfehler(res, fehler);
       }
+    });
+  });
+
+  // ---- KI-Assistent (optional) ----------------------------------------------
+
+  /** Ist der Assistent konfiguriert? Der Client blendet den Chat sonst aus. */
+  app.get('/api/ki/status', (_req, res) => {
+    res.json(
+      kiProvider
+        ? { aktiv: true, provider: kiProvider.provider, modell: kiProvider.modell }
+        : { aktiv: false },
+    );
+  });
+
+  /**
+   * Chat-Anfrage: nimmt den bisherigen Gesprächsverlauf (nur Nutzer-/
+   * Assistent-Texte) entgegen und führt den Agent-Loop inkl. Werkzeugen
+   * gegen die Kampagne aus. Nicht streamend – Antworten sind kurz.
+   */
+  app.post('/api/kampagnen/:kid/chat', (req, res) => {
+    if (!kiProvider) {
+      return res
+        .status(503)
+        .json({ fehler: 'KI-Assistent ist nicht konfiguriert (siehe .env.example)' });
+    }
+    mitKampagne(res, req.params.kid, (storage) => {
+      const eintrag = verwaltung.holen(req.params.kid)!;
+      const roh = Array.isArray(req.body?.nachrichten) ? req.body.nachrichten : [];
+      const verlauf: KiNachricht[] = [];
+      for (const n of roh) {
+        if (n && typeof n.text === 'string' && (n.rolle === 'nutzer' || n.rolle === 'assistent')) {
+          verlauf.push({ rolle: n.rolle, text: n.text });
+        }
+      }
+      if (verlauf.length === 0 || verlauf[verlauf.length - 1]?.rolle !== 'nutzer') {
+        return res
+          .status(400)
+          .json({ fehler: 'nachrichten muss mit einer Nutzer-Nachricht enden' });
+      }
+      fuehreChatAus(kiProvider, eintrag.kampagne, storage, verlauf)
+        .then((ergebnis) => res.json(ergebnis))
+        .catch((fehler: unknown) => {
+          // Provider-Fehler (Netz, Auth, Ratelimit) sauber an den Client melden.
+          const meldung = fehler instanceof Error ? fehler.message : 'KI-Anfrage fehlgeschlagen';
+          console.error('KI-Fehler:', meldung);
+          res.status(502).json({ fehler: meldung });
+        });
     });
   });
 
