@@ -6,7 +6,14 @@
  * DEFAULT_*-Konstanten die Templates für neu angelegte Einträge.
  */
 import { z } from 'zod';
-import type { Entitaet, EntityTyp, Kampagnenstand, Lesung, WidersacherTracker } from './types';
+import type {
+  Entitaet,
+  EntityTyp,
+  Kalender,
+  Kampagnenstand,
+  Lesung,
+  WidersacherTracker,
+} from './types';
 import {
   HALTUNGEN,
   LESUNG_KARTEN_STATUS,
@@ -232,6 +239,26 @@ export const widersacherTrackerSchema = z.object({
   ideen: z.array(checklistEintragSchema),
 });
 
+const kalenderDatumSchema = z.object({
+  jahr: z.number().int(),
+  monat: z.number().int().min(1),
+  tag: z.number().int().min(1),
+});
+
+export const kalenderSchema = z.object({
+  aera: z.string(),
+  monate: z.array(z.object({ name: z.string().min(1), tage: z.number().int().min(1).max(999) })),
+  aktuell: kalenderDatumSchema,
+  ereignisse: z.array(
+    z.object({
+      id: z.string().min(1),
+      datum: kalenderDatumSchema,
+      titel: z.string(),
+      entitaetId: refSchema,
+    }),
+  ),
+});
+
 export const lesungSchema = z.object({
   titel: z.string(),
   karten: z.array(
@@ -391,3 +418,11 @@ export const DEFAULT_WIDERSACHER: WidersacherTracker = { name: '', begegnungen: 
 
 /** Default-Lesung (leer – Karten legt der DM je nach Kampagne selbst an). */
 export const DEFAULT_LESUNG: Lesung = { titel: '', karten: [] };
+
+/** Default-Kalender (leer = Modul wartet auf Einrichtung). */
+export const DEFAULT_KALENDER: Kalender = {
+  aera: '',
+  monate: [],
+  aktuell: { jahr: 1, monat: 1, tag: 1 },
+  ereignisse: [],
+};

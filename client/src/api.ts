@@ -9,12 +9,18 @@
 import type {
   Entitaet,
   EntityTyp,
+  Kalender,
   Kampagne,
   Kampagnenstand,
   Lesung,
   WidersacherTracker,
 } from '@campanium/shared';
-import { DEFAULT_KAMPAGNENSTAND, DEFAULT_LESUNG, DEFAULT_WIDERSACHER } from '@campanium/shared';
+import {
+  DEFAULT_KALENDER,
+  DEFAULT_KAMPAGNENSTAND,
+  DEFAULT_LESUNG,
+  DEFAULT_WIDERSACHER,
+} from '@campanium/shared';
 
 /** true, wenn dieser Build der read-only Spieler-Build ist. */
 export const IST_SPIELER_MODUS = import.meta.env.MODE === 'player';
@@ -27,6 +33,7 @@ export interface KampagnenDaten {
   kampagnenstand: Kampagnenstand;
   widersacher: WidersacherTracker;
   lesung: Lesung;
+  kalender: Kalender;
 }
 
 async function pruefe(antwort: Response): Promise<Response> {
@@ -113,6 +120,7 @@ export async function ladeAlles(kid: string): Promise<KampagnenDaten> {
       kampagnenstand: { ...DEFAULT_KAMPAGNENSTAND, ...daten.kampagnenstand },
       widersacher: DEFAULT_WIDERSACHER,
       lesung: DEFAULT_LESUNG,
+      kalender: DEFAULT_KALENDER,
     };
   }
   const antwort = await pruefe(await fetch(`/api/kampagnen/${kid}/alles`));
@@ -256,6 +264,17 @@ export async function speichereLesung(kid: string, lesung: Lesung): Promise<Lesu
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(lesung),
+    }),
+  );
+  return antwort.json();
+}
+
+export async function speichereKalender(kid: string, kalender: Kalender): Promise<Kalender> {
+  const antwort = await pruefe(
+    await fetch(`/api/kampagnen/${kid}/kalender`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(kalender),
     }),
   );
   return antwort.json();

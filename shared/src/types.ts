@@ -348,6 +348,43 @@ export interface WidersacherTracker {
   ideen: ChecklistEintrag[];
 }
 
+/** Ein Monat des Kampagnen-Kalenders (frei benennbar, freie Länge). */
+export interface KalenderMonat {
+  name: string;
+  tage: number;
+}
+
+/** Ein Datum im Kampagnen-Kalender (Monat/Tag 1-basiert). */
+export interface KalenderDatum {
+  jahr: number;
+  monat: number;
+  tag: number;
+}
+
+/** Ein Ereignis an einem Kalendertag (Fest, Frist, geplante Szene, …). */
+export interface KalenderEreignis {
+  id: string;
+  datum: KalenderDatum;
+  titel: string;
+  /** Optional verknüpfte Entität (Quest, NSC, Ort, …). */
+  entitaetId: string | null;
+}
+
+/**
+ * Spezialmodul: In-Game-Kalender (DM-only). Eigene Monate mit eigenen
+ * Längen pro Kampagne – vom irdischen Kalender bis zur komplett
+ * erfundenen Zeitrechnung. Leere Monatsliste = Modul noch nicht
+ * eingerichtet.
+ */
+export interface Kalender {
+  /** Bezeichnung der Jahreszählung, z. B. „BC“ (Barovianischer Kalender). */
+  aera: string;
+  monate: KalenderMonat[];
+  /** Aktuelles In-Game-Datum. */
+  aktuell: KalenderDatum;
+  ereignisse: KalenderEreignis[];
+}
+
 export const LESUNG_KARTEN_STATUS = ['geheim', 'hinweis gegeben', 'von Party entdeckt'] as const;
 export type LesungKartenStatus = (typeof LESUNG_KARTEN_STATUS)[number];
 

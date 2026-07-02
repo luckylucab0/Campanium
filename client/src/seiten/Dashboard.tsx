@@ -8,7 +8,7 @@ import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Castle, Minus, Pencil, Plus, Sparkles, Tent, Trash2 } from 'lucide-react';
 import type { Entitaet, Nsc, Quest, Session } from '@campanium/shared';
-import { slugify } from '@campanium/shared';
+import { formatKalenderDatum, kalenderAktiv, slugify } from '@campanium/shared';
 import { IST_SPIELER_MODUS } from '../api';
 import { formatDatum, pfadFuer } from '../hilfen';
 import { useStore } from '../store';
@@ -17,7 +17,7 @@ import { Markdown } from '../komponenten/Markdown';
 import { Trennlinie } from '../komponenten/Ornament';
 
 export function Dashboard() {
-  const { entitaeten, kampagne, kampagnenstand, setzeKampagnenstand } = useStore();
+  const { entitaeten, kampagne, kampagnenstand, setzeKampagnenstand, kalender } = useStore();
   const navigate = useNavigate();
   const { erstellen } = useStore();
 
@@ -77,6 +77,15 @@ export function Dashboard() {
               </span>
             </ZaehlerKnoepfe>
           </div>
+          {/* Ist der Kalender eingerichtet, erscheint hier das formatierte Datum. */}
+          {!IST_SPIELER_MODUS && kalenderAktiv(kalender) && (
+            <Link
+              to="/kalender"
+              className="mt-1 block text-sm text-gold-hell hover:text-gold"
+            >
+              {formatKalenderDatum(kalender, kalender.aktuell)}
+            </Link>
+          )}
           {IST_SPIELER_MODUS ? (
             kampagnenstand.ingameDatumText && (
               <p className="mt-1 text-sm text-text-schwach">{kampagnenstand.ingameDatumText}</p>

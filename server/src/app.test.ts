@@ -210,6 +210,29 @@ describe('Singletons', () => {
     expect(antwort.status).toBe(400);
   });
 
+  it('speichert den Kalender validiert und weist kaputte Daten ab', async () => {
+    const ok = await put(`/api/kampagnen/${kid}/kalender`, {
+      aera: 'BC',
+      monate: [{ name: 'Frosthauch', tage: 30 }],
+      aktuell: { jahr: 735, monat: 1, tag: 12 },
+      ereignisse: [
+        { id: 'e1', datum: { jahr: 735, monat: 1, tag: 14 }, titel: 'Fest', entitaetId: null },
+      ],
+    });
+    expect(ok.status).toBe(200);
+    expect(fs.existsSync(path.join(datenOrdner, kid, 'kalender.json'))).toBe(true);
+    const alles = await (await fetch(`${basisUrl}/api/kampagnen/${kid}/alles`)).json();
+    expect(alles.kalender.monate).toHaveLength(1);
+
+    const kaputt = await put(`/api/kampagnen/${kid}/kalender`, {
+      aera: '',
+      monate: [{ name: 'X', tage: 0 }],
+      aktuell: { jahr: 1, monat: 1, tag: 1 },
+      ereignisse: [],
+    });
+    expect(kaputt.status).toBe(400);
+  });
+
   it('speichert Widersacher-Tracker und Lesung', async () => {
     const widersacher = await put(`/api/kampagnen/${kid}/widersacher`, {
       name: 'Strahd von Zarovich',

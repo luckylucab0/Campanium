@@ -16,6 +16,7 @@ import express from 'express';
 import { ZodError } from 'zod';
 import {
   eindeutigerSlug,
+  kalenderSchema,
   kampagnenstandSchema,
   lesungSchema,
   neueEntitaet,
@@ -80,6 +81,7 @@ export function erstelleApp(
         kampagnenstand: storage.kampagnenstand,
         widersacher: storage.widersacher,
         lesung: storage.lesung,
+        kalender: storage.kalender,
       });
     });
   });
@@ -283,6 +285,18 @@ export function erstelleApp(
         storage.lesung = lesungSchema.parse(req.body);
         storage.speichereSingleton('lesung', storage.lesung);
         return res.json(storage.lesung);
+      } catch (fehler) {
+        return sendeValidierungsfehler(res, fehler);
+      }
+    });
+  });
+
+  app.put('/api/kampagnen/:kid/kalender', (req, res) => {
+    mitKampagne(res, req.params.kid, (storage) => {
+      try {
+        storage.kalender = kalenderSchema.parse(req.body);
+        storage.speichereSingleton('kalender', storage.kalender);
+        return res.json(storage.kalender);
       } catch (fehler) {
         return sendeValidierungsfehler(res, fehler);
       }

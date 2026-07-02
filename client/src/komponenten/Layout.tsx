@@ -6,7 +6,19 @@
  */
 import { useEffect, useState, type ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Castle, Home, Menu, Moon, Plus, Search, Sun, Sparkles, Tent, X } from 'lucide-react';
+import {
+  CalendarDays,
+  Castle,
+  Home,
+  Menu,
+  Moon,
+  Plus,
+  Search,
+  Sun,
+  Sparkles,
+  Tent,
+  X,
+} from 'lucide-react';
 import { ENTITY_TYPEN, entityConfigs } from '@campanium/shared';
 import { IST_SPIELER_MODUS } from '../api';
 import { useStore } from '../store';
@@ -116,6 +128,9 @@ export function Layout({ children }: { children: ReactNode }) {
                 </NavLink>
                 <NavLink to="/lesung" className={navKlasse} onClick={() => setMenueOffen(false)}>
                   <Sparkles size={16} /> Lesung
+                </NavLink>
+                <NavLink to="/kalender" className={navKlasse} onClick={() => setMenueOffen(false)}>
+                  <CalendarDays size={16} /> Kalender
                 </NavLink>
               </>
             )}

@@ -14,6 +14,7 @@ import { Dashboard } from './seiten/Dashboard';
 import { EntityDetailSeite } from './seiten/EntityDetailSeite';
 import { EntityFormSeite } from './seiten/EntityFormSeite';
 import { EntityListeSeite } from './seiten/EntityListeSeite';
+import { KalenderSeite } from './seiten/KalenderSeite';
 import { KarteSeite } from './seiten/KarteSeite';
 import { LesungSeite } from './seiten/LesungSeite';
 import { SessionTimelineSeite } from './seiten/SessionTimelineSeite';
@@ -72,6 +73,7 @@ function Inhalt() {
             <Route path="/spielabend" element={<SpielabendSeite />} />
             <Route path="/widersacher" element={<WidersacherSeite />} />
             <Route path="/lesung" element={<LesungSeite />} />
+            <Route path="/kalender" element={<KalenderSeite />} />
             <Route path="/:route/:id/bearbeiten" element={<EntityFormSeite />} />
           </>
         )}
