@@ -4,6 +4,9 @@ node_modules/
 # Echte Kampagnendaten – bleiben privat! Nur data.example/ wird versioniert.
 data/
 
+# API-Keys für den optionalen KI-Assistenten (Vorlage: .env.example)
+.env
+
 # Build-Artefakte
 client/dist/
 client/dist-player/

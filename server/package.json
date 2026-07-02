@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.109.1",
     "@campanium/shared": "*",
     "express": "^4.21.0",
     "zod": "^3.24.0"

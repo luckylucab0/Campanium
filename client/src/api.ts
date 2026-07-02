@@ -182,6 +182,50 @@ export async function speichereWidersacher(
   return antwort.json();
 }
 
+// ---- KI-Assistent (optional, nur DM-Modus) ----------------------------------
+
+/** Status des optionalen KI-Assistenten (kein Key verlässt je den Server). */
+export interface KiStatus {
+  aktiv: boolean;
+  provider?: string;
+  modell?: string;
+}
+
+/** Eine vom Assistenten durchgeführte Änderung (Anzeige als Karte im Chat). */
+export interface KiAktion {
+  art: string;
+  beschreibung: string;
+  entitaetId?: string;
+  typ?: EntityTyp;
+}
+
+/** Fragt ab, ob der KI-Assistent serverseitig konfiguriert ist. */
+export async function ladeKiStatus(): Promise<KiStatus> {
+  if (IST_SPIELER_MODUS) return { aktiv: false };
+  try {
+    const antwort = await fetch('/api/ki/status');
+    if (!antwort.ok) return { aktiv: false };
+    return (await antwort.json()) as KiStatus;
+  } catch {
+    return { aktiv: false };
+  }
+}
+
+/** Sendet den Gesprächsverlauf an den Assistenten der aktiven Kampagne. */
+export async function sendeKiChat(
+  kid: string,
+  nachrichten: { rolle: 'nutzer' | 'assistent'; text: string }[],
+): Promise<{ antwort: string; aktionen: KiAktion[] }> {
+  const antwort = await pruefe(
+    await fetch(`/api/kampagnen/${kid}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nachrichten }),
+    }),
+  );
+  return antwort.json();
+}
+
 export async function speichereLesung(kid: string, lesung: Lesung): Promise<Lesung> {
   const antwort = await pruefe(
     await fetch(`/api/kampagnen/${kid}/lesung`, {

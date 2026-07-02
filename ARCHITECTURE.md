@@ -56,6 +56,13 @@ server/src/
   storage.ts       Datei-Speicher pro Kampagne + KampagnenVerwaltung
   app.ts           Express-Routen (/api/kampagnen/…), Zod-Validierung (+ Tests)
   index.ts         Einstiegspunkt (Port 3001, DATA_DIR überschreibbar)
+  ki/              Optionaler KI-Assistent (opt-in über .env):
+    provider.ts      provider-neutrale Typen (Nachrichten, Tools)
+    anthropic.ts     Claude über das offizielle SDK
+    openaiKompatibel.ts  OpenAI, Mistral, Gemini & Ollama (ein Adapter)
+    tools.ts         Werkzeuge = CRUD gegen den Storage (Zod-validiert, kein Löschen)
+    chat.ts          Agent-Loop (max. 8 Runden) + System-Prompt
+    config.ts        .env-Konfiguration, Provider-Factory (+ Tests)
 
 client/src/
   api.ts           REST-Aufrufe; im Spieler-Modus statisches JSON
