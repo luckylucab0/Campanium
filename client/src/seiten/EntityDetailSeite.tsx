@@ -8,7 +8,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Pencil } from 'lucide-react';
 import type { ChecklistEintrag, Entitaet, Quest } from '@campanium/shared';
 import { configVonRoute, entityConfigs, type EntityConfig } from '@campanium/shared';
-import { IST_SPIELER_MODUS } from '../api';
+import { bildUrl, IST_SPIELER_MODUS } from '../api';
 import { formatDatum, pfadFuer } from '../hilfen';
 import { useStore } from '../store';
 import { Badge, DmBadge } from '../komponenten/Badge';
@@ -31,13 +31,21 @@ export function EntityDetailSeite() {
 }
 
 function Detail({ config, entitaet }: { config: EntityConfig; entitaet: Entitaet }) {
-  const { perId, backlinks, aktualisieren } = useStore();
+  const { kampagne, perId, backlinks, aktualisieren } = useStore();
   const werte = entitaet as unknown as Record<string, unknown>;
   const Icon = entityIcon(config.icon);
   const erwaehnungen = backlinks(entitaet.id);
 
   return (
     <div className="mx-auto max-w-3xl">
+      {/* Portrait/Artwork: fließt rechts neben Kopf und Metadaten. */}
+      {entitaet.bild && kampagne && (
+        <img
+          src={bildUrl(kampagne.id, entitaet.bild)}
+          alt={`Bild von ${entitaet.name}`}
+          className="float-right mb-3 ml-5 w-36 rounded border border-rand object-cover shadow-md sm:w-48"
+        />
+      )}
       {/* Kopf */}
       <div className="mb-1 flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-text-schwach">
         <Icon size={13} aria-hidden /> {config.label}

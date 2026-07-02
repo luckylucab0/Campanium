@@ -154,6 +154,18 @@ describe('filterFuerSpieler (Whitelist)', () => {
     expect(json).not.toContain('Geheimplan');
   });
 
+  it('behält den Bild-Dateinamen exportierter Entitäten', () => {
+    const nsc = getroffenerNsc('Gregor', { bild: 'portrait.png' });
+    const ergebnis = filterFuerSpieler(kampagne, [nsc], stand);
+    expect(ergebnis.entitaeten[0]?.bild).toBe('portrait.png');
+  });
+
+  it('exportiert KEINE Bild-Dateinamen nicht sichtbarer Entitäten', () => {
+    const geheim = getroffenerNsc('Spion', { dmOnly: true, bild: 'geheim.png' });
+    const ergebnis = filterFuerSpieler(kampagne, [geheim], stand);
+    expect(JSON.stringify(ergebnis)).not.toContain('geheim.png');
+  });
+
   it('exportiert von der Kampagne nur Name und Beschreibung', () => {
     const ergebnis = filterFuerSpieler(kampagne, [], stand);
     expect(ergebnis.kampagne).toEqual({

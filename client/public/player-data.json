@@ -24,6 +24,7 @@
           "text": "Bat die Party, [[Kerzen für die Toten]] zum Friedhof zu bringen."
         }
       ],
+      "bild": null,
       "typ": "nsc",
       "status": "lebendig",
       "haltung": "freundlich",
@@ -54,6 +55,7 @@
           "text": "Stellte sich schützend vor [[Lyra vom Hohlweg]], als der Fremde am Friedhofstor erschien."
         }
       ],
+      "bild": null,
       "typ": "nsc",
       "status": "lebendig",
       "haltung": "verbündet",
@@ -74,6 +76,7 @@
       ],
       "dmOnly": false,
       "kampagnenLog": [],
+      "bild": null,
       "typ": "quest",
       "status": "offen",
       "questgeberId": "mara-wachsherz",
@@ -102,6 +105,7 @@
           "text": "Angenommen. Sieben von dreizehn Gräbern sind versorgt."
         }
       ],
+      "bild": null,
       "typ": "quest",
       "status": "aktiv",
       "questgeberId": "gregor-der-kerzenmacher",
@@ -147,6 +151,7 @@
           "text": "Begräbnis auf dem Friedhof – der bleiche Fremde erschien am Tor."
         }
       ],
+      "bild": null,
       "typ": "ort",
       "region": "Wildnis & Straßen",
       "besucht": true,
@@ -169,6 +174,7 @@
           "text": "Lehnte das Geschenk des Fremden am Friedhofstor ab."
         }
       ],
+      "bild": null,
       "typ": "sc",
       "spieler": "Alex",
       "klasseVolk": "Waldläuferin (Mensch)",
@@ -189,6 +195,7 @@
       "tags": [],
       "dmOnly": false,
       "kampagnenLog": [],
+      "bild": null,
       "typ": "session",
       "nummer": 1,
       "datum": "2026-05-15",
@@ -207,6 +214,7 @@
       "tags": [],
       "dmOnly": false,
       "kampagnenLog": [],
+      "bild": null,
       "typ": "session",
       "nummer": 2,
       "datum": "2026-05-29",
@@ -232,6 +240,7 @@
           "text": "Brannte am Friedhofstor plötzlich blau."
         }
       ],
+      "bild": null,
       "typ": "gegenstand",
       "gefunden": true,
       "besitzerId": "lyra-vom-hohlweg",
@@ -254,6 +263,7 @@
           "text": "Nahm die Party inoffiziell unter ihren Schutz."
         }
       ],
+      "bild": null,
       "typ": "fraktion",
       "haltung": "freundlich",
       "ziele": "Jede Nacht in jedem Fenster Nebelfurts ein brennendes Licht – der Zirkel glaubt, dass das Dunkel zählt, wer wacht.",
@@ -270,6 +280,7 @@
       ],
       "dmOnly": false,
       "kampagnenLog": [],
+      "bild": null,
       "typ": "notiz",
       "inhalt": "## Tischregeln\n\n1. **Kritische Treffer:** Maximalschaden + Würfelwurf\n2. **Trank trinken:** Bonusaktion, einflößen bleibt eine Aktion\n3. **Tod:** Bei 0 TP zählt jede Runde – wir spielen die Rettungswürfe offen\n\n## Lichtregel (kampagnenspezifisch)\n\nWer **ohne Lichtquelle** übernachtet, würfelt morgens mit Nachteil auf den ersten Wurf des Tages. Die Dorfbewohner haben recht: Das Dunkel zählt, wer wacht."
     }

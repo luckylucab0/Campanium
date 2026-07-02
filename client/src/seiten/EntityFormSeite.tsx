@@ -11,6 +11,7 @@ import type { ChecklistEintrag, Entitaet, KampagnenLogEintrag } from '@campanium
 import { configVonRoute, type EntityConfig, type FeldConfig } from '@campanium/shared';
 import { pfadFuer } from '../hilfen';
 import { useStore } from '../store';
+import { BildUpload } from '../komponenten/BildUpload';
 import { Checkliste } from '../komponenten/Checkliste';
 import { DmBadge } from '../komponenten/Badge';
 import { MarkdownEditor } from '../komponenten/MarkdownEditor';
@@ -76,6 +77,16 @@ function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entita
         onChange={(e) => setze('name', e.target.value)}
         aria-label="Name"
       />
+
+      {/* Bild / Portrait */}
+      <section className="mb-6">
+        <h2 className="mb-2 text-xs uppercase tracking-wider text-text-schwach">Bild</h2>
+        <BildUpload
+          wert={(werte.bild as string | null) ?? null}
+          onChange={(datei) => setze('bild', datei)}
+          alt={String(werte.name ?? '')}
+        />
+      </section>
 
       {/* Kopffelder aus der Registry */}
       <div className="mb-6 grid gap-4 sm:grid-cols-2">

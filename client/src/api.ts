@@ -182,6 +182,30 @@ export async function speichereWidersacher(
   return antwort.json();
 }
 
+// ---- Bilder ------------------------------------------------------------------
+
+/** Lädt eine Bilddatei hoch; der Server vergibt den Dateinamen. */
+export async function ladeBildHoch(kid: string, datei: File): Promise<string> {
+  const antwort = await pruefe(
+    await fetch(`/api/kampagnen/${kid}/bilder`, {
+      method: 'POST',
+      headers: { 'Content-Type': datei.type },
+      body: datei,
+    }),
+  );
+  const json = (await antwort.json()) as { datei: string };
+  return json.datei;
+}
+
+/**
+ * URL eines Kampagnen-Bildes. Im Spieler-Modus liegen die (gefilterten)
+ * Bilder als statische Dateien unter bilder/ im Build.
+ */
+export function bildUrl(kid: string, datei: string): string {
+  if (IST_SPIELER_MODUS) return `${import.meta.env.BASE_URL}bilder/${datei}`;
+  return `/api/kampagnen/${kid}/bilder/${datei}`;
+}
+
 // ---- KI-Assistent (optional, nur DM-Modus) ----------------------------------
 
 /** Status des optionalen KI-Assistenten (kein Key verlässt je den Server). */

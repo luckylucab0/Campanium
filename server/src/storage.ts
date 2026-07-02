@@ -128,6 +128,35 @@ export class Storage {
       JSON.stringify(daten, null, 2) + '\n',
     );
   }
+
+  // ---- Bilder ---------------------------------------------------------------
+  // Hochgeladene Bilder (Portraits, Kartengrafiken) liegen als normale
+  // Dateien in data/<kampagne>/bilder/; Entitäten referenzieren sie nur
+  // per Dateiname im Feld `bild`.
+
+  /** Ordner für die Bilder dieser Kampagne. */
+  get bilderOrdner(): string {
+    return path.join(this.datenOrdner, 'bilder');
+  }
+
+  /** Erlaubte Bild-Dateinamen: nur ein einzelnes, harmloses Pfadsegment. */
+  static istSichererDateiname(datei: string): boolean {
+    return /^[\w][\w.-]{0,127}$/.test(datei) && !datei.includes('..');
+  }
+
+  /** Schreibt eine Bilddatei in den bilder/-Ordner. */
+  speichereBild(datei: string, daten: Buffer): void {
+    if (!Storage.istSichererDateiname(datei)) throw new Error(`Unsicherer Dateiname: ${datei}`);
+    fs.mkdirSync(this.bilderOrdner, { recursive: true });
+    fs.writeFileSync(path.join(this.bilderOrdner, datei), daten);
+  }
+
+  /** Absoluter Pfad einer vorhandenen Bilddatei – sonst null. */
+  bildPfad(datei: string): string | null {
+    if (!Storage.istSichererDateiname(datei)) return null;
+    const voll = path.join(this.bilderOrdner, datei);
+    return fs.existsSync(voll) ? voll : null;
+  }
 }
 
 /**

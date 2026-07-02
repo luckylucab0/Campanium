@@ -47,6 +47,11 @@ export interface BasisEntitaet {
   /** true = gesamte Entität ist nur für den DM sichtbar. */
   dmOnly: boolean;
   kampagnenLog: KampagnenLogEintrag[];
+  /**
+   * Optionales Bild (Portrait, Artwork, Kartengrafik): Dateiname im
+   * bilder/-Ordner der Kampagne. null = kein Bild.
+   */
+  bild: string | null;
 }
 
 export const HALTUNGEN = [

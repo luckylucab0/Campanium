@@ -35,6 +35,8 @@ const basisSchema = z.object({
   tags: z.array(z.string()),
   dmOnly: z.boolean(),
   kampagnenLog: z.array(kampagnenLogEintragSchema),
+  // default(null): Bestandsdaten ohne bild-Feld bleiben gültig.
+  bild: z.string().min(1).nullable().default(null),
 });
 
 /** Optionale Verknüpfung auf eine andere Entität (per ID). */
@@ -243,6 +245,7 @@ export function neueEntitaet(typ: EntityTyp, id: string, name: string): Entitaet
     tags: [] as string[],
     dmOnly: false,
     kampagnenLog: [] as { sessionNr: number; text: string }[],
+    bild: null,
   };
   switch (typ) {
     case 'nsc':

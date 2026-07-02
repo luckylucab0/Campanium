@@ -9,7 +9,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Columns3, LayoutGrid, Plus, Table2 } from 'lucide-react';
 import type { Entitaet, Session } from '@campanium/shared';
 import { fuzzyFilter, type EntityConfig, configVonRoute } from '@campanium/shared';
-import { IST_SPIELER_MODUS } from '../api';
+import { bildUrl, IST_SPIELER_MODUS } from '../api';
 import { formatDatum, pfadFuer } from '../hilfen';
 import { useStore } from '../store';
 import { Badge, DmBadge } from '../komponenten/Badge';
@@ -211,6 +211,7 @@ function Liste({ config }: { config: EntityConfig }) {
 
 /** Eine Karte im Kartenraster. */
 export function EntityKarte({ entitaet, config }: { entitaet: Entitaet; config: EntityConfig }) {
+  const { kampagne } = useStore();
   const werte = entitaet as unknown as Record<string, unknown>;
   const untertitel = config.untertitelFeld ? String(werte[config.untertitelFeld] ?? '') : '';
   return (
@@ -219,7 +220,16 @@ export function EntityKarte({ entitaet, config }: { entitaet: Entitaet; config: 
       className="karte karte-ornament block p-3.5 transition-colors hover:bg-flaeche-3"
     >
       <div className="mb-1.5 flex items-start justify-between gap-2">
-        <span className="font-display text-base text-text-stark">{entitaet.name}</span>
+        <span className="flex min-w-0 items-center gap-2.5">
+          {entitaet.bild && kampagne && (
+            <img
+              src={bildUrl(kampagne.id, entitaet.bild)}
+              alt=""
+              className="h-9 w-9 shrink-0 rounded-full border border-rand object-cover"
+            />
+          )}
+          <span className="font-display text-base text-text-stark">{entitaet.name}</span>
+        </span>
         {(entitaet.dmOnly || config.immerDm) && <DmBadge />}
       </div>
       {untertitel && <p className="mb-2 line-clamp-2 text-sm text-text-schwach">{untertitel}</p>}

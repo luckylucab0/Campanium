@@ -32,6 +32,9 @@ const BASIS_WHITELIST = [
   'tags',
   'dmOnly',
   'kampagnenLog',
+  // Nur der Dateiname; die Bilddatei selbst kopiert build-player.ts
+  // ausschließlich für exportierte Entitäten in den Spieler-Build.
+  'bild',
 ] as const;
 
 /**
