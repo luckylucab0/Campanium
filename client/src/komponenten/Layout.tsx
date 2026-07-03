@@ -17,6 +17,7 @@ import {
   Sun,
   Sparkles,
   Tent,
+  Waypoints,
   X,
 } from 'lucide-react';
 import { ENTITY_TYPEN, entityConfigs } from '@campanium/shared';
@@ -113,6 +114,9 @@ export function Layout({ children }: { children: ReactNode }) {
                 </NavLink>
               );
             })}
+            <NavLink to="/graph" className={navKlasse} onClick={() => setMenueOffen(false)}>
+              <Waypoints size={16} /> Beziehungsgraph
+            </NavLink>
 
             {!IST_SPIELER_MODUS && (
               <>

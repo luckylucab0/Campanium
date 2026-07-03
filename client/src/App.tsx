@@ -14,6 +14,7 @@ import { Dashboard } from './seiten/Dashboard';
 import { EntityDetailSeite } from './seiten/EntityDetailSeite';
 import { EntityFormSeite } from './seiten/EntityFormSeite';
 import { EntityListeSeite } from './seiten/EntityListeSeite';
+import { GraphSeite } from './seiten/GraphSeite';
 import { KalenderSeite } from './seiten/KalenderSeite';
 import { KarteSeite } from './seiten/KarteSeite';
 import { LesungSeite } from './seiten/LesungSeite';
@@ -68,6 +69,7 @@ function Inhalt() {
         <Route path="/" element={<Dashboard />} />
         {/* Sessions haben eine eigene Timeline statt der generischen Liste. */}
         <Route path="/sessions" element={<SessionTimelineSeite />} />
+        <Route path="/graph" element={<GraphSeite />} />
         {!IST_SPIELER_MODUS && (
           <>
             <Route path="/spielabend" element={<SpielabendSeite />} />
