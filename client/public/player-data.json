@@ -24,7 +24,7 @@
           "text": "Bat die Party, [[Kerzen für die Toten]] zum Friedhof zu bringen."
         }
       ],
-      "bild": null,
+      "bild": "gregor.png",
       "typ": "nsc",
       "status": "lebendig",
       "haltung": "freundlich",
@@ -269,6 +269,29 @@
       "ziele": "Jede Nacht in jedem Fenster Nebelfurts ein brennendes Licht – der Zirkel glaubt, dass das Dunkel zählt, wer wacht.",
       "mitglieder": "- [[Gregor der Kerzenmacher]] (Ältester)\n- [[Mara Wachsherz]]\n- ein gutes Dutzend stiller Dorfbewohner",
       "stand": "Wohlwollend gegenüber der Party, seit sie [[Kerzen für die Toten]] angenommen hat."
+    },
+    {
+      "id": "nebelmark",
+      "name": "Die Nebelmark",
+      "erstellt": "2026-06-30T19:00:00.000Z",
+      "geaendert": "2026-06-30T19:00:00.000Z",
+      "tags": [
+        "übersichtskarte"
+      ],
+      "dmOnly": false,
+      "kampagnenLog": [],
+      "bild": "karte-nebelmark.jpg",
+      "typ": "karte",
+      "beschreibung": "Übersichtskarte des Tals. Der schwarze Fluss trennt das [[Nebelfurt]]er Umland vom Grauzahn-Kamm im Osten.",
+      "pins": [
+        {
+          "id": "pin-nebelfurt",
+          "x": 47.3,
+          "y": 46.9,
+          "ortId": "nebelfurt",
+          "beschriftung": ""
+        }
+      ]
     },
     {
       "id": "hausregeln",

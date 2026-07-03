@@ -50,6 +50,7 @@ shared/src/
   wikilink.ts      [[Wikilink]]-Parser (+ Tests)
   fuzzy.ts         Fuzzy-Suche für Palette & Autocomplete (+ Tests)
   slug.ts          sprechende IDs/Dateinamen (+ Tests)
+  kalender.ts      Kalender-Arithmetik (Tag vor/zurück, Formatierung) (+ Tests)
   playerFilter.ts  Spoiler-Filter, WHITELIST-Prinzip (+ Tests)
 
 server/src/
@@ -70,7 +71,8 @@ client/src/
   komponenten/     Layout (inkl. Kampagnen-Umschalter), Markdown(+Wikilinks),
                    Editor, Suche, Badges, …
   seiten/          Dashboard, generische Liste/Detail/Formular, QuestBoard,
-                   SessionTimeline, Spielabend, Widersacher, Lesung
+                   SessionTimeline, Spielabend, Widersacher, Lesung,
+                   KarteSeite (Pin-Overlay), KalenderSeite, GraphSeite
   styles/index.css Design-Tokens (CSS-Variablen) + Themes + Tailwind
 
 scripts/
@@ -86,7 +88,10 @@ scripts/
   des Namens (Kollisionen bekommen `-2`, `-3`, …). Menschenlesbar,
   git-versionierbar.
 - Singletons pro Kampagne: `kampagnenstand.json`,
-  `widersacher-tracker.json`, `lesung.json`.
+  `widersacher-tracker.json`, `lesung.json`, `kalender.json`.
+- `data/<kampagne>/bilder/` – hochgeladene Bilder (Portraits,
+  Kartengrafiken) als normale Dateien; Entitäten referenzieren sie nur
+  per Dateiname im Basisfeld `bild`.
 - Jede Schreiboperation validiert die API gegen die Zod-Schemas; ungültige
   Daten werden mit HTTP 400 abgewiesen und erreichen die Platte nie.
 
@@ -102,6 +107,8 @@ konfigurierbar – die Curse-of-Strahd-Demo zeigt die Belegung:
 | Eskalations-Tracker | optional, Titel + Stufen editierbar | „Strahds Eskalation“, 5 Stufen |
 | Custom-Tracker      | beliebige Zähler (`aktuell`/`max`)  | „Ireenas Bisse“ 1/3            |
 | Ort-Region          | Freitext, Filter aus Ist-Werten     | „Wildnis & Straßen“, …         |
+| Kalender            | Monate/Längen/Ära frei, Ereignisse  | 12 fiktive Monate, Jahr 735 BK |
+| Karten              | Grafik + Pins auf Orte              | „Die Nebelmark“, 3 Pins        |
 
 ## Spoiler-Trennung (wichtigste Invariante)
 

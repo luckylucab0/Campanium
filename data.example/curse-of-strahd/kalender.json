@@ -1,0 +1,32 @@
+{
+  "aera": "BK",
+  "monate": [
+    { "name": "Frosthauch", "tage": 30 },
+    { "name": "Tauwind", "tage": 28 },
+    { "name": "Saatmond", "tage": 31 },
+    { "name": "Regenzeit", "tage": 30 },
+    { "name": "Lichtmond", "tage": 31 },
+    { "name": "Heumond", "tage": 30 },
+    { "name": "Erntezeit", "tage": 31 },
+    { "name": "Nebelzeit", "tage": 30 },
+    { "name": "Mondwende", "tage": 28 },
+    { "name": "Rabenmond", "tage": 31 },
+    { "name": "Frostfall", "tage": 30 },
+    { "name": "Schattenzeit", "tage": 31 }
+  ],
+  "aktuell": { "jahr": 735, "monat": 8, "tag": 12 },
+  "ereignisse": [
+    {
+      "id": "kerzenfest",
+      "datum": { "jahr": 735, "monat": 8, "tag": 14 },
+      "titel": "Kerzenfest in Nebelfurt",
+      "entitaetId": "nebelfurt"
+    },
+    {
+      "id": "neumond",
+      "datum": { "jahr": 735, "monat": 8, "tag": 21 },
+      "titel": "Neumond – das Moor ist unruhig",
+      "entitaetId": null
+    }
+  ]
+}

@@ -314,7 +314,7 @@ function TagesPanel({
       <div className="flex flex-wrap items-center gap-2">
         <input
           className="min-w-40 flex-1 rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-sm"
-          placeholder="Neues Ereignis, z. B. „Fest des heiligen Andral“"
+          placeholder="Neues Ereignis, z. B. „Kerzenfest in Nebelfurt“"
           value={titel}
           onChange={(e) => setTitel(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && hinzufuegen()}
