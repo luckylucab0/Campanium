@@ -184,7 +184,7 @@ export class KampagnenVerwaltung {
         '⚠ data/ nutzt noch das alte Layout ohne Kampagnen-Ordner.\n' +
           '  Migration: Unterordner anlegen (z. B. data/meine-kampagne/), alle\n' +
           '  Entitäts-Ordner und Singleton-Dateien hineinschieben und eine\n' +
-          '  kampagne.json ergänzen (siehe data.example/curse-of-strahd/).',
+          '  kampagne.json ergänzen (siehe data.example/nebelmark-kampagne/).',
       );
     }
 

@@ -2,7 +2,7 @@
 
 A self-hosted **campaign management tool for D&D** (and similar tabletop RPGs), built to replace an Obsidian vault with something purpose-made: **multiple campaigns with an in-app switcher**, linked entities, spoiler-safe player exports, and a dashboard with the trackers that matter at your table.
 
-It ships with a fully fleshed-out (and entirely fictional) **Curse of Strahd** demo campaign, but nothing about the tool is CoS-specific: the nemesis tracker, the oracle/reading module, escalation stages, regions and all counters are freely configurable per campaign.
+It ships with a fully fleshed-out (and entirely fictional) **“Die Nebelmark”** demo campaign — a gothic mists-and-crows setting of our own invention — but nothing about the tool is tied to it: the nemesis tracker, the oracle/reading module, escalation stages, regions and all counters are freely configurable per campaign.
 
 > **UI languages: German & English.** Switch the language any time from the sidebar (the choice is remembered); more languages are planned and easy to add — see [ARCHITECTURE.md](ARCHITECTURE.md#mehrsprachigkeit-i18n). Seed data and in-code documentation are written in German; this README is in English for the wider community.
 
@@ -10,7 +10,7 @@ It ships with a fully fleshed-out (and entirely fictional) **Curse of Strahd** d
 
 <p align="center">
   <img src="docs/screenshots/quest-board.png" alt="Quest-Kanban" width="49%" />
-  <img src="docs/screenshots/lesung.png" alt="Lesung (Orakel-Modul, hier als Tarokka-Lesung)" width="49%" />
+  <img src="docs/screenshots/lesung.png" alt="Lesung (Orakel-Modul, hier als Kartenlegung der Salzmutter)" width="49%" />
 </p>
 
 <p align="center">
@@ -47,13 +47,13 @@ The tool runs in two modes:
 - **Relationship graph** — a force-directed view of how everything connects, fed by the same wikilinks and reference fields as the backlinks; filter by type, click a node to jump to its entity.
 - **Wikilinks & backlinks** — type `[[Name]]` (with autocomplete) in any Markdown field to link entities, Obsidian-style. Links render with hover previews; every detail page lists automatic backlinks (“Erwähnt in …”). Unresolved links offer one-click creation.
 - **Global search** — `Cmd/Ctrl+K` fuzzy palette over names, tags and full text, grouped by type, keyboard-first.
-- **Dashboard trackers** — party level, in-game day, an optional escalation tracker (freely named, with editable stage descriptions — “Strahd’s escalation” in the demo) and freely addable custom counters (“Ireena’s bites 1/3”), all editable in place.
+- **Dashboard trackers** — party level, in-game day, an optional escalation tracker (freely named, with editable stage descriptions — “Vessimirs Eskalation” in the demo) and freely addable custom counters (“Selunes Bisse 1/3”), all editable in place.
 - **Quest board** — list, table and Kanban view (open / active / done / failed) with drag & drop.
 - **Session timeline** — chronological log, each session linked to its prep; a dedicated **game-night view** shows tonight’s prep next to quick access to all linked NPCs/locations and table references (random encounter tables etc.).
-- **DM special modules** — a **nemesis tracker** for the campaign’s arch-villain (every appearance: mode, what they wanted, what they got, consequences + an idea stockpile; “Strahd von Zarovich” in the demo) and a **reading/oracle module** with freely configurable cards (the Tarokka reading in the demo — omens or prophecies anywhere else).
+- **DM special modules** — a **nemesis tracker** for the campaign’s arch-villain (every appearance: mode, what they wanted, what they got, consequences + an idea stockpile; “Graf Vessimir” in the demo) and a **reading/oracle module** with freely configurable cards (the “Kartenlegung der Salzmutter” in the demo — omens, prophecies or tarot-style readings anywhere else).
 - **Optional AI assistant (opt-in)** — a chat drawer for the DM that applies changes for you mid-session (“the party finished the candle quest and Gregor is now allied” → quest status, campaign logs and NPC attitude get updated). Bring your own provider: Anthropic (Claude), OpenAI, Google (Gemini), Mistral — or Ollama for a fully local setup. Disabled unless configured; see below.
 - **Spoiler-safe player build** — a whitelist-based filter (never a blacklist) exports only what is explicitly player-safe. Tests prove no DM field survives the export.
-- **Gothic Barovia design** — dark blue-black default theme with blood-red and candle-gold accents, optional parchment theme, locally bundled fonts (Cinzel, Inter, Cormorant Garamond), ornamental card corners, WCAG-AA contrast, `prefers-reduced-motion` support, tablet-friendly.
+- **Gothic horror design** — dark blue-black default theme with blood-red and candle-gold accents, optional parchment theme, locally bundled fonts (Cinzel, Inter, Cormorant Garamond), ornamental card corners, WCAG-AA contrast, `prefers-reduced-motion` support, tablet-friendly.
 
 ## Quickstart
 
@@ -101,7 +101,7 @@ Restart `npm run dev` — a chat button appears bottom-right (DM mode only). The
 
 ```bash
 npm run build:player                        # if data/ contains exactly one campaign
-KAMPAGNE=curse-of-strahd npm run build:player   # pick one when there are several
+KAMPAGNE=nebelmark-kampagne npm run build:player   # pick one when there are several
 ```
 
 This:
@@ -147,6 +147,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the data flow and a guide to adding n
 ## Disclaimer
 
 This is an unofficial fan-made tool and is **not affiliated with or endorsed by Wizards of the Coast**. The repository contains **no text, stat blocks, or other content from any published adventure** (including _Curse of Strahd_) — `data.example/` consists entirely of original, fictional sample content. Bring your own copy of whatever adventure you run; this tool only organises _your_ notes about it.
+
+Campanium is unofficial Fan Content permitted under the Fan Content Policy. Not approved/endorsed by Wizards. Portions of the materials used are property of Wizards of the Coast. ©Wizards of the Coast LLC.
 
 ## License
 

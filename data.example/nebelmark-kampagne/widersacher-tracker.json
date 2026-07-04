@@ -1,5 +1,5 @@
 {
-  "name": "Strahd von Zarovich",
+  "name": "Graf Vessimir",
   "begegnungen": [
     {
       "nr": 1,
@@ -12,7 +12,7 @@
     }
   ],
   "ideen": [
-    { "text": "Strahd schickt eine Einladung per Krähenschwarm", "erledigt": false },
+    { "text": "Vessimir schickt eine Einladung per Krähenschwarm", "erledigt": false },
     { "text": "Er rettet die Party demonstrativ vor Wölfen – und geht wortlos", "erledigt": false },
     { "text": "Ein Spiegel im Gasthaus zeigt kurz sein Gesicht", "erledigt": true }
   ]

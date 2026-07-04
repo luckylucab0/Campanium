@@ -15,8 +15,8 @@
  *     (GitHub-Pages-tauglich). Ergebnis: client/dist-player/.
  *
  * Aufruf:  npm run build:player            (eine Kampagne in data/)
- *          KAMPAGNE=curse-of-strahd npm run build:player
- *          DATA_DIR=data.example KAMPAGNE=curse-of-strahd npm run build:player
+ *          KAMPAGNE=nebelmark-kampagne npm run build:player
+ *          DATA_DIR=data.example KAMPAGNE=nebelmark-kampagne npm run build:player
  */
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';

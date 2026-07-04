@@ -99,18 +99,18 @@ scripts/
 
 ## Kampagnen-agnostische Spezialmodule
 
-Die früher CoS-spezifischen Module sind generisch und pro Kampagne
-konfigurierbar – die Curse-of-Strahd-Demo zeigt die Belegung:
+Alle Spezialmodule sind generisch und pro Kampagne konfigurierbar – die
+fiktive Demo-Kampagne „Die Nebelmark“ zeigt eine Belegung:
 
-| Modul               | Generisch                           | In der CoS-Demo                |
-| ------------------- | ----------------------------------- | ------------------------------ |
-| Widersacher-Tracker | Name frei (`widersacher.name`)      | „Strahd von Zarovich“          |
-| Lesung              | Titel + beliebig viele Karten       | Tarokka-Lesung, 5 Karten       |
-| Eskalations-Tracker | optional, Titel + Stufen editierbar | „Strahds Eskalation“, 5 Stufen |
-| Custom-Tracker      | beliebige Zähler (`aktuell`/`max`)  | „Ireenas Bisse“ 1/3            |
-| Ort-Region          | Freitext, Filter aus Ist-Werten     | „Wildnis & Straßen“, …         |
-| Kalender            | Monate/Längen/Ära frei, Ereignisse  | 12 fiktive Monate, Jahr 735 BK |
-| Karten              | Grafik + Pins auf Orte              | „Die Nebelmark“, 3 Pins        |
+| Modul               | Generisch                           | In der Nebelmark-Demo               |
+| ------------------- | ----------------------------------- | ----------------------------------- |
+| Widersacher-Tracker | Name frei (`widersacher.name`)      | „Graf Vessimir“                     |
+| Lesung              | Titel + beliebig viele Karten       | Kartenlegung der Salzmutter, 5 K.   |
+| Eskalations-Tracker | optional, Titel + Stufen editierbar | „Vessimirs Eskalation“, 5 Stufen    |
+| Custom-Tracker      | beliebige Zähler (`aktuell`/`max`)  | „Selunes Bisse“ 1/3                 |
+| Ort-Region          | Freitext, Filter aus Ist-Werten     | „Wildnis & Straßen“, …              |
+| Kalender            | Monate/Längen/Ära frei, Ereignisse  | 12 fiktive Monate, Jahr 735 NZ      |
+| Karten              | Grafik + Pins auf Orte              | Übersichtskarte des Tals, 3 Pins    |
 
 ## Mehrsprachigkeit (i18n)
 
