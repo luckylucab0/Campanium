@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * Mappt die Icon-Namen aus der Entitäts-Registry (shared/) auf
  * Lucide-Komponenten. So bleibt shared/ frei von React-Abhängigkeiten.

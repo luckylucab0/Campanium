@@ -1,8 +1,16 @@
 # Contributing
 
-Issues und Pull Requests sind willkommen! Das Projekt steht unter
-[CC BY-NC 4.0](LICENSE): Forks und Weiterentwicklungen sind erlaubt,
-solange auf das Original verwiesen wird und niemand Geld damit verdient.
+Issues und Pull Requests sind willkommen! Das Projekt ist dual-lizenziert:
+[AGPL v3](LICENSE) für die Open-Source-Nutzung plus eine
+[kommerzielle Lizenz](LICENSE-COMMERCIAL.md) für Nutzung ohne
+AGPL-Pflichten.
+
+## CLA (Voraussetzung für jeden PR)
+
+Damit das Dual-Licensing funktioniert, werden Pull Requests **nur mit
+akzeptiertem CLA** gemerged: Lies [CLA.md](CLA.md) (kurz und verständlich)
+und schreibe in die Beschreibung deines ersten PRs den Satz
+„I have read and agree to the CLA (CLA.md).“
 
 ## Setup
 

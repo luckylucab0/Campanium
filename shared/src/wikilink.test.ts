@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /** Tests für den Wikilink-Parser – Herzstück der Verknüpfungen. */
 import { describe, expect, it } from 'vitest';
 import { ersetzeWikilinks, parseWikilinks, sammleLinkZiele } from './wikilink';

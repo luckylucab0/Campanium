@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * Slug-Erzeugung für IDs und Dateinamen.
  * Aus "Gregor der Kerzenmacher" wird "gregor-der-kerzenmacher" –

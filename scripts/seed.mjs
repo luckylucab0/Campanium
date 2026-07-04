@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * Seed-Skript: kopiert die fiktiven Beispieldaten aus data.example/ nach
  * data/, damit das Tool beim ersten Start lebendig aussieht.

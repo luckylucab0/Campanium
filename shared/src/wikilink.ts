@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * Wikilink-Parser: erkennt `[[Name]]` und `[[Name|Anzeigetext]]` in
  * Markdown-Texten – die Grundlage für Verknüpfungen, Backlinks und

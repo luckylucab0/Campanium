@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * UI-Context: globaler „Neu anlegen“-Dialog (auch von kaputten Wikilinks
  * aus erreichbar) und das Theme (dunkel ⇄ pergament, in localStorage).

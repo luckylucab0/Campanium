@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * Spieler-Build: erzeugt die statische, read-only Spieler-Version für
  * genau EINE Kampagne.

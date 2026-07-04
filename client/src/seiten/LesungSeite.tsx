@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * Spezialmodul (DM-only): Lesung / Prophezeiung.
  * Generisches Orakel-Modul mit frei konfigurierbarem Titel und beliebig

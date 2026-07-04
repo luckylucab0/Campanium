@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * Farbcodierte Badges für Status, Haltung & Co. sowie die DM-Markierung.
  * Übersetzt Enum-Werte zentral für die Anzeige – gespeichert bleiben

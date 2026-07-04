@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * Generische Detailseite: Kopf mit Badges, Metadaten (Verknüpfungen als
  * Links), Markdown-Abschnitte (DM-Abschnitte markiert), Quest-Fortschritt,

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * Öffentliche Schnittstelle des Shared-Pakets.
  * Client, Server und Skripte importieren ausschließlich von hier.

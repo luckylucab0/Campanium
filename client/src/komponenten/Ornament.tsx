@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * Thematische SVG-Akzente: ornamentale Trennlinie, Fledermaus und
  * Burg-Silhouette. Bewusst dezent gehalten – Atmosphäre, kein Clipart.

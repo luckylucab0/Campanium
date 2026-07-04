@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /** Tests für die Slug-Erzeugung (IDs & Dateinamen). */
 import { describe, expect, it } from 'vitest';
 import { eindeutigerSlug, slugify } from './slug';
