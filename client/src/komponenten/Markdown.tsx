@@ -114,7 +114,7 @@ function HoverVorschau({ entitaet, x, y }: VorschauZustand) {
   const haltung = (entitaet as unknown as Record<string, unknown>)['haltung'];
   return (
     <div
-      className="karte karte-ornament fixed z-50 max-w-xs px-3 py-2 text-sm shadow-xl"
+      className="karte karte-ornament fixed! z-50 max-w-xs px-3 py-2 text-sm shadow-xl"
       style={{ left: Math.min(x, window.innerWidth - 320), top: y }}
       role="tooltip"
     >

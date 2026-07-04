@@ -107,7 +107,7 @@ fiktive Demo-Kampagne „Die Nebelmark“ zeigt eine Belegung:
 | Widersacher-Tracker | Name frei (`widersacher.name`)      | „Graf Vessimir“                     |
 | Lesung              | Titel + beliebig viele Karten       | Kartenlegung der Salzmutter, 5 K.   |
 | Eskalations-Tracker | optional, Titel + Stufen editierbar | „Vessimirs Eskalation“, 5 Stufen    |
-| Custom-Tracker      | beliebige Zähler (`aktuell`/`max`)  | „Selunes Bisse“ 1/3                 |
+| Custom-Tracker      | beliebige Zähler (`aktuell`/`max`)  | „Selainestes Bisse“ 1/3                 |
 | Ort-Region          | Freitext, Filter aus Ist-Werten     | „Wildnis & Straßen“, …              |
 | Kalender            | Monate/Längen/Ära frei, Ereignisse  | 12 fiktive Monate, Jahr 735 NZ      |
 | Karten              | Grafik + Pins auf Orte              | Übersichtskarte des Tals, 3 Pins    |
