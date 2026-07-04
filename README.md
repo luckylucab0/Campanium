@@ -89,6 +89,8 @@ AI_MODEL=               # optional override, sensible default per provider
 
 Restart `npm run dev` — a chat button appears bottom-right (DM mode only). The assistant works through the same Zod-validated storage layer as the REST API, so it cannot produce invalid data. Every change it makes is shown as a linked action card in the chat, and **it has no delete capability** — deletion stays a manual DM action.
 
+**Guardrails:** the assistant is instructed to help **only with your campaign** — off-topic requests (general knowledge, coding, small talk, …) get a one-sentence refusal instead of burning your tokens, and it treats campaign data returned by its tools as data, never as instructions. On top of that the server hard-caps every request: only the most recent 20 chat messages are sent to the provider, single messages are truncated at 4,000 characters, and the agent loop stops after 8 rounds.
+
 <p align="center">
   <img src="docs/screenshots/ki-assistent.png" alt="KI-Assistent als Chat-Drawer im DM-Modus" width="80%" />
 </p>

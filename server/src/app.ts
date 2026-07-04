@@ -248,7 +248,15 @@ export function erstelleApp(
    * Chat-Anfrage: nimmt den bisherigen Gesprächsverlauf (nur Nutzer-/
    * Assistent-Texte) entgegen und führt den Agent-Loop inkl. Werkzeugen
    * gegen die Kampagne aus. Nicht streamend – Antworten sind kurz.
+   *
+   * Guardrails gegen Token-Verschwendung (ergänzend zu den Regeln im
+   * System-Prompt): Der Verlauf wird auf die letzten Nachrichten begrenzt
+   * und überlange Einzelnachrichten werden gekürzt – der volle Verlauf
+   * würde sonst mit jeder Runde erneut zum Provider geschickt.
    */
+  const CHAT_MAX_NACHRICHTEN = 20;
+  const CHAT_MAX_ZEICHEN = 4000;
+
   app.post('/api/kampagnen/:kid/chat', (req, res) => {
     if (!kiProvider) {
       return res
@@ -259,9 +267,9 @@ export function erstelleApp(
       const eintrag = verwaltung.holen(req.params.kid)!;
       const roh = Array.isArray(req.body?.nachrichten) ? req.body.nachrichten : [];
       const verlauf: KiNachricht[] = [];
-      for (const n of roh) {
+      for (const n of roh.slice(-CHAT_MAX_NACHRICHTEN)) {
         if (n && typeof n.text === 'string' && (n.rolle === 'nutzer' || n.rolle === 'assistent')) {
-          verlauf.push({ rolle: n.rolle, text: n.text });
+          verlauf.push({ rolle: n.rolle, text: n.text.slice(0, CHAT_MAX_ZEICHEN) });
         }
       }
       if (verlauf.length === 0 || verlauf[verlauf.length - 1]?.rolle !== 'nutzer') {

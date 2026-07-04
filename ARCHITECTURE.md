@@ -62,7 +62,9 @@ server/src/
     anthropic.ts     Claude über das offizielle SDK
     openaiKompatibel.ts  OpenAI, Mistral, Gemini & Ollama (ein Adapter)
     tools.ts         Werkzeuge = CRUD gegen den Storage (Zod-validiert, kein Löschen)
-    chat.ts          Agent-Loop (max. 8 Runden) + System-Prompt
+    chat.ts          Agent-Loop (max. 8 Runden) + System-Prompt mit Guardrails
+                     (nur Kampagnen-Themen, Injection-Schutz); die Chat-Route
+                     deckelt zusätzlich Verlaufslänge und Nachrichtengröße
     config.ts        .env-Konfiguration, Provider-Factory (+ Tests)
 
 client/src/

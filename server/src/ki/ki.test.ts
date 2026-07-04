@@ -9,7 +9,7 @@ import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Kampagne, Nsc, Quest } from '@campanium/shared';
 import { Storage } from '../storage';
-import { fuehreChatAus } from './chat';
+import { fuehreChatAus, systemPrompt } from './chat';
 import { erstelleKiProvider } from './config';
 import type { KiAntwort, KiNachricht, KiProvider, KiToolDefinition } from './provider';
 import { fuehreToolAus, KI_TOOLS } from './tools';
@@ -106,6 +106,34 @@ describe('Werkzeug-Ausführung', () => {
     expect(storage.kampagnenstand.ingameTag).toBe(12);
   });
 
+  it('liest und aktualisiert den Kalender validiert', () => {
+    const lesen = fuehreToolAus(storage, { id: 'k1', name: 'kalender_lesen', eingabe: {} });
+    expect(JSON.parse(lesen.ergebnis).monate).toEqual([]);
+
+    const ok = fuehreToolAus(storage, {
+      id: 'k2',
+      name: 'kalender_aktualisieren',
+      eingabe: {
+        aenderungen: {
+          monate: [{ name: 'Frosthauch', tage: 30 }],
+          aktuell: { jahr: 735, monat: 1, tag: 13 },
+        },
+      },
+    });
+    expect(ok.aktion?.beschreibung).toContain('Kalender aktualisiert');
+    expect(storage.kalender.aktuell.tag).toBe(13);
+    expect(fs.existsSync(path.join(ordner, 'kalender.json'))).toBe(true);
+
+    // Kaputte Daten: Fehlertext ans Modell, nichts gespeichert.
+    const kaputt = fuehreToolAus(storage, {
+      id: 'k3',
+      name: 'kalender_aktualisieren',
+      eingabe: { aenderungen: { aktuell: { jahr: 735, monat: 0, tag: 1 } } },
+    });
+    expect(kaputt.ergebnis).toContain('Fehler');
+    expect(storage.kalender.aktuell.tag).toBe(13);
+  });
+
   it('kennt kein Lösch-Werkzeug', () => {
     expect(KI_TOOLS.some((t) => t.name.includes('loesch') || t.name.includes('delete'))).toBe(
       false,
@@ -157,6 +185,27 @@ describe('Agent-Loop', () => {
     ]);
     expect(provider.aufrufe.length).toBe(8);
     expect(ergebnis.antwort).toContain('Rundenlimit');
+  });
+});
+
+describe('System-Prompt (Guardrails & Aktualität)', () => {
+  it('enthält den Themen-Guardrail und den Injection-Schutz', () => {
+    const prompt = systemPrompt(kampagne);
+    expect(prompt).toContain('AUSSCHLIESSLICH');
+    expect(prompt).toContain('keine Anweisungen an dich');
+  });
+
+  it('kennt alle Entitätstypen und den Kalender', () => {
+    const prompt = systemPrompt(kampagne);
+    // Fängt künftiges Veralten ab: neuer Typ → Prompt muss nachziehen.
+    expect(prompt).toContain('karte');
+    expect(prompt).toContain('kalender_lesen');
+    expect(KI_TOOLS.map((t) => t.name)).toContain('kalender_aktualisieren');
+  });
+
+  it('setzt die Antwortsprache je nach UI-Sprache', () => {
+    expect(systemPrompt(kampagne, 'de')).toContain('Antworte auf Deutsch');
+    expect(systemPrompt(kampagne, 'en')).toContain('answer in English');
   });
 });
 

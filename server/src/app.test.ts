@@ -9,6 +9,7 @@ import path from 'node:path';
 import type { Server } from 'node:http';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { erstelleApp } from './app';
+import type { KiNachricht, KiProvider } from './ki/provider';
 import { KampagnenVerwaltung } from './storage';
 
 let server: Server;
@@ -185,6 +186,51 @@ describe('Bilder', () => {
       `${basisUrl}/api/kampagnen/${kid}/bilder/${encodeURIComponent('../kampagne.json')}`,
     );
     expect(antwort.status).toBe(404);
+  });
+});
+
+describe('KI-Chat-Guardrails (Verlaufs- und Längenlimits)', () => {
+  it('kürzt lange Verläufe und überlange Nachrichten vor dem Provider-Aufruf', async () => {
+    // Eigene App mit Fake-Provider, der den empfangenen Verlauf aufzeichnet.
+    const empfangen: KiNachricht[][] = [];
+    const fakeProvider: KiProvider = {
+      provider: 'fake',
+      modell: 'fake-1',
+      chat: (_system, nachrichten) => {
+        empfangen.push([...nachrichten]);
+        return Promise.resolve({ text: 'ok', toolAufrufe: [] });
+      },
+    };
+    const verwaltung = new KampagnenVerwaltung(datenOrdner);
+    verwaltung.laden();
+    const kiApp = erstelleApp(verwaltung, fakeProvider);
+    const kiServer = await new Promise<Server>((resolve) => {
+      const s = kiApp.listen(0, () => resolve(s));
+    });
+    const adresse = kiServer.address();
+    if (typeof adresse === 'string' || adresse === null) throw new Error('Kein Port');
+
+    // 30 Nachrichten, die letzte 10 000 Zeichen lang.
+    const nachrichten = Array.from({ length: 29 }, (_, i) => ({
+      rolle: i % 2 === 0 ? 'nutzer' : 'assistent',
+      text: `Nachricht ${i + 1}`,
+    }));
+    nachrichten.push({ rolle: 'nutzer', text: 'x'.repeat(10_000) });
+
+    const antwort = await fetch(`http://127.0.0.1:${adresse.port}/api/kampagnen/${kid}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nachrichten }),
+    });
+    kiServer.close();
+
+    expect(antwort.status).toBe(200);
+    const texte = empfangen[0]!.map((n) => ('text' in n ? n.text : ''));
+    // Nur die letzten 20 Nachrichten erreichen den Provider …
+    expect(texte).toHaveLength(20);
+    expect(texte[0]).toBe('Nachricht 11');
+    // … und überlange Nachrichten sind auf 4000 Zeichen gekürzt.
+    expect(texte.at(-1)).toHaveLength(4000);
   });
 });
 
