@@ -10,6 +10,7 @@ import {
   eindeutigerSlug,
   ENTITY_TYPEN,
   entityConfigs,
+  kalenderSchema,
   kampagnenstandSchema,
   neueEntitaet,
   validiereEntitaet,
@@ -55,6 +56,7 @@ const AKTIONS_TEXTE: Record<
     aktualisiert: (label: string, name: string, felder: string) => string;
     logEintrag: (sessionNr: number, name: string) => string;
     kampagnenstand: (felder: string) => string;
+    kalender: (felder: string) => string;
   }
 > = {
   de: {
@@ -62,12 +64,14 @@ const AKTIONS_TEXTE: Record<
     aktualisiert: (label, name, felder) => `${label} „${name}“ aktualisiert (${felder})`,
     logEintrag: (sessionNr, name) => `Log-Eintrag (S${sessionNr}) bei „${name}“ ergänzt`,
     kampagnenstand: (felder) => `Kampagnenstand aktualisiert (${felder})`,
+    kalender: (felder) => `Kalender aktualisiert (${felder})`,
   },
   en: {
     angelegt: (label, name) => `${label} “${name}” created`,
     aktualisiert: (label, name, felder) => `${label} “${name}” updated (${felder})`,
     logEintrag: (sessionNr, name) => `Log entry (S${sessionNr}) added to “${name}”`,
     kampagnenstand: (felder) => `Campaign state updated (${felder})`,
+    kalender: (felder) => `Calendar updated (${felder})`,
   },
 };
 
@@ -163,6 +167,30 @@ export const KI_TOOLS: KiToolDefinition[] = [
       type: 'object',
       properties: {
         aenderungen: { type: 'object', description: 'Zu ändernde Felder des Kampagnenstands' },
+      },
+      required: ['aenderungen'],
+    },
+  },
+  {
+    name: 'kalender_lesen',
+    beschreibung:
+      'Liest den In-Game-Kalender der Kampagne: Monate (Name + Tage), Ära, ' +
+      'aktuelles Datum {jahr, monat, tag} und Ereignisse. Leere Monatsliste = ' +
+      'Kalender nicht eingerichtet.',
+    parameter: { type: 'object', properties: {} },
+  },
+  {
+    name: 'kalender_aktualisieren',
+    beschreibung:
+      'Aktualisiert Felder des Kalenders (Teil-Update), z. B. das aktuelle ' +
+      'Datum weitersetzen oder ein Ereignis ergänzen. Lies den Kalender vorher ' +
+      'mit kalender_lesen. Beim Weiterzählen des Datums Monats- und ' +
+      'Jahresgrenzen beachten (tage des Monats aus der Monatsliste; nach dem ' +
+      'letzten Monat beginnt Monat 1 des Folgejahres). Monat und Tag sind 1-basiert.',
+    parameter: {
+      type: 'object',
+      properties: {
+        aenderungen: { type: 'object', description: 'Zu ändernde Felder des Kalenders' },
       },
       required: ['aenderungen'],
     },
@@ -309,6 +337,24 @@ export function fuehreToolAus(
           aktion: {
             art: 'aktualisiert',
             beschreibung: texte.kampagnenstand(geaenderteFelder),
+          },
+        };
+      }
+
+      case 'kalender_lesen':
+        return { ergebnis: JSON.stringify(storage.kalender) };
+
+      case 'kalender_aktualisieren': {
+        const kandidat = { ...storage.kalender, ...((eingabe.aenderungen as object) ?? {}) };
+        const kalender = kalenderSchema.parse(kandidat);
+        storage.kalender = kalender;
+        storage.speichereSingleton('kalender', kalender);
+        const geaenderteFelder = Object.keys((eingabe.aenderungen as object) ?? {}).join(', ');
+        return {
+          ergebnis: JSON.stringify(kalender),
+          aktion: {
+            art: 'aktualisiert',
+            beschreibung: texte.kalender(geaenderteFelder),
           },
         };
       }
