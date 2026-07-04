@@ -151,6 +151,43 @@ describe('Entitäten-CRUD (kampagnenbezogen)', () => {
   });
 });
 
+describe('Bilder', () => {
+  /** 1×1-PNG (Magic Bytes reichen – der Server prüft nur den Content-Type). */
+  const miniPng = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00]);
+
+  it('nimmt einen Upload an und liefert das Bild wieder aus', async () => {
+    const upload = await fetch(`${basisUrl}/api/kampagnen/${kid}/bilder`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'image/png' },
+      body: miniPng,
+    });
+    expect(upload.status).toBe(201);
+    const { datei } = await upload.json();
+    expect(datei).toMatch(/^[\w-]+\.png$/);
+    expect(fs.existsSync(path.join(datenOrdner, kid, 'bilder', datei))).toBe(true);
+
+    const abruf = await fetch(`${basisUrl}/api/kampagnen/${kid}/bilder/${datei}`);
+    expect(abruf.status).toBe(200);
+    expect(Buffer.from(await abruf.arrayBuffer())).toEqual(miniPng);
+  });
+
+  it('weist nicht unterstützte Formate ab', async () => {
+    const antwort = await fetch(`${basisUrl}/api/kampagnen/${kid}/bilder`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'image/svg+xml' },
+      body: '<svg/>',
+    });
+    expect(antwort.status).toBe(400);
+  });
+
+  it('blockiert Pfad-Tricks beim Abruf', async () => {
+    const antwort = await fetch(
+      `${basisUrl}/api/kampagnen/${kid}/bilder/${encodeURIComponent('../kampagne.json')}`,
+    );
+    expect(antwort.status).toBe(404);
+  });
+});
+
 describe('Singletons', () => {
   it('speichert den Kampagnenstand validiert (inkl. Eskalation)', async () => {
     const alles = await (await fetch(`${basisUrl}/api/kampagnen/${kid}/alles`)).json();
@@ -171,6 +208,29 @@ describe('Singletons', () => {
       eskalation: { titel: 'X', stufe: 9, stufen: ['eins', 'zwei'] },
     });
     expect(antwort.status).toBe(400);
+  });
+
+  it('speichert den Kalender validiert und weist kaputte Daten ab', async () => {
+    const ok = await put(`/api/kampagnen/${kid}/kalender`, {
+      aera: 'BC',
+      monate: [{ name: 'Frosthauch', tage: 30 }],
+      aktuell: { jahr: 735, monat: 1, tag: 12 },
+      ereignisse: [
+        { id: 'e1', datum: { jahr: 735, monat: 1, tag: 14 }, titel: 'Fest', entitaetId: null },
+      ],
+    });
+    expect(ok.status).toBe(200);
+    expect(fs.existsSync(path.join(datenOrdner, kid, 'kalender.json'))).toBe(true);
+    const alles = await (await fetch(`${basisUrl}/api/kampagnen/${kid}/alles`)).json();
+    expect(alles.kalender.monate).toHaveLength(1);
+
+    const kaputt = await put(`/api/kampagnen/${kid}/kalender`, {
+      aera: '',
+      monate: [{ name: 'X', tage: 0 }],
+      aktuell: { jahr: 1, monat: 1, tag: 1 },
+      ereignisse: [],
+    });
+    expect(kaputt.status).toBe(400);
   });
 
   it('speichert Widersacher-Tracker und Lesung', async () => {

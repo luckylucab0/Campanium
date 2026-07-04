@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 import { Bot, Pencil, Plus, ScrollText, Send, X } from 'lucide-react';
 import { entityConfigs } from '@campanium/shared';
 import { IST_SPIELER_MODUS, ladeKiStatus, sendeKiChat, type KiAktion, type KiStatus } from '../api';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { Markdown } from './Markdown';
 
@@ -24,6 +25,7 @@ interface ChatNachricht {
 
 export function KiChat() {
   const { kampagne, neuLaden } = useStore();
+  const { t, sprache } = useI18n();
   const [status, setStatus] = useState<KiStatus>({ aktiv: false });
   const [offen, setOffen] = useState(false);
   const [nachrichten, setNachrichten] = useState<ChatNachricht[]>([]);
@@ -58,6 +60,7 @@ export function KiChat() {
       const ergebnis = await sendeKiChat(
         kampagne.id,
         verlauf.filter((n) => !n.fehler).map((n) => ({ rolle: n.rolle, text: n.text })),
+        sprache,
       );
       setNachrichten((alt) => [
         ...alt,
@@ -69,7 +72,7 @@ export function KiChat() {
         ...alt,
         {
           rolle: 'assistent',
-          text: fehler instanceof Error ? fehler.message : 'Anfrage fehlgeschlagen.',
+          text: fehler instanceof Error ? fehler.message : t('Anfrage fehlgeschlagen.'),
           fehler: true,
         },
       ]);
@@ -85,8 +88,8 @@ export function KiChat() {
         <button
           className="kerze fixed bottom-5 right-5 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-arkan/50 bg-flaeche-2 text-arkan shadow-xl hover:bg-arkan-flaeche"
           onClick={() => setOffen(true)}
-          aria-label="KI-Assistent öffnen"
-          title={`KI-Assistent (${status.provider} / ${status.modell})`}
+          aria-label={t('KI-Assistent öffnen')}
+          title={`${t('KI-Assistent')} (${status.provider} / ${status.modell})`}
         >
           <Bot size={22} />
         </button>
@@ -97,19 +100,19 @@ export function KiChat() {
         <div
           className="karte karte-ornament fixed bottom-5 right-5 z-40 flex h-[70vh] w-[min(26rem,calc(100vw-2.5rem))] flex-col shadow-2xl"
           role="dialog"
-          aria-label="KI-Assistent"
+          aria-label={t('KI-Assistent')}
           onKeyDown={(e) => e.key === 'Escape' && setOffen(false)}
         >
           <div className="flex items-center gap-2 border-b border-rand px-3 py-2.5">
             <Bot size={16} className="text-arkan" aria-hidden />
-            <span className="font-display text-sm text-text-stark">KI-Assistent</span>
+            <span className="font-display text-sm text-text-stark">{t('KI-Assistent')}</span>
             <span className="text-[10px] uppercase tracking-wider text-text-schwach">
               {status.provider}
             </span>
             <button
               className="ml-auto text-text-schwach hover:text-text-stark"
               onClick={() => setOffen(false)}
-              aria-label="Schließen"
+              aria-label={t('Schließen')}
             >
               <X size={16} />
             </button>
@@ -118,13 +121,13 @@ export function KiChat() {
           <div ref={listeRef} className="flex-1 space-y-3 overflow-y-auto px-3 py-3">
             {nachrichten.length === 0 && (
               <p className="text-sm text-text-schwach">
-                Erzähl mir, was am Tisch passiert ist – ich pflege es ein. Zum Beispiel:{' '}
+                {t('Erzähl mir, was am Tisch passiert ist – ich pflege es ein. Zum Beispiel:')}{' '}
                 <em>
-                  „Die Gruppe hat die Kerzen-Quest abgeschlossen und Gregor ist jetzt verbündet.“
+                  {t('„Die Gruppe hat die Kerzen-Quest abgeschlossen und Gregor ist jetzt verbündet.“')}
                 </em>
                 <br />
                 <br />
-                Ich kann Einträge anlegen und ändern, aber nichts löschen.
+                {t('Ich kann Einträge anlegen und ändern, aber nichts löschen.')}
               </p>
             )}
             {nachrichten.map((n, i) => (
@@ -151,14 +154,14 @@ export function KiChat() {
                 )}
               </div>
             ))}
-            {laedt && <p className="mr-6 animate-pulse text-sm text-text-schwach">denkt nach …</p>}
+            {laedt && <p className="mr-6 animate-pulse text-sm text-text-schwach">{t('denkt nach …')}</p>}
           </div>
 
           <div className="flex gap-2 border-t border-rand p-2.5">
             <textarea
               className="max-h-28 flex-1 resize-none rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-sm text-text-stark placeholder:text-text-schwach/60"
               rows={2}
-              placeholder="Was ist passiert?"
+              placeholder={t('Was ist passiert?')}
               value={eingabe}
               onChange={(e) => setEingabe(e.target.value)}
               onKeyDown={(e) => {
@@ -167,13 +170,13 @@ export function KiChat() {
                   void senden();
                 }
               }}
-              aria-label="Nachricht an den KI-Assistenten"
+              aria-label={t('Nachricht an den KI-Assistenten')}
             />
             <button
               className="self-end rounded bg-blut p-2 text-white hover:bg-blut-hell disabled:opacity-40"
               onClick={() => void senden()}
               disabled={laedt || !eingabe.trim()}
-              aria-label="Senden"
+              aria-label={t('Senden')}
             >
               <Send size={15} />
             </button>

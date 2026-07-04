@@ -4,7 +4,7 @@ A self-hosted **campaign management tool for D&D** (and similar tabletop RPGs), 
 
 It ships with a fully fleshed-out (and entirely fictional) **Curse of Strahd** demo campaign, but nothing about the tool is CoS-specific: the nemesis tracker, the oracle/reading module, escalation stages, regions and all counters are freely configurable per campaign.
 
-> **UI language: German.** The interface, seed data and in-code documentation are written in German; this README is in English for the wider community.
+> **UI languages: German & English.** Switch the language any time from the sidebar (the choice is remembered); more languages are planned and easy to add — see [ARCHITECTURE.md](ARCHITECTURE.md#mehrsprachigkeit-i18n). Seed data and in-code documentation are written in German; this README is in English for the wider community.
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
@@ -14,8 +14,13 @@ It ships with a fully fleshed-out (and entirely fictional) **Curse of Strahd** d
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/nsc-detail.png" alt="NSC-Detailseite mit DM-Abschnitten und Backlinks" width="49%" />
-  <img src="docs/screenshots/kampagne-wechsel.png" alt="Zweite Kampagne nach dem Umschalten" width="49%" />
+  <img src="docs/screenshots/nsc-detail.png" alt="NSC-Detailseite mit Portrait, DM-Abschnitten und Backlinks" width="49%" />
+  <img src="docs/screenshots/karte-pins.png" alt="Interaktive Karte mit Pins auf Orte" width="49%" />
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/kalender.png" alt="In-Game-Kalender mit Ereignissen" width="49%" />
+  <img src="docs/screenshots/graph.png" alt="Beziehungsgraph der Kampagne" width="49%" />
 </p>
 
 _Screenshots show the two fictional demo campaigns from `data.example/` (DM mode, dark theme)._
@@ -33,8 +38,13 @@ The tool runs in two modes:
 
 ### Features
 
+- **Two UI languages, more to come** — German and English out of the box, switchable at runtime (player build included); your campaign data stays untouched, only the interface is translated. The optional AI assistant answers in the selected language, too. Adding another language is a single dictionary file.
 - **Multiple campaigns** — each campaign is its own folder under `data/`; switch between them from the sidebar, create new ones in-app. Wikilinks, search and backlinks are always scoped to the active campaign.
-- **Entities with templates** — NPCs, quests, locations, player characters, sessions, session preps, items, factions and free-form reference notes, each with a sensible section structure and per-entity campaign log.
+- **Entities with templates** — NPCs, quests, locations, player characters, sessions, session preps, items, factions, maps and free-form reference notes, each with a sensible section structure and per-entity campaign log.
+- **Images & portraits** — attach an image to any entity (PNG/JPEG/WebP/GIF, stored as plain files inside your campaign folder): portraits on detail pages and list cards, artwork for locations and items.
+- **Interactive maps** — upload a map image and place pins that link to your locations; pin colours show visited/unvisited, clicking navigates to the place. The player export keeps only pins of visited locations.
+- **In-game calendar** — months with custom names and lengths per campaign (two presets included), a current date that rolls cleanly over month and year boundaries, and events that can link to any entity. DM-only by design.
+- **Relationship graph** — a force-directed view of how everything connects, fed by the same wikilinks and reference fields as the backlinks; filter by type, click a node to jump to its entity.
 - **Wikilinks & backlinks** — type `[[Name]]` (with autocomplete) in any Markdown field to link entities, Obsidian-style. Links render with hover previews; every detail page lists automatic backlinks (“Erwähnt in …”). Unresolved links offer one-click creation.
 - **Global search** — `Cmd/Ctrl+K` fuzzy palette over names, tags and full text, grouped by type, keyboard-first.
 - **Dashboard trackers** — party level, in-game day, an optional escalation tracker (freely named, with editable stage descriptions — “Strahd’s escalation” in the demo) and freely addable custom counters (“Ireena’s bites 1/3”), all editable in place.
@@ -105,10 +115,13 @@ This:
 - locations only if `besucht` (visited) is true;
 - NPCs only if the party has demonstrably met them: status ≠ `unbekannt` **and** at least one campaign-log entry;
 - items only if `gefunden` (found) is true;
+- map pins only if their linked location is exported; free markers and DM pin labels are stripped;
+- images are copied only for exported entities (the target folder is wiped first, so no stale files leak);
 - per entity, only explicitly whitelisted fields are copied — new fields are DM-only by default;
-- references to non-exported entities are nulled so no IDs leak names.
+- references to non-exported entities are nulled so no IDs leak names;
+- the calendar (DM planning) is never exported.
 
-**Deploying to Pages:** commit the (spoiler-free) `client/public/player-data.json`, push, then manually trigger the **“Spieler-Build auf GitHub Pages”** workflow (`workflow_dispatch`) — so _you_ decide when content goes public. The workflow rebuilds the static app from the committed JSON and publishes it. Test locally with `npx vite preview --outDir dist-player` inside `client/`.
+**Deploying to Pages:** commit the (spoiler-free) `client/public/player-data.json` and `client/public/bilder/`, push, then manually trigger the **“Spieler-Build auf GitHub Pages”** workflow (`workflow_dispatch`) — so _you_ decide when content goes public. The workflow rebuilds the static app from the committed JSON and publishes it. Test locally with `npx vite preview --outDir dist-player` inside `client/`.
 
 ## Project layout
 
@@ -122,7 +135,8 @@ data/     YOUR campaigns – gitignored
   └─ <campaign-id>/
        kampagne.json           campaign manifest (name, tagline)
        kampagnenstand.json     dashboard trackers
-       widersacher-tracker.json / lesung.json   DM special modules
+       widersacher-tracker.json / lesung.json / kalender.json   DM special modules
+       bilder/                 uploaded images (portraits, map art)
        nsc/ quest/ ort/ …      one JSON file per entity
 ```
 

@@ -17,6 +17,7 @@ export const ENTITY_TYPEN = [
   'sessionPrep',
   'gegenstand',
   'fraktion',
+  'karte',
   'notiz',
 ] as const;
 
@@ -47,6 +48,11 @@ export interface BasisEntitaet {
   /** true = gesamte Entität ist nur für den DM sichtbar. */
   dmOnly: boolean;
   kampagnenLog: KampagnenLogEintrag[];
+  /**
+   * Optionales Bild (Portrait, Artwork, Kartengrafik): Dateiname im
+   * bilder/-Ordner der Kampagne. null = kein Bild.
+   */
+  bild: string | null;
 }
 
 export const HALTUNGEN = [
@@ -220,6 +226,31 @@ export interface Fraktion extends BasisEntitaet {
   stand: string;
 }
 
+/** Ein Pin auf einer Karte. */
+export interface KartenPin {
+  id: string;
+  /** Position in Prozent der Bildbreite (0–100). */
+  x: number;
+  /** Position in Prozent der Bildhöhe (0–100). */
+  y: number;
+  /** Verknüpfter Ort (Entitäts-ID), null = freier Marker. */
+  ortId: string | null;
+  /** Freitext-Beschriftung (bei verknüpften Pins optional, sonst der Name). */
+  beschriftung: string;
+}
+
+/**
+ * Interaktive Karte: eine hochgeladene Kartengrafik (Basisfeld `bild`)
+ * mit klickbaren Pins, die auf Orte verlinken. Im Spieler-Build werden
+ * nur Pins exportierter (= besuchter) Orte übernommen.
+ */
+export interface Karte extends BasisEntitaet {
+  typ: 'karte';
+  /** Abschnitt: Beschreibung / Legende (Markdown). */
+  beschreibung: string;
+  pins: KartenPin[];
+}
+
 /** Freie Referenz-Notiz (Hausregeln, Kalender, Tabellen, …). */
 export interface Notiz extends BasisEntitaet {
   typ: 'notiz';
@@ -237,6 +268,7 @@ export type Entitaet =
   | SessionPrep
   | Gegenstand
   | Fraktion
+  | Karte
   | Notiz;
 
 // ---------------------------------------------------------------------------
@@ -314,6 +346,43 @@ export interface WidersacherTracker {
   begegnungen: WidersacherBegegnung[];
   /** „Ideen-Vorrat": abhakbare Szenen-Ideen. */
   ideen: ChecklistEintrag[];
+}
+
+/** Ein Monat des Kampagnen-Kalenders (frei benennbar, freie Länge). */
+export interface KalenderMonat {
+  name: string;
+  tage: number;
+}
+
+/** Ein Datum im Kampagnen-Kalender (Monat/Tag 1-basiert). */
+export interface KalenderDatum {
+  jahr: number;
+  monat: number;
+  tag: number;
+}
+
+/** Ein Ereignis an einem Kalendertag (Fest, Frist, geplante Szene, …). */
+export interface KalenderEreignis {
+  id: string;
+  datum: KalenderDatum;
+  titel: string;
+  /** Optional verknüpfte Entität (Quest, NSC, Ort, …). */
+  entitaetId: string | null;
+}
+
+/**
+ * Spezialmodul: In-Game-Kalender (DM-only). Eigene Monate mit eigenen
+ * Längen pro Kampagne – vom irdischen Kalender bis zur komplett
+ * erfundenen Zeitrechnung. Leere Monatsliste = Modul noch nicht
+ * eingerichtet.
+ */
+export interface Kalender {
+  /** Bezeichnung der Jahreszählung, z. B. „BC“ (Barovianischer Kalender). */
+  aera: string;
+  monate: KalenderMonat[];
+  /** Aktuelles In-Game-Datum. */
+  aktuell: KalenderDatum;
+  ereignisse: KalenderEreignis[];
 }
 
 export const LESUNG_KARTEN_STATUS = ['geheim', 'hinweis gegeben', 'von Party entdeckt'] as const;

@@ -16,6 +16,7 @@ import express from 'express';
 import { ZodError } from 'zod';
 import {
   eindeutigerSlug,
+  kalenderSchema,
   kampagnenstandSchema,
   lesungSchema,
   neueEntitaet,
@@ -25,6 +26,7 @@ import {
 import { istEntityTyp, KampagnenVerwaltung, type Storage } from './storage';
 import { fuehreChatAus } from './ki/chat';
 import type { KiNachricht, KiProvider } from './ki/provider';
+import type { KiSprache } from './ki/tools';
 
 export function erstelleApp(
   verwaltung: KampagnenVerwaltung,
@@ -80,6 +82,7 @@ export function erstelleApp(
         kampagnenstand: storage.kampagnenstand,
         widersacher: storage.widersacher,
         lesung: storage.lesung,
+        kalender: storage.kalender,
       });
     });
   });
@@ -158,6 +161,52 @@ export function erstelleApp(
     });
   });
 
+  // ---- Bilder -----------------------------------------------------------------
+
+  /** Content-Type → Dateiendung der erlaubten Bildformate. */
+  const BILD_FORMATE: Record<string, string> = {
+    'image/png': 'png',
+    'image/jpeg': 'jpg',
+    'image/webp': 'webp',
+    'image/gif': 'gif',
+  };
+
+  /**
+   * Bild-Upload: Der Client schickt die Datei roh (Content-Type = Bildtyp),
+   * der Server vergibt einen sicheren Dateinamen und antwortet mit ihm.
+   * Entitäten speichern nur diesen Dateinamen im Feld `bild`.
+   */
+  app.post(
+    '/api/kampagnen/:kid/bilder',
+    express.raw({ type: 'image/*', limit: '10mb' }),
+    (req, res) => {
+      mitKampagne(res, req.params.kid, (storage) => {
+        const contentType = (req.headers['content-type'] ?? '').split(';')[0]!.trim();
+        const endung = BILD_FORMATE[contentType];
+        if (!endung) {
+          return res
+            .status(400)
+            .json({ fehler: 'Bildformat nicht unterstützt (erlaubt: PNG, JPEG, WebP, GIF)' });
+        }
+        if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
+          return res.status(400).json({ fehler: 'Leerer Upload' });
+        }
+        // Zeitstempel + Zufallsteil: eindeutig, ohne Nutzereingabe im Namen.
+        const datei = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.${endung}`;
+        storage.speichereBild(datei, req.body);
+        return res.status(201).json({ datei });
+      });
+    },
+  );
+
+  app.get('/api/kampagnen/:kid/bilder/:datei', (req, res) => {
+    mitKampagne(res, req.params.kid, (storage) => {
+      const pfad = storage.bildPfad(req.params.datei);
+      if (!pfad) return res.status(404).json({ fehler: 'Bild nicht gefunden' });
+      return res.sendFile(pfad);
+    });
+  });
+
   // ---- Singletons -------------------------------------------------------------
 
   app.put('/api/kampagnen/:kid/kampagnenstand', (req, res) => {
@@ -220,7 +269,9 @@ export function erstelleApp(
           .status(400)
           .json({ fehler: 'nachrichten muss mit einer Nutzer-Nachricht enden' });
       }
-      fuehreChatAus(kiProvider, eintrag.kampagne, storage, verlauf)
+      // UI-Sprache des Clients (Antworten + Aktions-Beschreibungen), Default Deutsch.
+      const sprache: KiSprache = req.body?.sprache === 'en' ? 'en' : 'de';
+      fuehreChatAus(kiProvider, eintrag.kampagne, storage, verlauf, sprache)
         .then((ergebnis) => res.json(ergebnis))
         .catch((fehler: unknown) => {
           // Provider-Fehler (Netz, Auth, Ratelimit) sauber an den Client melden.
@@ -237,6 +288,18 @@ export function erstelleApp(
         storage.lesung = lesungSchema.parse(req.body);
         storage.speichereSingleton('lesung', storage.lesung);
         return res.json(storage.lesung);
+      } catch (fehler) {
+        return sendeValidierungsfehler(res, fehler);
+      }
+    });
+  });
+
+  app.put('/api/kampagnen/:kid/kalender', (req, res) => {
+    mitKampagne(res, req.params.kid, (storage) => {
+      try {
+        storage.kalender = kalenderSchema.parse(req.body);
+        storage.speichereSingleton('kalender', storage.kalender);
+        return res.json(storage.kalender);
       } catch (fehler) {
         return sendeValidierungsfehler(res, fehler);
       }

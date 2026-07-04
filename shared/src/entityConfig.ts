@@ -292,6 +292,18 @@ export const entityConfigs: Record<EntityTyp, EntityConfig> = {
     ],
     filter: [{ feld: 'haltung', label: 'Haltung', art: 'select', optionen: HALTUNGEN }],
   },
+  karte: {
+    typ: 'karte',
+    label: 'Karte',
+    labelPlural: 'Karten',
+    route: 'karten',
+    icon: 'Map',
+    beschreibung:
+      'Interaktive Karten: Kartengrafik hochladen und Pins setzen, die auf Orte verlinken.',
+    felder: [],
+    abschnitte: [{ feld: 'beschreibung', titel: 'Beschreibung / Legende' }],
+    filter: [],
+  },
   notiz: {
     typ: 'notiz',
     label: 'Notiz',

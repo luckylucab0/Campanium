@@ -5,6 +5,7 @@
 export * from './types';
 export * from './schemas';
 export * from './entityConfig';
+export * from './kalender';
 export * from './wikilink';
 export * from './slug';
 export * from './fuzzy';

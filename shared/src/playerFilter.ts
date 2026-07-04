@@ -19,6 +19,8 @@
  *  7. Verknüpfungen (z. B. `ortId`) auf nicht exportierte Entitäten werden
  *     auf null gesetzt, damit der Spieler-Build keine toten IDs enthält,
  *     deren Slug bereits Namen verraten könnte.
+ *  8. Karten-Pins überleben nur, wenn ihr verknüpfter Ort exportiert ist;
+ *     freie Marker und DM-Beschriftungen werden entfernt.
  */
 import type { Entitaet, EntityTyp, Kampagne, Kampagnenstand } from './types';
 
@@ -32,6 +34,9 @@ const BASIS_WHITELIST = [
   'tags',
   'dmOnly',
   'kampagnenLog',
+  // Nur der Dateiname; die Bilddatei selbst kopiert build-player.ts
+  // ausschließlich für exportierte Entitäten in den Spieler-Build.
+  'bild',
 ] as const;
 
 /**
@@ -66,6 +71,8 @@ const FELD_WHITELIST: Partial<Record<EntityTyp, readonly string[]>> = {
   ],
   gegenstand: ['gefunden', 'besitzerId', 'fundortId', 'eigenschaften', 'geschichte'],
   fraktion: ['haltung', 'ziele', 'mitglieder', 'stand'],
+  // Pins werden zusätzlich in bereinigePins() gefiltert (nur besuchte Orte).
+  karte: ['beschreibung', 'pins'],
   notiz: ['inhalt'],
 };
 
@@ -120,6 +127,21 @@ function bereinigeRefs(e: Entitaet, exportierteIds: ReadonlySet<string>): Entita
 }
 
 /**
+ * Karten-Pins: Es überleben nur Pins, deren Ort selbst exportiert (= besucht)
+ * ist – Position und Beschriftung unentdeckter Orte sind Spoiler. Die
+ * Beschriftung wird geleert (DM-Freitext); die Spieler-UI zeigt den Ortsnamen.
+ */
+function bereinigePins(e: Entitaet, exportierteIds: ReadonlySet<string>): Entitaet {
+  if (e.typ !== 'karte') return e;
+  return {
+    ...e,
+    pins: e.pins
+      .filter((pin) => pin.ortId !== null && exportierteIds.has(pin.ortId))
+      .map((pin) => ({ ...pin, beschriftung: '' })),
+  };
+}
+
+/**
  * Wendet alle Regeln an und liefert das spielersichere Datenpaket.
  * Das ist die einzige Funktion, die der Spieler-Build (scripts/build-player.ts)
  * zum Filtern verwendet – Single Source of Truth.
@@ -131,7 +153,7 @@ export function filterFuerSpieler(
 ): PlayerDaten {
   const sichtbar = entitaeten.filter(istSpielerSichtbar);
   const ids = new Set(sichtbar.map((e) => e.id));
-  const gefiltert = sichtbar.map((e) => bereinigeRefs(filtereFelder(e), ids));
+  const gefiltert = sichtbar.map((e) => bereinigePins(bereinigeRefs(filtereFelder(e), ids), ids));
 
   const standGefiltert: Record<string, unknown> = {};
   for (const key of KAMPAGNENSTAND_WHITELIST) {

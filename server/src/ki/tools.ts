@@ -21,12 +21,59 @@ import type { KiToolAufruf, KiToolDefinition } from './provider';
 
 /** Eine vom Assistenten durchgeführte Änderung – wird dem DM im Chat angezeigt. */
 export interface KiAktion {
-  /** z. B. "aktualisiert", "angelegt", "Log-Eintrag" */
+  /** Stabiler Bezeichner: "aktualisiert" | "angelegt" | "Log-Eintrag". */
   art: string;
+  /** Anzeigetext in der UI-Sprache des Clients. */
   beschreibung: string;
   /** Verlinkbare Entität, falls vorhanden. */
   entitaetId?: string;
   typ?: EntityTyp;
+}
+
+/** Vom Client übergebene UI-Sprache (für die Anzeigetexte der Aktions-Karten). */
+export type KiSprache = 'de' | 'en';
+
+/** Typ-Labels für englische Aktions-Beschreibungen (Deutsch liefert die Registry). */
+const TYP_LABEL_EN: Record<EntityTyp, string> = {
+  nsc: 'NPC',
+  quest: 'Quest',
+  ort: 'Location',
+  sc: 'Player character',
+  session: 'Session',
+  sessionPrep: 'Session prep',
+  gegenstand: 'Item',
+  fraktion: 'Faction',
+  karte: 'Map',
+  notiz: 'Note',
+};
+
+/** Beschreibungs-Vorlagen der Aktions-Karten pro Sprache. */
+const AKTIONS_TEXTE: Record<
+  KiSprache,
+  {
+    angelegt: (label: string, name: string) => string;
+    aktualisiert: (label: string, name: string, felder: string) => string;
+    logEintrag: (sessionNr: number, name: string) => string;
+    kampagnenstand: (felder: string) => string;
+  }
+> = {
+  de: {
+    angelegt: (label, name) => `${label} „${name}“ angelegt`,
+    aktualisiert: (label, name, felder) => `${label} „${name}“ aktualisiert (${felder})`,
+    logEintrag: (sessionNr, name) => `Log-Eintrag (S${sessionNr}) bei „${name}“ ergänzt`,
+    kampagnenstand: (felder) => `Kampagnenstand aktualisiert (${felder})`,
+  },
+  en: {
+    angelegt: (label, name) => `${label} “${name}” created`,
+    aktualisiert: (label, name, felder) => `${label} “${name}” updated (${felder})`,
+    logEintrag: (sessionNr, name) => `Log entry (S${sessionNr}) added to “${name}”`,
+    kampagnenstand: (felder) => `Campaign state updated (${felder})`,
+  },
+};
+
+/** Typ-Label in der gewünschten Sprache. */
+function typLabel(typ: EntityTyp, sprache: KiSprache): string {
+  return sprache === 'de' ? entityConfigs[typ].label : TYP_LABEL_EN[typ];
 }
 
 const TYP_LISTE = ENTITY_TYPEN.join(' | ');
@@ -138,7 +185,12 @@ function istEntityTyp(wert: unknown): wert is EntityTyp {
  * Führt einen Werkzeug-Aufruf gegen den Storage aus. Fehler werden als
  * Text zurückgegeben (nicht geworfen), damit das Modell reagieren kann.
  */
-export function fuehreToolAus(storage: Storage, aufruf: KiToolAufruf): ToolErgebnis {
+export function fuehreToolAus(
+  storage: Storage,
+  aufruf: KiToolAufruf,
+  sprache: KiSprache = 'de',
+): ToolErgebnis {
+  const texte = AKTIONS_TEXTE[sprache];
   const eingabe = (aufruf.eingabe ?? {}) as Record<string, unknown>;
   try {
     switch (aufruf.name) {
@@ -185,7 +237,7 @@ export function fuehreToolAus(storage: Storage, aufruf: KiToolAufruf): ToolErgeb
           ergebnis: JSON.stringify(entitaet),
           aktion: {
             art: 'angelegt',
-            beschreibung: `${entityConfigs[entitaet.typ].label} „${entitaet.name}“ angelegt`,
+            beschreibung: texte.angelegt(typLabel(entitaet.typ, sprache), entitaet.name),
             entitaetId: entitaet.id,
             typ: entitaet.typ,
           },
@@ -210,7 +262,11 @@ export function fuehreToolAus(storage: Storage, aufruf: KiToolAufruf): ToolErgeb
           ergebnis: JSON.stringify(entitaet),
           aktion: {
             art: 'aktualisiert',
-            beschreibung: `${entityConfigs[entitaet.typ].label} „${entitaet.name}“ aktualisiert (${geaenderteFelder})`,
+            beschreibung: texte.aktualisiert(
+              typLabel(entitaet.typ, sprache),
+              entitaet.name,
+              geaenderteFelder,
+            ),
             entitaetId: entitaet.id,
             typ: entitaet.typ,
           },
@@ -232,7 +288,7 @@ export function fuehreToolAus(storage: Storage, aufruf: KiToolAufruf): ToolErgeb
           ergebnis: JSON.stringify(entitaet.kampagnenLog),
           aktion: {
             art: 'Log-Eintrag',
-            beschreibung: `Log-Eintrag (S${eintrag.sessionNr}) bei „${entitaet.name}“ ergänzt`,
+            beschreibung: texte.logEintrag(eintrag.sessionNr, entitaet.name),
             entitaetId: entitaet.id,
             typ: entitaet.typ,
           },
@@ -252,7 +308,7 @@ export function fuehreToolAus(storage: Storage, aufruf: KiToolAufruf): ToolErgeb
           ergebnis: JSON.stringify(stand),
           aktion: {
             art: 'aktualisiert',
-            beschreibung: `Kampagnenstand aktualisiert (${geaenderteFelder})`,
+            beschreibung: texte.kampagnenstand(geaenderteFelder),
           },
         };
       }

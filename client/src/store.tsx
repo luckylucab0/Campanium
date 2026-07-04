@@ -25,6 +25,7 @@ import {
 import type {
   Entitaet,
   EntityTyp,
+  Kalender,
   Kampagne,
   Kampagnenstand,
   Lesung,
@@ -52,6 +53,7 @@ interface StoreWert {
   kampagnenstand: Kampagnenstand;
   widersacher: WidersacherTracker;
   lesung: Lesung;
+  kalender: Kalender;
   /** Entität per ID nachschlagen. */
   perId: (id: string) => Entitaet | undefined;
   /** Entität per Name nachschlagen (case-insensitiv) – für [[Wikilinks]]. */
@@ -64,6 +66,7 @@ interface StoreWert {
   setzeKampagnenstand: (stand: Kampagnenstand) => Promise<void>;
   setzeWidersacher: (tracker: WidersacherTracker) => Promise<void>;
   setzeLesung: (lesung: Lesung) => Promise<void>;
+  setzeKalender: (kalender: Kalender) => Promise<void>;
 }
 
 const StoreContext = createContext<StoreWert | null>(null);
@@ -86,6 +89,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     null as unknown as WidersacherTracker,
   );
   const [lesung, setLesungState] = useState<Lesung>(null as unknown as Lesung);
+  const [kalender, setKalenderState] = useState<Kalender>(null as unknown as Kalender);
 
   // Schritt 1: Kampagnen-Liste laden und Start-Kampagne bestimmen.
   useEffect(() => {
@@ -116,6 +120,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setKampagnenstandState(daten.kampagnenstand);
         setWidersacherState(daten.widersacher);
         setLesungState(daten.lesung);
+        setKalenderState(daten.kalender);
         setGeladen(true);
       })
       .catch((fehler: Error) => setLadeFehler(fehler.message));
@@ -134,6 +139,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setKampagnenstandState(daten.kampagnenstand);
     setWidersacherState(daten.widersacher);
     setLesungState(daten.lesung);
+    setKalenderState(daten.kalender);
   }, [aktuelleId]);
 
   const wechsleKampagne = useCallback((id: string) => {
@@ -260,6 +266,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [kid],
   );
 
+  const setzeKalender = useCallback(
+    async (neu: Kalender) => {
+      setKalenderState(neu);
+      await api.speichereKalender(kid(), neu);
+    },
+    [kid],
+  );
+
   const wert: StoreWert = {
     geladen,
     ladeFehler,
@@ -273,6 +287,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     kampagnenstand,
     widersacher,
     lesung,
+    kalender,
     perId,
     perName,
     backlinks,
@@ -282,6 +297,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setzeKampagnenstand,
     setzeWidersacher,
     setzeLesung,
+    setzeKalender,
   };
 
   return <StoreContext.Provider value={wert}>{children}</StoreContext.Provider>;

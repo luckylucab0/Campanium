@@ -116,6 +116,28 @@ const zielJson = path.join(wurzel, 'client', 'public', 'player-data.json');
 fs.mkdirSync(path.dirname(zielJson), { recursive: true });
 fs.writeFileSync(zielJson, json + '\n');
 
+// Bilder: NUR die Dateien exportierter Entitäten in den Build kopieren.
+// Der Zielordner wird vorher geleert, damit keine Altlasten (z. B. Bilder
+// inzwischen DM-only gestellter Entitäten) veröffentlicht werden.
+const bilderZiel = path.join(wurzel, 'client', 'public', 'bilder');
+fs.rmSync(bilderZiel, { recursive: true, force: true });
+const bilderQuelle = path.join(kampagnenOrdner, 'bilder');
+const exportierteBilder = spielerDaten.entitaeten
+  .map((e) => e.bild)
+  .filter((b): b is string => typeof b === 'string' && b.length > 0);
+if (exportierteBilder.length > 0) {
+  fs.mkdirSync(bilderZiel, { recursive: true });
+  for (const datei of exportierteBilder) {
+    const quelle = path.join(bilderQuelle, datei);
+    if (!fs.existsSync(quelle)) {
+      console.error(`⚠ Bild fehlt und wird übersprungen: ${quelle}`);
+      continue;
+    }
+    fs.copyFileSync(quelle, path.join(bilderZiel, datei));
+  }
+  console.log(`→ ${exportierteBilder.length} Bild(er) in den Spieler-Build kopiert`);
+}
+
 console.log('→ Baue statischen Spieler-Client …');
 execSync('npx vite build --mode player --base ./ --outDir dist-player', {
   cwd: path.join(wurzel, 'client'),

@@ -11,7 +11,7 @@
 import type { Kampagne } from '@campanium/shared';
 import type { Storage } from '../storage';
 import type { KiNachricht, KiProvider } from './provider';
-import { fuehreToolAus, KI_TOOLS, type KiAktion } from './tools';
+import { fuehreToolAus, KI_TOOLS, type KiAktion, type KiSprache } from './tools';
 
 /** Obergrenze an Modell-Runden pro Anfrage (Schutz vor Endlosschleifen). */
 const MAX_RUNDEN = 8;
@@ -21,8 +21,25 @@ export interface ChatErgebnis {
   aktionen: KiAktion[];
 }
 
+/** Antwortsprache-Anweisung je UI-Sprache des Clients. */
+const SPRACHE_ANWEISUNG: Record<KiSprache, string> = {
+  de: 'Antworte auf Deutsch',
+  en: 'Antworte auf Englisch (answer in English)',
+};
+
+/** Meldung, wenn das Rundenlimit greift, in der UI-Sprache. */
+const LIMIT_MELDUNG: Record<KiSprache, string> = {
+  de:
+    'Ich habe das Rundenlimit erreicht, bevor ich fertig wurde – die bisher ' +
+    'durchgeführten Änderungen sind unten aufgeführt. Bitte formuliere den Rest ' +
+    'als neue, kleinere Anfrage.',
+  en:
+    'I hit the round limit before finishing – the changes made so far are ' +
+    'listed below. Please phrase the rest as a new, smaller request.',
+};
+
 /** System-Prompt: Rolle, Datenmodell-Kurzreferenz und Arbeitsregeln. */
-export function systemPrompt(kampagne: Kampagne): string {
+export function systemPrompt(kampagne: Kampagne, sprache: KiSprache = 'de'): string {
   return `Du bist der Kampagnen-Assistent des Dungeon Masters in „Campanium“, \
 einem Verwaltungstool für D&D-Kampagnen. Aktive Kampagne: „${kampagne.name}“.
 
@@ -42,7 +59,7 @@ Arbeitsregeln:
 2. Lies eine Entität, bevor du sie änderst – ändere nur die nötigen Felder.
 3. Mache minimale, präzise Änderungen. Erfinde keine Fakten, die der DM nicht genannt hat.
 4. Du kannst nichts löschen – bitte den DM, das selbst zu tun, falls nötig.
-5. Antworte auf Deutsch, kurz und tischtauglich: fasse am Ende in 1–3 Sätzen \
+5. ${SPRACHE_ANWEISUNG[sprache]}, kurz und tischtauglich: fasse am Ende in 1–3 Sätzen \
 zusammen, was du geändert hast.`;
 }
 
@@ -52,10 +69,11 @@ export async function fuehreChatAus(
   kampagne: Kampagne,
   storage: Storage,
   verlauf: KiNachricht[],
+  sprache: KiSprache = 'de',
 ): Promise<ChatErgebnis> {
   const nachrichten = [...verlauf];
   const aktionen: KiAktion[] = [];
-  const system = systemPrompt(kampagne);
+  const system = systemPrompt(kampagne, sprache);
 
   for (let runde = 0; runde < MAX_RUNDEN; runde++) {
     const antwort = await provider.chat(system, nachrichten, KI_TOOLS);
@@ -70,7 +88,7 @@ export async function fuehreChatAus(
       toolAufrufe: antwort.toolAufrufe,
     });
     for (const aufruf of antwort.toolAufrufe) {
-      const ergebnis = fuehreToolAus(storage, aufruf);
+      const ergebnis = fuehreToolAus(storage, aufruf, sprache);
       if (ergebnis.aktion) aktionen.push(ergebnis.aktion);
       nachrichten.push({
         rolle: 'tool',
@@ -81,11 +99,5 @@ export async function fuehreChatAus(
     }
   }
 
-  return {
-    antwort:
-      'Ich habe das Rundenlimit erreicht, bevor ich fertig wurde – die bisher ' +
-      'durchgeführten Änderungen sind unten aufgeführt. Bitte formuliere den Rest ' +
-      'als neue, kleinere Anfrage.',
-    aktionen,
-  };
+  return { antwort: LIMIT_MELDUNG[sprache], aktionen };
 }

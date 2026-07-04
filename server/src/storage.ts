@@ -18,6 +18,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {
+  DEFAULT_KALENDER,
   DEFAULT_KAMPAGNENSTAND,
   DEFAULT_LESUNG,
   DEFAULT_WIDERSACHER,
@@ -27,6 +28,7 @@ import {
   validiereEntitaet,
   type Entitaet,
   type EntityTyp,
+  type Kalender,
   type Kampagne,
   type Kampagnenstand,
   type Lesung,
@@ -37,6 +39,7 @@ const SINGLETON_DATEIEN = {
   kampagnenstand: 'kampagnenstand.json',
   widersacher: 'widersacher-tracker.json',
   lesung: 'lesung.json',
+  kalender: 'kalender.json',
 } as const;
 
 /** Speicher für genau EINE Kampagne (ein Unterordner von data/). */
@@ -45,6 +48,7 @@ export class Storage {
   kampagnenstand: Kampagnenstand = DEFAULT_KAMPAGNENSTAND;
   widersacher: WidersacherTracker = DEFAULT_WIDERSACHER;
   lesung: Lesung = DEFAULT_LESUNG;
+  kalender: Kalender = DEFAULT_KALENDER;
 
   constructor(public readonly datenOrdner: string) {}
 
@@ -73,6 +77,7 @@ export class Storage {
     this.kampagnenstand = this.ladeSingleton('kampagnenstand', DEFAULT_KAMPAGNENSTAND);
     this.widersacher = this.ladeSingleton('widersacher', DEFAULT_WIDERSACHER);
     this.lesung = this.ladeSingleton('lesung', DEFAULT_LESUNG);
+    this.kalender = this.ladeSingleton('kalender', DEFAULT_KALENDER);
   }
 
   private ladeSingleton<T>(schluessel: keyof typeof SINGLETON_DATEIEN, fallback: T): T {
@@ -120,13 +125,42 @@ export class Storage {
 
   speichereSingleton(
     schluessel: keyof typeof SINGLETON_DATEIEN,
-    daten: Kampagnenstand | WidersacherTracker | Lesung,
+    daten: Kampagnenstand | WidersacherTracker | Lesung | Kalender,
   ): void {
     fs.mkdirSync(this.datenOrdner, { recursive: true });
     fs.writeFileSync(
       path.join(this.datenOrdner, SINGLETON_DATEIEN[schluessel]),
       JSON.stringify(daten, null, 2) + '\n',
     );
+  }
+
+  // ---- Bilder ---------------------------------------------------------------
+  // Hochgeladene Bilder (Portraits, Kartengrafiken) liegen als normale
+  // Dateien in data/<kampagne>/bilder/; Entitäten referenzieren sie nur
+  // per Dateiname im Feld `bild`.
+
+  /** Ordner für die Bilder dieser Kampagne. */
+  get bilderOrdner(): string {
+    return path.join(this.datenOrdner, 'bilder');
+  }
+
+  /** Erlaubte Bild-Dateinamen: nur ein einzelnes, harmloses Pfadsegment. */
+  static istSichererDateiname(datei: string): boolean {
+    return /^[\w][\w.-]{0,127}$/.test(datei) && !datei.includes('..');
+  }
+
+  /** Schreibt eine Bilddatei in den bilder/-Ordner. */
+  speichereBild(datei: string, daten: Buffer): void {
+    if (!Storage.istSichererDateiname(datei)) throw new Error(`Unsicherer Dateiname: ${datei}`);
+    fs.mkdirSync(this.bilderOrdner, { recursive: true });
+    fs.writeFileSync(path.join(this.bilderOrdner, datei), daten);
+  }
+
+  /** Absoluter Pfad einer vorhandenen Bilddatei – sonst null. */
+  bildPfad(datei: string): string | null {
+    if (!Storage.istSichererDateiname(datei)) return null;
+    const voll = path.join(this.bilderOrdner, datei);
+    return fs.existsSync(voll) ? voll : null;
   }
 }
 

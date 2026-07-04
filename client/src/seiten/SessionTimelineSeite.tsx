@@ -8,11 +8,13 @@ import { BookOpen, ClipboardList, Plus } from 'lucide-react';
 import type { Session, SessionPrep } from '@campanium/shared';
 import { IST_SPIELER_MODUS } from '../api';
 import { formatDatum, pfadFuer } from '../hilfen';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { useUi } from '../komponenten/UiContext';
 
 export function SessionTimelineSeite() {
   const { entitaeten } = useStore();
+  const { t, locale } = useI18n();
   const { oeffneNeuDialog } = useUi();
 
   const sessions = entitaeten
@@ -24,7 +26,7 @@ export function SessionTimelineSeite() {
     <div className="mx-auto max-w-3xl">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="flex items-center gap-2.5 text-2xl">
-          <BookOpen size={22} className="text-blut-hell" aria-hidden /> Sessions
+          <BookOpen size={22} className="text-blut-hell" aria-hidden /> {t('Sessions')}
           <span className="text-base text-text-schwach">({sessions.length})</span>
         </h1>
         {!IST_SPIELER_MODUS && (
@@ -32,13 +34,15 @@ export function SessionTimelineSeite() {
             className="flex items-center gap-1.5 rounded bg-blut px-3 py-1.5 text-sm font-medium text-white hover:bg-blut-hell"
             onClick={() => oeffneNeuDialog('', 'session')}
           >
-            <Plus size={15} /> Session anlegen
+            <Plus size={15} /> {t('{label} anlegen', { label: t('Session') })}
           </button>
         )}
       </div>
 
       {sessions.length === 0 && (
-        <p className="py-12 text-center text-text-schwach">Noch keine Sessions protokolliert.</p>
+        <p className="py-12 text-center text-text-schwach">
+          {t('Noch keine Sessions protokolliert.')}
+        </p>
       )}
 
       {/* Timeline mit Mittellinie */}
@@ -61,7 +65,7 @@ export function SessionTimelineSeite() {
                     <span className="text-gold">#{session.nummer}</span> {session.name}
                   </span>
                   <span className="text-xs text-text-schwach">
-                    {formatDatum(session.datum)}
+                    {formatDatum(session.datum, locale)}
                     {session.ingameDatum && ` · ${session.ingameDatum}`}
                   </span>
                 </div>
@@ -76,7 +80,7 @@ export function SessionTimelineSeite() {
                   to={pfadFuer(prep)}
                   className="mt-1.5 inline-flex items-center gap-1.5 text-xs text-text-schwach hover:text-gold"
                 >
-                  <ClipboardList size={12} aria-hidden /> Zum Prep dieser Session
+                  <ClipboardList size={12} aria-hidden /> {t('Zum Prep dieser Session')}
                 </Link>
               )}
             </li>

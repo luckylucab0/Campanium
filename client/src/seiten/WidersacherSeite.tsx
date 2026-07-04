@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import type { Session, WidersacherBegegnung, WidersacherModus } from '@campanium/shared';
 import { WIDERSACHER_MODI } from '@campanium/shared';
 import { pfadFuer } from '../hilfen';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { Checkliste } from '../komponenten/Checkliste';
 import { DmBadge } from '../komponenten/Badge';
@@ -21,6 +22,7 @@ const MODUS_FARBE: Record<WidersacherModus, string> = {
 
 export function WidersacherSeite() {
   const { widersacher, setzeWidersacher, entitaeten } = useStore();
+  const { t } = useI18n();
   const sessions = entitaeten.filter((e): e is Session => e.typ === 'session');
 
   const setzeBegegnung = (index: number, aenderung: Partial<WidersacherBegegnung>) => {
@@ -60,14 +62,14 @@ export function WidersacherSeite() {
         <input
           className="min-w-0 border-b border-transparent bg-transparent font-display text-2xl text-text-stark hover:border-rand focus:border-gold focus:outline-none"
           value={widersacher.name}
-          placeholder="Name des Widersachers …"
+          placeholder={t('Name des Widersachers …')}
           onChange={(e) => void setzeWidersacher({ ...widersacher, name: e.target.value })}
-          aria-label="Name des Widersachers"
+          aria-label={t('Name des Widersachers')}
         />
         <DmBadge />
       </h1>
       <p className="mb-6 text-sm text-text-schwach">
-        Jeder Auftritt des großen Gegenspielers – damit er berechenbar unberechenbar bleibt.
+        {t('Jeder Auftritt des großen Gegenspielers – damit er berechenbar unberechenbar bleibt.')}
       </p>
 
       <div className="karte overflow-x-auto">
@@ -88,7 +90,7 @@ export function WidersacherSeite() {
                   key={i}
                   className="px-2 py-2 text-[11px] uppercase tracking-wider text-text-schwach"
                 >
-                  {titel}
+                  {titel ? t(titel) : ''}
                 </th>
               ))}
             </tr>
@@ -108,7 +110,7 @@ export function WidersacherSeite() {
                           sessionNr: e.target.value === '' ? null : Number(e.target.value),
                         })
                       }
-                      aria-label={`Session für Begegnung ${b.nr}`}
+                      aria-label={t('Session für Begegnung {nr}', { nr: b.nr })}
                     >
                       <option value="">–</option>
                       {sessions
@@ -130,7 +132,7 @@ export function WidersacherSeite() {
                       className={zelle}
                       value={b.ort}
                       onChange={(e) => setzeBegegnung(i, { ort: e.target.value })}
-                      aria-label="Ort"
+                      aria-label={t('Ort')}
                     />
                   </td>
                   <td className="px-2 py-1.5">
@@ -140,11 +142,11 @@ export function WidersacherSeite() {
                       onChange={(e) =>
                         setzeBegegnung(i, { modus: e.target.value as WidersacherModus })
                       }
-                      aria-label="Modus"
+                      aria-label={t('Modus')}
                     >
                       {WIDERSACHER_MODI.map((m) => (
                         <option key={m} value={m}>
-                          {m}
+                          {t(m)}
                         </option>
                       ))}
                     </select>
@@ -154,7 +156,7 @@ export function WidersacherSeite() {
                       className={zelle}
                       value={b.wollte}
                       onChange={(e) => setzeBegegnung(i, { wollte: e.target.value })}
-                      aria-label="Was er/sie wollte"
+                      aria-label={t('Was er/sie wollte')}
                     />
                   </td>
                   <td className="px-2 py-1.5">
@@ -162,7 +164,7 @@ export function WidersacherSeite() {
                       className={zelle}
                       value={b.bekam}
                       onChange={(e) => setzeBegegnung(i, { bekam: e.target.value })}
-                      aria-label="Was er/sie bekam"
+                      aria-label={t('Was er/sie bekam')}
                     />
                   </td>
                   <td className="px-2 py-1.5">
@@ -170,13 +172,13 @@ export function WidersacherSeite() {
                       className={zelle}
                       value={b.folgen}
                       onChange={(e) => setzeBegegnung(i, { folgen: e.target.value })}
-                      aria-label="Folgen"
+                      aria-label={t('Folgen')}
                     />
                   </td>
                   <td className="px-2 py-1.5">
                     <button
                       className="text-text-schwach hover:text-rot"
-                      aria-label={`Begegnung ${b.nr} löschen`}
+                      aria-label={t('Begegnung {nr} löschen', { nr: b.nr })}
                       onClick={() =>
                         void setzeWidersacher({
                           ...widersacher,
@@ -196,7 +198,9 @@ export function WidersacherSeite() {
         </table>
         {widersacher.begegnungen.length === 0 && (
           <p className="px-4 py-6 text-center text-sm text-text-schwach">
-            Noch keine Begegnung – {widersacher.name || 'der Widersacher'} lässt auf sich warten.
+            {t('Noch keine Begegnung – {name} lässt auf sich warten.', {
+              name: widersacher.name || t('der Widersacher'),
+            })}
           </p>
         )}
       </div>
@@ -204,14 +208,14 @@ export function WidersacherSeite() {
         className="mt-3 flex items-center gap-1.5 rounded border border-rand px-3 py-1.5 text-sm hover:border-gold hover:text-gold"
         onClick={neueBegegnung}
       >
-        <Plus size={14} /> Begegnung eintragen
+        <Plus size={14} /> {t('Begegnung eintragen')}
       </button>
 
       <Trennlinie className="my-8" />
 
-      <h2 className="mb-3 text-lg">Ideen-Vorrat</h2>
+      <h2 className="mb-3 text-lg">{t('Ideen-Vorrat')}</h2>
       <p className="mb-3 text-sm text-text-schwach">
-        Szenen-Ideen für künftige Auftritte – abhaken, was verbraucht ist.
+        {t('Szenen-Ideen für künftige Auftritte – abhaken, was verbraucht ist.')}
       </p>
       <div className="karte karte-ornament max-w-2xl p-4">
         <Checkliste

@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import type { LesungKartenStatus, LesungsKarte } from '@campanium/shared';
 import { LESUNG_KARTEN_STATUS } from '@campanium/shared';
 import { pfadFuer } from '../hilfen';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { DmBadge } from '../komponenten/Badge';
 
@@ -21,6 +22,7 @@ const STATUS_FARBE: Record<LesungKartenStatus, string> = {
 
 export function LesungSeite() {
   const { lesung, setzeLesung, entitaeten } = useStore();
+  const { t, locale } = useI18n();
 
   const setzeKarte = (index: number, aenderung: Partial<LesungsKarte>) => {
     void setzeLesung({
@@ -41,7 +43,7 @@ export function LesungSeite() {
 
   const kandidaten = entitaeten
     .filter((e) => e.typ === 'ort' || e.typ === 'nsc')
-    .sort((a, b) => a.name.localeCompare(b.name, 'de'));
+    .sort((a, b) => a.name.localeCompare(b.name, locale));
 
   return (
     <div>
@@ -50,14 +52,14 @@ export function LesungSeite() {
         <input
           className="min-w-0 border-b border-transparent bg-transparent font-display text-2xl text-text-stark hover:border-rand focus:border-gold focus:outline-none"
           value={lesung.titel}
-          placeholder="Titel, z. B. „Tarokka-Lesung“ …"
+          placeholder={t('Titel, z. B. „Tarokka-Lesung“ …')}
           onChange={(e) => void setzeLesung({ ...lesung, titel: e.target.value })}
-          aria-label="Titel der Lesung"
+          aria-label={t('Titel der Lesung')}
         />
         <DmBadge />
       </h1>
       <p className="mb-6 text-sm text-text-schwach">
-        Prophezeiungen, Omen und Visionen – die Schicksalsfäden dieser Kampagne.
+        {t('Prophezeiungen, Omen und Visionen – die Schicksalsfäden dieser Kampagne.')}
       </p>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -71,13 +73,13 @@ export function LesungSeite() {
                 <input
                   className="w-full border-b border-transparent bg-transparent text-[11px] uppercase tracking-[0.18em] text-arkan hover:border-rand focus:border-arkan focus:outline-none"
                   value={karte.aspekt}
-                  placeholder="Aspekt, z. B. „Verbündeter“"
+                  placeholder={t('Aspekt, z. B. „Verbündeter“')}
                   onChange={(e) => setzeKarte(i, { aspekt: e.target.value })}
-                  aria-label={`Aspekt von Karte ${i + 1}`}
+                  aria-label={t('Aspekt von Karte {nr}', { nr: i + 1 })}
                 />
                 <button
                   className="text-text-schwach hover:text-rot"
-                  aria-label={`Karte ${i + 1} entfernen`}
+                  aria-label={t('Karte {nr} entfernen', { nr: i + 1 })}
                   onClick={() =>
                     void setzeLesung({
                       ...lesung,
@@ -88,23 +90,23 @@ export function LesungSeite() {
                   <Trash2 size={13} />
                 </button>
               </div>
-              <label className="mb-1 block text-xs text-text-schwach">Gezogene Karte / Omen</label>
+              <label className="mb-1 block text-xs text-text-schwach">{t('Gezogene Karte / Omen')}</label>
               <input
                 className="mb-3 w-full rounded border border-rand bg-flaeche-3 px-2 py-1.5 font-display text-text-stark"
                 value={karte.karte}
-                placeholder="z. B. „Drei der Gläser“"
+                placeholder={t('z. B. „Drei der Gläser“')}
                 onChange={(e) => setzeKarte(i, { karte: e.target.value })}
               />
               <label className="mb-1 block text-xs text-text-schwach">
-                Aufgelöst als (Ort/NSC)
+                {t('Aufgelöst als (Ort/NSC)')}
               </label>
               <select
                 className="mb-2 w-full rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-sm"
                 value={karte.aufgeloestId ?? ''}
                 onChange={(e) => setzeKarte(i, { aufgeloestId: e.target.value || null })}
-                aria-label={`Auflösung für Karte ${i + 1}`}
+                aria-label={t('Auflösung für Karte {nr}', { nr: i + 1 })}
               >
-                <option value="">– Freitext / offen –</option>
+                <option value="">{t('– Freitext / offen –')}</option>
                 {kandidaten.map((e) => (
                   <option key={e.id} value={e.id}>
                     {e.name}
@@ -119,12 +121,12 @@ export function LesungSeite() {
                 <input
                   className="mb-3 w-full rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-sm"
                   value={karte.aufgeloestText}
-                  placeholder="Freitext-Auflösung"
+                  placeholder={t('Freitext-Auflösung')}
                   onChange={(e) => setzeKarte(i, { aufgeloestText: e.target.value })}
-                  aria-label={`Freitext-Auflösung für Karte ${i + 1}`}
+                  aria-label={t('Freitext-Auflösung für Karte {nr}', { nr: i + 1 })}
                 />
               )}
-              <div className="flex flex-wrap gap-1.5" role="group" aria-label="Status">
+              <div className="flex flex-wrap gap-1.5" role="group" aria-label={t('Status')}>
                 {LESUNG_KARTEN_STATUS.map((status) => (
                   <button
                     key={status}
@@ -136,7 +138,7 @@ export function LesungSeite() {
                     onClick={() => setzeKarte(i, { status })}
                     aria-pressed={karte.status === status}
                   >
-                    {status}
+                    {t(status)}
                   </button>
                 ))}
               </div>
@@ -147,7 +149,7 @@ export function LesungSeite() {
           className="karte flex min-h-40 items-center justify-center gap-2 border-dashed text-sm text-text-schwach hover:border-arkan hover:text-arkan"
           onClick={neueKarte}
         >
-          <Plus size={15} /> Karte hinzufügen
+          <Plus size={15} /> {t('Karte hinzufügen')}
         </button>
       </div>
     </div>

@@ -1,0 +1,17 @@
+{
+  "id": "nebelmark",
+  "typ": "karte",
+  "name": "Die Nebelmark",
+  "erstellt": "2026-06-30T19:00:00.000Z",
+  "geaendert": "2026-06-30T19:00:00.000Z",
+  "tags": ["übersichtskarte"],
+  "dmOnly": false,
+  "kampagnenLog": [],
+  "bild": "karte-nebelmark.jpg",
+  "beschreibung": "Übersichtskarte des Tals. Der schwarze Fluss trennt das [[Nebelfurt]]er Umland vom Grauzahn-Kamm im Osten.",
+  "pins": [
+    { "id": "pin-nebelfurt", "x": 47.3, "y": 46.9, "ortId": "nebelfurt", "beschriftung": "" },
+    { "id": "pin-windmuehle", "x": 58.2, "y": 23.5, "ortId": "alte-windmuehle", "beschriftung": "" },
+    { "id": "pin-moor", "x": 19.5, "y": 56.5, "ortId": null, "beschriftung": "Flüstermoor – hier lauert der Flüsterer" }
+  ]
+}

@@ -1,14 +1,29 @@
 /**
  * App-Rahmen: Sidebar-Navigation mit Kampagnen-Umschalter, Kopfzeile mit
- * Nebel-Gradient, Theme-Umschalter und globale Suche. Im Spieler-Modus
- * werden alle DM-Bereiche (Preps, Widersacher, Lesung, Spielabend, „Neu“)
- * und der Kampagnen-Wechsel ausgeblendet.
+ * Nebel-Gradient, Theme-/Sprach-Umschalter und globale Suche. Im
+ * Spieler-Modus werden alle DM-Bereiche (Preps, Widersacher, Lesung,
+ * Kalender, Spielabend, „Neu“) und der Kampagnen-Wechsel ausgeblendet.
  */
 import { useEffect, useState, type ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Castle, Home, Menu, Moon, Plus, Search, Sun, Sparkles, Tent, X } from 'lucide-react';
+import {
+  CalendarDays,
+  Castle,
+  Home,
+  Languages,
+  Menu,
+  Moon,
+  Plus,
+  Search,
+  Sun,
+  Sparkles,
+  Tent,
+  Waypoints,
+  X,
+} from 'lucide-react';
 import { ENTITY_TYPEN, entityConfigs } from '@campanium/shared';
 import { IST_SPIELER_MODUS } from '../api';
+import { SPRACHEN, useI18n, type Sprache } from '../i18n';
 import { useStore } from '../store';
 import { entityIcon } from './icons';
 import { Fledermaus } from './Ornament';
@@ -25,6 +40,7 @@ const navKlasse = ({ isActive }: { isActive: boolean }) =>
 
 export function Layout({ children }: { children: ReactNode }) {
   const { oeffneNeuDialog, theme, wechsleTheme } = useUi();
+  const { t, sprache, setzeSprache } = useI18n();
   const [sucheOffen, setSucheOffen] = useState(false);
   const [menueOffen, setMenueOffen] = useState(false);
 
@@ -64,7 +80,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 Campanium
               </div>
               <div className="text-[10px] uppercase tracking-[0.25em] text-text-schwach">
-                Kampagnen-Companion
+                {t('Kampagnen-Companion')}
               </div>
             </div>
           </NavLink>
@@ -73,19 +89,19 @@ export function Layout({ children }: { children: ReactNode }) {
 
           <nav
             className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3"
-            aria-label="Hauptnavigation"
+            aria-label={t('Hauptnavigation')}
           >
             <NavLink to="/" end className={navKlasse} onClick={() => setMenueOffen(false)}>
-              <Home size={16} /> Dashboard
+              <Home size={16} /> {t('Dashboard')}
             </NavLink>
             {!IST_SPIELER_MODUS && (
               <NavLink to="/spielabend" className={navKlasse} onClick={() => setMenueOffen(false)}>
-                <Tent size={16} /> Spielabend
+                <Tent size={16} /> {t('Spielabend')}
               </NavLink>
             )}
 
             <div className="px-3 pt-3 pb-1 text-[10px] uppercase tracking-[0.2em] text-text-schwach">
-              Kompendium
+              {t('Kompendium')}
             </div>
             {sichtbareTypen.map((typ) => {
               const config = entityConfigs[typ];
@@ -97,25 +113,31 @@ export function Layout({ children }: { children: ReactNode }) {
                   className={navKlasse}
                   onClick={() => setMenueOffen(false)}
                 >
-                  <Icon size={16} /> {config.labelPlural}
+                  <Icon size={16} /> {t(config.labelPlural)}
                 </NavLink>
               );
             })}
+            <NavLink to="/graph" className={navKlasse} onClick={() => setMenueOffen(false)}>
+              <Waypoints size={16} /> {t('Beziehungsgraph')}
+            </NavLink>
 
             {!IST_SPIELER_MODUS && (
               <>
                 <div className="px-3 pt-3 pb-1 text-[10px] uppercase tracking-[0.2em] text-text-schwach">
-                  DM-Module
+                  {t('DM-Module')}
                 </div>
                 <NavLink
                   to="/widersacher"
                   className={navKlasse}
                   onClick={() => setMenueOffen(false)}
                 >
-                  <Castle size={16} /> Widersacher
+                  <Castle size={16} /> {t('Widersacher')}
                 </NavLink>
                 <NavLink to="/lesung" className={navKlasse} onClick={() => setMenueOffen(false)}>
-                  <Sparkles size={16} /> Lesung
+                  <Sparkles size={16} /> {t('Lesung')}
+                </NavLink>
+                <NavLink to="/kalender" className={navKlasse} onClick={() => setMenueOffen(false)}>
+                  <CalendarDays size={16} /> {t('Kalender')}
                 </NavLink>
               </>
             )}
@@ -126,7 +148,7 @@ export function Layout({ children }: { children: ReactNode }) {
               className="flex w-full items-center gap-2.5 rounded px-3 py-1.5 text-sm text-text-normal hover:bg-flaeche-3 hover:text-text-stark"
               onClick={() => setSucheOffen(true)}
             >
-              <Search size={16} /> Suche
+              <Search size={16} /> {t('Suche')}
               <kbd className="ml-auto rounded border border-rand px-1 text-[10px] text-text-schwach">
                 ⌘K
               </kbd>
@@ -136,22 +158,40 @@ export function Layout({ children }: { children: ReactNode }) {
                 className="flex w-full items-center gap-2.5 rounded px-3 py-1.5 text-sm text-text-normal hover:bg-flaeche-3 hover:text-text-stark"
                 onClick={() => oeffneNeuDialog()}
               >
-                <Plus size={16} /> Neu anlegen
+                <Plus size={16} /> {t('Neu anlegen')}
               </button>
             )}
             <button
               className="flex w-full items-center gap-2.5 rounded px-3 py-1.5 text-sm text-text-normal hover:bg-flaeche-3 hover:text-text-stark"
               onClick={wechsleTheme}
               aria-label={
-                theme === 'dunkel' ? 'Pergament-Theme aktivieren' : 'Dunkles Theme aktivieren'
+                theme === 'dunkel'
+                  ? t('Pergament-Theme aktivieren')
+                  : t('Dunkles Theme aktivieren')
               }
             >
               {theme === 'dunkel' ? <Sun size={16} /> : <Moon size={16} />}
-              {theme === 'dunkel' ? 'Pergament' : 'Dunkel'}
+              {theme === 'dunkel' ? t('Pergament') : t('Dunkel')}
             </button>
+            {/* Sprachumschalter: neue Sprachen erscheinen hier automatisch. */}
+            <label className="flex w-full items-center gap-2.5 rounded px-3 py-1.5 text-sm text-text-normal hover:bg-flaeche-3">
+              <Languages size={16} aria-hidden />
+              <select
+                className="flex-1 bg-transparent text-sm text-text-normal outline-none"
+                value={sprache}
+                onChange={(e) => setzeSprache(e.target.value as Sprache)}
+                aria-label={t('Sprache wählen')}
+              >
+                {SPRACHEN.map((s) => (
+                  <option key={s.code} value={s.code}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </label>
             {IST_SPIELER_MODUS && (
               <p className="px-3 pt-1 text-[10px] leading-relaxed text-text-schwach">
-                Spieler-Kompendium · read-only
+                {t('Spieler-Kompendium · read-only')}
               </p>
             )}
           </div>
@@ -177,7 +217,7 @@ export function Layout({ children }: { children: ReactNode }) {
           <button
             className="rounded border border-rand p-1.5 text-text-normal"
             onClick={() => setMenueOffen(true)}
-            aria-label="Menü öffnen"
+            aria-label={t('Menü öffnen')}
           >
             {menueOffen ? <X size={18} /> : <Menu size={18} />}
           </button>
@@ -198,6 +238,7 @@ export function Layout({ children }: { children: ReactNode }) {
  */
 function KampagnenWahl({ schliesseMenue }: { schliesseMenue: () => void }) {
   const { kampagnen, kampagne, wechsleKampagne, neueKampagne } = useStore();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [dialogOffen, setDialogOffen] = useState(false);
   const [name, setName] = useState('');
@@ -219,14 +260,14 @@ function KampagnenWahl({ schliesseMenue }: { schliesseMenue: () => void }) {
       setBeschreibung('');
       navigate('/');
     } catch (e) {
-      setFehler(e instanceof Error ? e.message : 'Anlegen fehlgeschlagen');
+      setFehler(e instanceof Error ? e.message : t('Anlegen fehlgeschlagen'));
     }
   };
 
   return (
     <div className="border-b border-rand px-2 py-2">
       <label className="px-2 text-[10px] uppercase tracking-[0.2em] text-text-schwach">
-        Kampagne
+        {t('Kampagne')}
         <select
           className="mt-1 w-full rounded border border-rand bg-flaeche-2 px-2 py-1.5 text-sm normal-case tracking-normal text-gold-hell"
           value={kampagne.id}
@@ -247,7 +288,7 @@ function KampagnenWahl({ schliesseMenue }: { schliesseMenue: () => void }) {
               {k.name}
             </option>
           ))}
-          <option value="__neu">＋ Neue Kampagne …</option>
+          <option value="__neu">＋ {t('Neue Kampagne …')}</option>
         </select>
       </label>
 
@@ -257,21 +298,21 @@ function KampagnenWahl({ schliesseMenue }: { schliesseMenue: () => void }) {
           onClick={() => setDialogOffen(false)}
           role="dialog"
           aria-modal="true"
-          aria-label="Neue Kampagne anlegen"
+          aria-label={t('Neue Kampagne anlegen')}
         >
           <div
             className="karte karte-ornament w-full max-w-md p-5"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="mb-4 text-lg">Neue Kampagne</h2>
+            <h2 className="mb-4 text-lg">{t('Neue Kampagne')}</h2>
             <label className="mb-1 block text-xs uppercase tracking-wider text-text-schwach">
-              Name
+              {t('Name')}
             </label>
             <input
               autoFocus
               className="mb-3 w-full rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-text-stark"
               value={name}
-              placeholder="z. B. „Sturm über den Salzmarschen“"
+              placeholder={t('z. B. „Sturm über den Salzmarschen“')}
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') void anlegen();
@@ -279,7 +320,7 @@ function KampagnenWahl({ schliesseMenue }: { schliesseMenue: () => void }) {
               }}
             />
             <label className="mb-1 block text-xs uppercase tracking-wider text-text-schwach">
-              Untertitel (optional)
+              {t('Untertitel (optional)')}
             </label>
             <input
               className="mb-3 w-full rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-text-stark"
@@ -293,13 +334,13 @@ function KampagnenWahl({ schliesseMenue }: { schliesseMenue: () => void }) {
                 className="rounded border border-rand px-3 py-1.5 text-sm hover:bg-flaeche-3"
                 onClick={() => setDialogOffen(false)}
               >
-                Abbrechen
+                {t('Abbrechen')}
               </button>
               <button
                 className="rounded bg-blut px-3 py-1.5 text-sm font-medium text-white hover:bg-blut-hell"
                 onClick={() => void anlegen()}
               >
-                Anlegen
+                {t('Anlegen')}
               </button>
             </div>
           </div>

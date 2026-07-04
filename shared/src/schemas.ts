@@ -6,7 +6,14 @@
  * DEFAULT_*-Konstanten die Templates für neu angelegte Einträge.
  */
 import { z } from 'zod';
-import type { Entitaet, EntityTyp, Kampagnenstand, Lesung, WidersacherTracker } from './types';
+import type {
+  Entitaet,
+  EntityTyp,
+  Kalender,
+  Kampagnenstand,
+  Lesung,
+  WidersacherTracker,
+} from './types';
 import {
   HALTUNGEN,
   LESUNG_KARTEN_STATUS,
@@ -35,6 +42,8 @@ const basisSchema = z.object({
   tags: z.array(z.string()),
   dmOnly: z.boolean(),
   kampagnenLog: z.array(kampagnenLogEintragSchema),
+  // default(null): Bestandsdaten ohne bild-Feld bleiben gültig.
+  bild: z.string().min(1).nullable().default(null),
 });
 
 /** Optionale Verknüpfung auf eine andere Entität (per ID). */
@@ -140,6 +149,20 @@ export const fraktionSchema = basisSchema.extend({
   stand: z.string(),
 });
 
+const kartenPinSchema = z.object({
+  id: z.string().min(1),
+  x: z.number().min(0).max(100),
+  y: z.number().min(0).max(100),
+  ortId: refSchema,
+  beschriftung: z.string(),
+});
+
+export const karteSchema = basisSchema.extend({
+  typ: z.literal('karte'),
+  beschreibung: z.string(),
+  pins: z.array(kartenPinSchema),
+});
+
 export const notizSchema = basisSchema.extend({
   typ: z.literal('notiz'),
   inhalt: z.string(),
@@ -155,6 +178,7 @@ export const entitySchemas: Record<EntityTyp, z.ZodTypeAny> = {
   sessionPrep: sessionPrepSchema,
   gegenstand: gegenstandSchema,
   fraktion: fraktionSchema,
+  karte: karteSchema,
   notiz: notizSchema,
 };
 
@@ -215,6 +239,26 @@ export const widersacherTrackerSchema = z.object({
   ideen: z.array(checklistEintragSchema),
 });
 
+const kalenderDatumSchema = z.object({
+  jahr: z.number().int(),
+  monat: z.number().int().min(1),
+  tag: z.number().int().min(1),
+});
+
+export const kalenderSchema = z.object({
+  aera: z.string(),
+  monate: z.array(z.object({ name: z.string().min(1), tage: z.number().int().min(1).max(999) })),
+  aktuell: kalenderDatumSchema,
+  ereignisse: z.array(
+    z.object({
+      id: z.string().min(1),
+      datum: kalenderDatumSchema,
+      titel: z.string(),
+      entitaetId: refSchema,
+    }),
+  ),
+});
+
 export const lesungSchema = z.object({
   titel: z.string(),
   karten: z.array(
@@ -243,6 +287,7 @@ export function neueEntitaet(typ: EntityTyp, id: string, name: string): Entitaet
     tags: [] as string[],
     dmOnly: false,
     kampagnenLog: [] as { sessionNr: number; text: string }[],
+    bild: null,
   };
   switch (typ) {
     case 'nsc':
@@ -352,6 +397,8 @@ export function neueEntitaet(typ: EntityTyp, id: string, name: string): Entitaet
         mitglieder: '',
         stand: '',
       };
+    case 'karte':
+      return { ...basis, typ, beschreibung: '', pins: [] };
     case 'notiz':
       return { ...basis, typ, inhalt: '' };
   }
@@ -371,3 +418,11 @@ export const DEFAULT_WIDERSACHER: WidersacherTracker = { name: '', begegnungen: 
 
 /** Default-Lesung (leer – Karten legt der DM je nach Kampagne selbst an). */
 export const DEFAULT_LESUNG: Lesung = { titel: '', karten: [] };
+
+/** Default-Kalender (leer = Modul wartet auf Einrichtung). */
+export const DEFAULT_KALENDER: Kalender = {
+  aera: '',
+  monate: [],
+  aktuell: { jahr: 1, monat: 1, tag: 1 },
+  ereignisse: [],
+};

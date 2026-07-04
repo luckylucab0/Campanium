@@ -8,16 +8,18 @@ import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Castle, Minus, Pencil, Plus, Sparkles, Tent, Trash2 } from 'lucide-react';
 import type { Entitaet, Nsc, Quest, Session } from '@campanium/shared';
-import { slugify } from '@campanium/shared';
+import { formatKalenderDatum, kalenderAktiv, slugify } from '@campanium/shared';
 import { IST_SPIELER_MODUS } from '../api';
 import { formatDatum, pfadFuer } from '../hilfen';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { Badge } from '../komponenten/Badge';
 import { Markdown } from '../komponenten/Markdown';
 import { Trennlinie } from '../komponenten/Ornament';
 
 export function Dashboard() {
-  const { entitaeten, kampagne, kampagnenstand, setzeKampagnenstand } = useStore();
+  const { entitaeten, kampagne, kampagnenstand, setzeKampagnenstand, kalender } = useStore();
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
   const { erstellen } = useStore();
 
@@ -49,22 +51,22 @@ export function Dashboard() {
 
   return (
     <div>
-      <h1 className="mb-1 text-3xl">{kampagne?.name ?? 'Kampagnen-Übersicht'}</h1>
+      <h1 className="mb-1 text-3xl">{kampagne?.name ?? t('Kampagnen-Übersicht')}</h1>
       <p className="mb-6 font-serif text-lg italic text-text-schwach">
-        {kampagne?.beschreibung || 'Ein neues Kapitel wartet darauf, geschrieben zu werden …'}
+        {kampagne?.beschreibung || t('Ein neues Kapitel wartet darauf, geschrieben zu werden …')}
       </p>
 
       {/* Tracker-Widgets */}
       <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Zaehler
-          titel="Party-Level"
+          titel={t('Party-Level')}
           wert={kampagnenstand.partyLevel}
           min={1}
           max={20}
           onChange={(v) => setzeWert({ partyLevel: v })}
         />
         <div className="karte karte-ornament p-4">
-          <TrackerTitel>In-Game-Tag</TrackerTitel>
+          <TrackerTitel>{t('In-Game-Tag')}</TrackerTitel>
           <div className="flex items-center gap-2">
             <ZaehlerKnoepfe
               wert={kampagnenstand.ingameTag}
@@ -73,10 +75,19 @@ export function Dashboard() {
               onChange={(v) => setzeWert({ ingameTag: v })}
             >
               <span className="font-display text-2xl text-text-stark">
-                Tag {kampagnenstand.ingameTag}
+                {t('Tag {nr}', { nr: kampagnenstand.ingameTag })}
               </span>
             </ZaehlerKnoepfe>
           </div>
+          {/* Ist der Kalender eingerichtet, erscheint hier das formatierte Datum. */}
+          {!IST_SPIELER_MODUS && kalenderAktiv(kalender) && (
+            <Link
+              to="/kalender"
+              className="mt-1 block text-sm text-gold-hell hover:text-gold"
+            >
+              {formatKalenderDatum(kalender, kalender.aktuell)}
+            </Link>
+          )}
           {IST_SPIELER_MODUS ? (
             kampagnenstand.ingameDatumText && (
               <p className="mt-1 text-sm text-text-schwach">{kampagnenstand.ingameDatumText}</p>
@@ -85,9 +96,9 @@ export function Dashboard() {
             <input
               className="mt-1.5 w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-sm text-text-schwach hover:border-rand focus:border-rand"
               value={kampagnenstand.ingameDatumText}
-              placeholder="z. B. „neblig, kurz vor Mitternacht“"
+              placeholder={t('z. B. „neblig, kurz vor Mitternacht“')}
               onChange={(e) => setzeWert({ ingameDatumText: e.target.value })}
-              aria-label="In-Game-Datum (Freitext)"
+              aria-label={t('In-Game-Datum (Freitext)')}
             />
           )}
         </div>
@@ -99,7 +110,7 @@ export function Dashboard() {
               {!IST_SPIELER_MODUS && (
                 <button
                   className="float-right text-text-schwach hover:text-rot"
-                  aria-label={`Tracker „${tracker.name}“ löschen`}
+                  aria-label={t('Tracker „{name}“ löschen', { name: tracker.name })}
                   onClick={() =>
                     setzeWert({
                       customTracker: kampagnenstand.customTracker.filter(
@@ -141,19 +152,19 @@ export function Dashboard() {
             onClick={() => void neuesPrep()}
             className="flex items-center gap-2 rounded bg-blut px-3.5 py-2 text-sm font-medium text-white hover:bg-blut-hell"
           >
-            <Tent size={15} /> Neue Session vorbereiten
+            <Tent size={15} /> {t('Neue Session vorbereiten')}
           </button>
           <Link
             to="/widersacher"
             className="flex items-center gap-2 rounded border border-rand px-3.5 py-2 text-sm hover:border-gold hover:text-gold"
           >
-            <Castle size={15} /> Widersacher-Tracker
+            <Castle size={15} /> {t('Widersacher-Tracker')}
           </Link>
           <Link
             to="/lesung"
             className="flex items-center gap-2 rounded border border-arkan/40 px-3.5 py-2 text-sm text-arkan hover:bg-arkan-flaeche"
           >
-            <Sparkles size={15} /> Lesung
+            <Sparkles size={15} /> {t('Lesung')}
           </Link>
         </div>
       )}
@@ -161,9 +172,9 @@ export function Dashboard() {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Aktive Quests */}
         <section>
-          <h2 className="mb-3 text-lg">Aktive Quests</h2>
+          <h2 className="mb-3 text-lg">{t('Aktive Quests')}</h2>
           {aktiveQuests.length === 0 && (
-            <p className="text-sm text-text-schwach">Keine aktiven Quests.</p>
+            <p className="text-sm text-text-schwach">{t('Keine aktiven Quests.')}</p>
           )}
           <div className="space-y-2">
             {aktiveQuests.map((quest) => (
@@ -184,9 +195,9 @@ export function Dashboard() {
 
         {/* Letzte Sessions */}
         <section>
-          <h2 className="mb-3 text-lg">Letzte Sessions</h2>
+          <h2 className="mb-3 text-lg">{t('Letzte Sessions')}</h2>
           {letzteSessions.length === 0 && (
-            <p className="text-sm text-text-schwach">Noch keine Sessions protokolliert.</p>
+            <p className="text-sm text-text-schwach">{t('Noch keine Sessions protokolliert.')}</p>
           )}
           <div className="space-y-2">
             {letzteSessions.map((session) => (
@@ -199,7 +210,7 @@ export function Dashboard() {
                   <span className="font-display text-text-stark">
                     #{session.nummer} · {session.name}
                   </span>
-                  <span className="text-xs text-text-schwach">{formatDatum(session.datum)}</span>
+                  <span className="text-xs text-text-schwach">{formatDatum(session.datum, locale)}</span>
                 </div>
               </Link>
             ))}
@@ -208,10 +219,10 @@ export function Dashboard() {
 
         {/* Verbündete */}
         <section>
-          <h2 className="mb-3 text-lg">Verbündete NSCs</h2>
+          <h2 className="mb-3 text-lg">{t('Verbündete NSCs')}</h2>
           {verbuendete.length === 0 && (
             <p className="text-sm text-text-schwach">
-              Noch keine Verbündeten – die Welt ist ein einsamer Ort.
+              {t('Noch keine Verbündeten – die Welt ist ein einsamer Ort.')}
             </p>
           )}
           <ul className="flex flex-wrap gap-2">
@@ -231,16 +242,16 @@ export function Dashboard() {
 
         {/* Offene Fäden */}
         <section>
-          <h2 className="mb-3 text-lg">Offene Fäden</h2>
+          <h2 className="mb-3 text-lg">{t('Offene Fäden')}</h2>
           {letzteSession?.offeneFaeden ? (
             <div className="karte karte-ornament p-3.5">
               <p className="mb-2 text-xs uppercase tracking-wider text-text-schwach">
-                aus Session #{letzteSession.nummer}
+                {t('aus Session')} #{letzteSession.nummer}
               </p>
               <Markdown text={letzteSession.offeneFaeden} />
             </div>
           ) : (
-            <p className="text-sm text-text-schwach">Keine offenen Fäden notiert.</p>
+            <p className="text-sm text-text-schwach">{t('Keine offenen Fäden notiert.')}</p>
           )}
         </section>
       </div>
@@ -272,6 +283,7 @@ function ZaehlerKnoepfe({
   onChange: (wert: number) => void;
   children: ReactNode;
 }) {
+  const { t } = useI18n();
   if (IST_SPIELER_MODUS) return <>{children}</>;
   return (
     <div className="flex items-center gap-2">
@@ -279,7 +291,7 @@ function ZaehlerKnoepfe({
         className="rounded border border-rand p-1 text-text-schwach hover:border-gold hover:text-gold disabled:opacity-30"
         onClick={() => onChange(Math.max(min, wert - 1))}
         disabled={wert <= min}
-        aria-label="verringern"
+        aria-label={t('verringern')}
       >
         <Minus size={13} />
       </button>
@@ -288,7 +300,7 @@ function ZaehlerKnoepfe({
         className="rounded border border-rand p-1 text-text-schwach hover:border-gold hover:text-gold disabled:opacity-30"
         onClick={() => onChange(Math.min(max, wert + 1))}
         disabled={wert >= max}
-        aria-label="erhöhen"
+        aria-label={t('erhöhen')}
       >
         <Plus size={13} />
       </button>
@@ -326,6 +338,7 @@ function Zaehler({
  */
 function EskalationsKarte() {
   const { kampagnenstand, setzeKampagnenstand } = useStore();
+  const { t } = useI18n();
   const [editorOffen, setEditorOffen] = useState(false);
   const eskalation = kampagnenstand.eskalation;
 
@@ -338,13 +351,13 @@ function EskalationsKarte() {
         className="karte flex min-h-24 items-center justify-center gap-2 border-dashed text-sm text-text-schwach hover:border-gold hover:text-gold"
         onClick={() =>
           speichere({
-            titel: 'Eskalation',
+            titel: t('Eskalation'),
             stufe: 1,
-            stufen: ['Stufe 1', 'Stufe 2', 'Stufe 3', 'Stufe 4', 'Stufe 5'],
+            stufen: [1, 2, 3, 4, 5].map((nr) => t('Stufe {nr}', { nr })),
           })
         }
       >
-        <Plus size={15} /> Eskalations-Tracker
+        <Plus size={15} /> {t('Eskalations-Tracker')}
       </button>
     );
   }
@@ -352,10 +365,10 @@ function EskalationsKarte() {
   return (
     <div className="karte karte-ornament p-4">
       <TrackerTitel>
-        {eskalation.titel || 'Eskalation'}
+        {eskalation.titel || t('Eskalation')}
         <button
           className="float-right text-text-schwach hover:text-gold"
-          aria-label="Eskalations-Tracker bearbeiten"
+          aria-label={t('Eskalations-Tracker bearbeiten')}
           onClick={() => setEditorOffen((o) => !o)}
         >
           <Pencil size={13} />
@@ -367,7 +380,7 @@ function EskalationsKarte() {
         max={eskalation.stufen.length}
         onChange={(v) => speichere({ ...eskalation, stufe: v })}
       >
-        <span className="font-display text-2xl text-text-stark">Stufe {eskalation.stufe}</span>
+        <span className="font-display text-2xl text-text-stark">{t('Stufe {nr}', { nr: eskalation.stufe })}</span>
       </ZaehlerKnoepfe>
       <p className="mt-1 line-clamp-2 text-xs text-text-schwach">
         {eskalation.stufen[eskalation.stufe - 1]}
@@ -378,9 +391,9 @@ function EskalationsKarte() {
           <input
             className="mb-2 w-full rounded border border-rand bg-flaeche-3 px-2 py-1 text-sm"
             value={eskalation.titel}
-            placeholder="Titel, z. B. „Strahds Eskalation“"
+            placeholder={t('Titel, z. B. „Strahds Eskalation“')}
             onChange={(e) => speichere({ ...eskalation, titel: e.target.value })}
-            aria-label="Titel des Eskalations-Trackers"
+            aria-label={t('Titel des Eskalations-Trackers')}
           />
           {eskalation.stufen.map((stufe, i) => (
             <div key={i} className="mb-1.5 flex items-start gap-1.5">
@@ -395,12 +408,12 @@ function EskalationsKarte() {
                     stufen: eskalation.stufen.map((s, j) => (j === i ? e.target.value : s)),
                   })
                 }
-                aria-label={`Beschreibung Stufe ${i + 1}`}
+                aria-label={t('Beschreibung Stufe {nr}', { nr: i + 1 })}
               />
               <button
                 className="mt-1.5 text-text-schwach hover:text-rot disabled:opacity-30"
                 disabled={eskalation.stufen.length <= 1}
-                aria-label={`Stufe ${i + 1} entfernen`}
+                aria-label={t('Stufe {nr} entfernen', { nr: i + 1 })}
                 onClick={() =>
                   speichere({
                     ...eskalation,
@@ -419,22 +432,25 @@ function EskalationsKarte() {
               onClick={() =>
                 speichere({
                   ...eskalation,
-                  stufen: [...eskalation.stufen, `Stufe ${eskalation.stufen.length + 1}`],
+                  stufen: [
+                    ...eskalation.stufen,
+                    t('Stufe {nr}', { nr: eskalation.stufen.length + 1 }),
+                  ],
                 })
               }
             >
-              + Stufe
+              + {t('Stufe')}
             </button>
             <button
               className="text-xs text-text-schwach hover:text-rot"
               onClick={() => {
-                if (window.confirm('Eskalations-Tracker wirklich entfernen?')) {
+                if (window.confirm(t('Eskalations-Tracker wirklich entfernen?'))) {
                   speichere(null);
                   setEditorOffen(false);
                 }
               }}
             >
-              Tracker entfernen
+              {t('Tracker entfernen')}
             </button>
           </div>
         </div>
@@ -446,6 +462,7 @@ function EskalationsKarte() {
 /** Formular-Karte zum Anlegen eines neuen Custom-Trackers. */
 function NeuerTrackerKnopf() {
   const { kampagnenstand, setzeKampagnenstand } = useStore();
+  const { t } = useI18n();
   const [offen, setOffen] = useState(false);
   const [name, setName] = useState('');
   const [max, setMax] = useState(3);
@@ -456,23 +473,23 @@ function NeuerTrackerKnopf() {
         className="karte flex min-h-24 items-center justify-center gap-2 border-dashed text-sm text-text-schwach hover:border-gold hover:text-gold"
         onClick={() => setOffen(true)}
       >
-        <Plus size={15} /> Eigener Tracker
+        <Plus size={15} /> {t('Eigener Tracker')}
       </button>
     );
   }
   return (
     <div className="karte karte-ornament p-4">
-      <TrackerTitel>Neuer Tracker</TrackerTitel>
+      <TrackerTitel>{t('Neuer Tracker')}</TrackerTitel>
       <input
         autoFocus
         className="mb-2 w-full rounded border border-rand bg-flaeche-3 px-2 py-1 text-sm"
-        placeholder="Name"
+        placeholder={t('Name')}
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
       <div className="flex items-center gap-2">
         <label className="text-xs text-text-schwach">
-          Max:{' '}
+          {t('Max:')}{' '}
           <input
             type="number"
             className="w-16 rounded border border-rand bg-flaeche-3 px-2 py-1 text-sm"
@@ -496,7 +513,7 @@ function NeuerTrackerKnopf() {
             setOffen(false);
           }}
         >
-          Anlegen
+          {t('Anlegen')}
         </button>
         <button
           className="rounded border border-rand px-2.5 py-1 text-xs"
