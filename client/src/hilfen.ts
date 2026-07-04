@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * Kleine UI-Hilfsfunktionen: Routen-Pfade, Datumsformatierung und die
  * Farbzuordnung für Status-/Haltungs-Badges.

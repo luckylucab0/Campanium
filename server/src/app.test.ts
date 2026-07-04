@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * API-CRUD-Tests: starten die Express-App auf einem zufälligen Port mit
  * temporärem Datenordner und prüfen Kampagnen-Verwaltung, Anlegen, Ändern,

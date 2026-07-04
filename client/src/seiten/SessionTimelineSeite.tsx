@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * Chronologische Session-Timeline (ersetzt für Sessions die generische
  * Liste). Jede Session zeigt ihr Protokoll-Resümee; existiert ein Prep mit

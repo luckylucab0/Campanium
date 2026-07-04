@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * Detailseite einer interaktiven Karte: zeigt die Kartengrafik mit
  * Pin-Overlay. Pins verlinken auf Orte (Farbe: besucht = gold,

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * API-Schicht mit zwei Betriebsmodi:
  *  - DM-Modus (Standard): spricht die kampagnen-bezogene REST-API des

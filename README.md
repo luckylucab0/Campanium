@@ -148,10 +148,13 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the data flow and a guide to adding n
 
 This is an unofficial fan-made tool and is **not affiliated with or endorsed by Wizards of the Coast**. The repository contains **no text, stat blocks, or other content from any published adventure** (including _Curse of Strahd_) — `data.example/` consists entirely of original, fictional sample content. Bring your own copy of whatever adventure you run; this tool only organises _your_ notes about it.
 
-Campanium is unofficial Fan Content permitted under the Fan Content Policy. Not approved/endorsed by Wizards. Portions of the materials used are property of Wizards of the Coast. ©Wizards of the Coast LLC.
-
 ## License
 
-[CC BY-NC 4.0](LICENSE) — open source in spirit: using, forking and building upon this project is free and welcome, **as long as you credit the original author** ([luckylucab0](https://github.com/luckylucab0)) with a link back to this repository, and **don’t use it commercially**. Full terms: <https://creativecommons.org/licenses/by-nc/4.0/>
+Copyright (c) 2026 [luckylucab0](https://github.com/luckylucab0)
 
-Contributions welcome, see [CONTRIBUTING.md](CONTRIBUTING.md).
+Campanium is dual-licensed:
+
+- **Open source:** [GNU AGPL v3](LICENSE). In practice this means you can use, modify and self-host Campanium freely and at no cost. If you run a **modified** version as a service for other people, the AGPL requires you to offer those users the source code of your modifications — that's the whole catch.
+- **Commercial:** if you want to use Campanium without the AGPL obligations (e.g. run it as a closed-source SaaS), see [LICENSE-COMMERCIAL.md](LICENSE-COMMERCIAL.md).
+
+Contributions welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) (a short [CLA](CLA.md) is required).

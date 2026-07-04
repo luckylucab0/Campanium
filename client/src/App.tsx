@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * App-Wurzel: Router, Provider und Ladezustand.
  * HashRouter statt BrowserRouter, damit der statische Spieler-Build auf

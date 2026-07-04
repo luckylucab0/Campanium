@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Campanium-Commercial
+// Copyright (c) 2026 luckylucab0
+
 /**
  * In-Game-Kalender (DM-Modul): frei konfigurierbare Monate mit eigenen
  * Längen, aktuelles Datum mit Tages-Schaltung (rollt über Monats-/
