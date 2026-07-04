@@ -10,12 +10,12 @@ export function pfadFuer(e: Pick<Entitaet, 'typ' | 'id'>): string {
   return `/${entityConfigs[e.typ].route}/${e.id}`;
 }
 
-/** Formatiert ein ISO-Datum als deutsches Datum (12.06.2026). */
-export function formatDatum(iso: string): string {
+/** Formatiert ein ISO-Datum gemäß Locale (12.06.2026 bzw. 06/12/2026). */
+export function formatDatum(iso: string, locale = 'de-DE'): string {
   if (!iso) return '–';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  return d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 export type BadgeFarbe = 'gruen' | 'gold' | 'rot' | 'grau' | 'arkan' | 'blut';

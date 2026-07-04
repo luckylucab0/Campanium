@@ -26,6 +26,7 @@ import {
 import { istEntityTyp, KampagnenVerwaltung, type Storage } from './storage';
 import { fuehreChatAus } from './ki/chat';
 import type { KiNachricht, KiProvider } from './ki/provider';
+import type { KiSprache } from './ki/tools';
 
 export function erstelleApp(
   verwaltung: KampagnenVerwaltung,
@@ -268,7 +269,9 @@ export function erstelleApp(
           .status(400)
           .json({ fehler: 'nachrichten muss mit einer Nutzer-Nachricht enden' });
       }
-      fuehreChatAus(kiProvider, eintrag.kampagne, storage, verlauf)
+      // UI-Sprache des Clients (Antworten + Aktions-Beschreibungen), Default Deutsch.
+      const sprache: KiSprache = req.body?.sprache === 'en' ? 'en' : 'de';
+      fuehreChatAus(kiProvider, eintrag.kampagne, storage, verlauf, sprache)
         .then((ergebnis) => res.json(ergebnis))
         .catch((fehler: unknown) => {
           // Provider-Fehler (Netz, Auth, Ratelimit) sauber an den Client melden.

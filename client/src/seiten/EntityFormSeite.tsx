@@ -10,6 +10,7 @@ import { Save, Trash2 } from 'lucide-react';
 import type { ChecklistEintrag, Entitaet, KampagnenLogEintrag } from '@campanium/shared';
 import { configVonRoute, type EntityConfig, type FeldConfig } from '@campanium/shared';
 import { pfadFuer } from '../hilfen';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { BildUpload } from '../komponenten/BildUpload';
 import { Checkliste } from '../komponenten/Checkliste';
@@ -20,19 +21,21 @@ type Werte = Record<string, unknown>;
 
 export function EntityFormSeite() {
   const { route = '', id = '' } = useParams();
+  const { t } = useI18n();
   const config = configVonRoute(route);
   const { perId } = useStore();
   const entitaet = perId(id);
 
-  if (!config) return <p className="text-text-schwach">Unbekannter Bereich.</p>;
+  if (!config) return <p className="text-text-schwach">{t('Unbekannter Bereich.')}</p>;
   if (!entitaet || entitaet.typ !== config.typ) {
-    return <p className="text-text-schwach">Eintrag nicht gefunden.</p>;
+    return <p className="text-text-schwach">{t('Eintrag nicht gefunden.')}</p>;
   }
   return <Formular config={config} entitaet={entitaet} />;
 }
 
 function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entitaet }) {
   const { aktualisieren, loeschen } = useStore();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [werte, setWerte] = useState<Werte>({ ...entitaet });
   const [fehler, setFehler] = useState<string | null>(null);
@@ -47,7 +50,7 @@ function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entita
       const gespeichert = await aktualisieren(config.typ, entitaet.id, werte as Partial<Entitaet>);
       navigate(pfadFuer(gespeichert));
     } catch (e) {
-      setFehler(e instanceof Error ? e.message : 'Speichern fehlgeschlagen');
+      setFehler(e instanceof Error ? e.message : t('Speichern fehlgeschlagen'));
     } finally {
       setSpeichert(false);
     }
@@ -56,7 +59,9 @@ function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entita
   const entfernen = async () => {
     if (
       !window.confirm(
-        `„${entitaet.name}“ wirklich löschen? Das kann nicht rückgängig gemacht werden.`,
+        t('„{name}“ wirklich löschen? Das kann nicht rückgängig gemacht werden.', {
+          name: entitaet.name,
+        }),
       )
     )
       return;
@@ -69,18 +74,18 @@ function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entita
   return (
     <div className="mx-auto max-w-3xl">
       <p className="mb-1 text-[11px] uppercase tracking-[0.2em] text-text-schwach">
-        {config.label} bearbeiten
+        {t('{label} bearbeiten', { label: t(config.label) })}
       </p>
       <input
         className="mb-5 w-full border-b border-rand bg-transparent pb-2 font-display text-2xl text-text-stark outline-none focus:border-gold"
         value={String(werte.name ?? '')}
         onChange={(e) => setze('name', e.target.value)}
-        aria-label="Name"
+        aria-label={t('Name')}
       />
 
       {/* Bild / Portrait */}
       <section className="mb-6">
-        <h2 className="mb-2 text-xs uppercase tracking-wider text-text-schwach">Bild</h2>
+        <h2 className="mb-2 text-xs uppercase tracking-wider text-text-schwach">{t('Bild')}</h2>
         <BildUpload
           wert={(werte.bild as string | null) ?? null}
           onChange={(datei) => setze('bild', datei)}
@@ -95,7 +100,7 @@ function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entita
         ))}
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-xs uppercase tracking-wider text-text-schwach">
-            Tags (kommagetrennt)
+            {t('Tags (kommagetrennt)')}
           </span>
           <input
             className="rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-text-stark"
@@ -120,7 +125,7 @@ function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entita
               onChange={(e) => setze('dmOnly', e.target.checked)}
             />
             <span className="flex items-center gap-1.5">
-              Komplett DM-only <DmBadge />
+              {t('Komplett DM-only')} <DmBadge />
             </span>
           </label>
         )}
@@ -129,7 +134,9 @@ function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entita
       {/* Quest-Fortschritt */}
       {config.typ === 'quest' && (
         <section className="mb-6">
-          <h2 className="mb-2 text-sm uppercase tracking-wider text-text-schwach">Fortschritt</h2>
+          <h2 className="mb-2 text-sm uppercase tracking-wider text-text-schwach">
+            {t('Fortschritt')}
+          </h2>
           <Checkliste
             eintraege={(werte.fortschritt as ChecklistEintrag[]) ?? []}
             onChange={(neu) => setze('fortschritt', neu)}
@@ -142,12 +149,12 @@ function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entita
       {config.abschnitte.map((abschnitt) => (
         <section key={abschnitt.feld} className={`mb-6 ${abschnitt.dm ? 'dm-bereich pl-3' : ''}`}>
           <h2 className="mb-2 flex items-center gap-2 text-sm uppercase tracking-wider text-text-schwach">
-            {abschnitt.titel} {abschnitt.dm && <DmBadge />}
+            {t(abschnitt.titel)} {abschnitt.dm && <DmBadge />}
           </h2>
           <MarkdownEditor
             wert={String(werte[abschnitt.feld] ?? '')}
             onChange={(neu) => setze(abschnitt.feld, neu)}
-            placeholder={abschnitt.hinweis}
+            placeholder={abschnitt.hinweis ? t(abschnitt.hinweis) : undefined}
           />
         </section>
       ))}
@@ -155,7 +162,7 @@ function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entita
       {/* Kampagnen-Log */}
       <section className="mb-6">
         <h2 className="mb-2 text-sm uppercase tracking-wider text-text-schwach">
-          Kampagnen-Log (was ist wann passiert?)
+          {t('Kampagnen-Log (was ist wann passiert?)')}
         </h2>
         {log.map((eintrag, i) => (
           <div key={i} className="mb-2 flex gap-2">
@@ -169,7 +176,7 @@ function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entita
                   log.map((l, j) => (j === i ? { ...l, sessionNr: Number(e.target.value) } : l)),
                 )
               }
-              aria-label={`Session-Nummer Eintrag ${i + 1}`}
+              aria-label={t('Session-Nummer Eintrag {nr}', { nr: i + 1 })}
             />
             <input
               className="flex-1 rounded border border-rand bg-flaeche-3 px-2 py-1 text-sm"
@@ -180,7 +187,7 @@ function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entita
                   log.map((l, j) => (j === i ? { ...l, text: e.target.value } : l)),
                 )
               }
-              aria-label={`Log-Text Eintrag ${i + 1}`}
+              aria-label={t('Log-Text Eintrag {nr}', { nr: i + 1 })}
             />
             <button
               type="button"
@@ -191,7 +198,7 @@ function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entita
                   log.filter((_, j) => j !== i),
                 )
               }
-              aria-label={`Log-Eintrag ${i + 1} entfernen`}
+              aria-label={t('Log-Eintrag {nr} entfernen', { nr: i + 1 })}
             >
               <Trash2 size={15} />
             </button>
@@ -202,7 +209,7 @@ function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entita
           className="rounded border border-rand px-2.5 py-1 text-xs text-text-schwach hover:text-gold"
           onClick={() => setze('kampagnenLog', [...log, { sessionNr: log.length + 1, text: '' }])}
         >
-          + Log-Eintrag
+          + {t('Log-Eintrag')}
         </button>
       </section>
 
@@ -214,19 +221,19 @@ function Formular({ config, entitaet }: { config: EntityConfig; entitaet: Entita
           onClick={() => void speichern()}
           disabled={speichert}
         >
-          <Save size={15} /> Speichern
+          <Save size={15} /> {t('Speichern')}
         </button>
         <button
           className="rounded border border-rand px-4 py-2 text-sm hover:bg-flaeche-3"
           onClick={() => navigate(pfadFuer(entitaet))}
         >
-          Abbrechen
+          {t('Abbrechen')}
         </button>
         <button
           className="ml-auto flex items-center gap-2 rounded border border-rot/40 px-4 py-2 text-sm text-rot hover:bg-rot-flaeche"
           onClick={() => void entfernen()}
         >
-          <Trash2 size={15} /> Löschen
+          <Trash2 size={15} /> {t('Löschen')}
         </button>
       </div>
     </div>
@@ -244,9 +251,10 @@ function Feld({
   setze: (feld: string, wert: unknown) => void;
 }) {
   const { entitaeten } = useStore();
+  const { t, locale } = useI18n();
   const label = (
     <span className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-text-schwach">
-      {feld.label} {feld.dm && <DmBadge />}
+      {t(feld.label)} {feld.dm && <DmBadge />}
     </span>
   );
   const basisKlasse = 'rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-text-stark';
@@ -275,7 +283,7 @@ function Feld({
           >
             {(feld.optionen ?? []).map((o) => (
               <option key={o} value={o}>
-                {o}
+                {t(o)}
               </option>
             ))}
           </select>
@@ -284,7 +292,7 @@ function Feld({
     case 'ref': {
       const kandidaten = entitaeten
         .filter((e) => feld.refTypen?.includes(e.typ))
-        .sort((a, b) => a.name.localeCompare(b.name, 'de'));
+        .sort((a, b) => a.name.localeCompare(b.name, locale));
       return (
         <label className="flex flex-col gap-1 text-sm">
           {label}
@@ -293,7 +301,7 @@ function Feld({
             value={String(wert ?? '')}
             onChange={(e) => setze(feld.feld, e.target.value || null)}
           >
-            <option value="">– keine –</option>
+            <option value="">{t('– keine –')}</option>
             {kandidaten.map((e) => (
               <option key={e.id} value={e.id}>
                 {e.name}
@@ -334,7 +342,7 @@ function Feld({
           <input
             className={basisKlasse}
             value={String(wert ?? '')}
-            placeholder={feld.hinweis}
+            placeholder={feld.hinweis ? t(feld.hinweis) : undefined}
             onChange={(e) => setze(feld.feld, e.target.value)}
           />
         </label>

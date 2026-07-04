@@ -8,6 +8,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { entityConfigs, fuzzyFilter } from '@campanium/shared';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { Markdown } from './Markdown';
 
@@ -33,6 +34,7 @@ function offeneKlammer(text: string, cursor: number): { start: number; suche: st
 export function MarkdownEditor({ wert, onChange, zeilen = 6, placeholder, id }: Props) {
   const { entitaeten } = useStore();
   const textarea = useRef<HTMLTextAreaElement>(null);
+  const { t } = useI18n();
   const [vorschauAn, setVorschauAn] = useState(false);
   const [autocomplete, setAutocomplete] = useState<{ start: number; suche: string } | null>(null);
   const [auswahl, setAuswahl] = useState(0);
@@ -77,7 +79,7 @@ export function MarkdownEditor({ wert, onChange, zeilen = 6, placeholder, id }: 
           aria-pressed={vorschauAn}
         >
           {vorschauAn ? <EyeOff size={13} /> : <Eye size={13} />}
-          {vorschauAn ? 'Vorschau aus' : 'Vorschau'}
+          {vorschauAn ? t('Vorschau aus') : t('Vorschau')}
         </button>
       </div>
       <div className={vorschauAn ? 'grid gap-3 lg:grid-cols-2' : ''}>
@@ -87,7 +89,7 @@ export function MarkdownEditor({ wert, onChange, zeilen = 6, placeholder, id }: 
           className="w-full resize-y rounded border border-rand bg-flaeche-3 px-3 py-2 font-mono text-sm leading-relaxed text-text-stark placeholder:text-text-schwach/60"
           rows={zeilen}
           value={wert}
-          placeholder={placeholder ?? 'Markdown … [[Name]] verlinkt eine Entität'}
+          placeholder={placeholder ?? t('Markdown … [[Name]] verlinkt eine Entität')}
           onChange={(e) => {
             onChange(e.target.value);
           }}

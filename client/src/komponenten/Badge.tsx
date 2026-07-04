@@ -1,8 +1,11 @@
 /**
  * Farbcodierte Badges für Status, Haltung & Co. sowie die DM-Markierung.
+ * Übersetzt Enum-Werte zentral für die Anzeige – gespeichert bleiben
+ * die sprachneutralen Originalwerte (z. B. "lebendig").
  */
 import { EyeOff } from 'lucide-react';
 import { badgeFarbe, type BadgeFarbe } from '../hilfen';
+import { useI18n } from '../i18n';
 
 const FARBKLASSEN: Record<BadgeFarbe, string> = {
   gruen: 'bg-gruen-flaeche text-gruen border-gruen/40',
@@ -15,21 +18,23 @@ const FARBKLASSEN: Record<BadgeFarbe, string> = {
 
 /** Badge mit automatischer Farbwahl anhand des Wertes (Status/Haltung). */
 export function Badge({ wert, farbe }: { wert: string; farbe?: BadgeFarbe }) {
+  const { t } = useI18n();
   return (
     <span
       className={`inline-flex items-center rounded-sm border px-1.5 py-0.5 text-[11px] font-medium uppercase tracking-wide ${FARBKLASSEN[farbe ?? badgeFarbe(wert)]}`}
     >
-      {wert}
+      {t(wert)}
     </span>
   );
 }
 
 /** Markierung für DM-only-Inhalte (nur im DM-Modus sichtbar). */
 export function DmBadge() {
+  const { t } = useI18n();
   return (
     <span
       className="inline-flex items-center gap-1 rounded-sm border border-blut/40 bg-blut-flaeche px-1.5 py-0.5 text-[11px] font-medium uppercase tracking-wide text-blut-hell"
-      title="Nur für den DM sichtbar – wird im Spieler-Build entfernt"
+      title={t('Nur für den DM sichtbar – wird im Spieler-Build entfernt')}
     >
       <EyeOff size={11} aria-hidden /> DM
     </span>

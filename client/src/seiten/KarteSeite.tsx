@@ -15,22 +15,25 @@ import { MapPin, Pencil, X } from 'lucide-react';
 import type { Karte, KartenPin, Ort } from '@campanium/shared';
 import { bildUrl, IST_SPIELER_MODUS } from '../api';
 import { pfadFuer } from '../hilfen';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { DmBadge } from '../komponenten/Badge';
 import { Markdown } from '../komponenten/Markdown';
 
 export function KarteSeite() {
   const { id = '' } = useParams();
+  const { t } = useI18n();
   const { perId } = useStore();
   const entitaet = perId(id);
   if (!entitaet || entitaet.typ !== 'karte') {
-    return <p className="text-text-schwach">Karte nicht gefunden.</p>;
+    return <p className="text-text-schwach">{t('Karte nicht gefunden.')}</p>;
   }
   return <KartenAnsicht karte={entitaet} />;
 }
 
 function KartenAnsicht({ karte }: { karte: Karte }) {
   const { kampagne, perId, entitaeten, aktualisieren } = useStore();
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
   const bildRef = useRef<HTMLDivElement>(null);
   const [bearbeiten, setBearbeiten] = useState(false);
@@ -39,7 +42,7 @@ function KartenAnsicht({ karte }: { karte: Karte }) {
 
   const orte = entitaeten
     .filter((e): e is Ort => e.typ === 'ort')
-    .sort((a, b) => a.name.localeCompare(b.name, 'de'));
+    .sort((a, b) => a.name.localeCompare(b.name, locale));
 
   const speicherePins = (pins: KartenPin[]) => {
     void aktualisieren('karte', karte.id, { pins });
@@ -79,7 +82,7 @@ function KartenAnsicht({ karte }: { karte: Karte }) {
 
   const pinTitel = (pin: KartenPin): string => {
     const ort = pin.ortId ? perId(pin.ortId) : undefined;
-    return pin.beschriftung || ort?.name || 'Pin';
+    return pin.beschriftung || ort?.name || t('Pin');
   };
 
   const bearbeiteterPin = karte.pins.find((p) => p.id === offenerPin);
@@ -88,7 +91,7 @@ function KartenAnsicht({ karte }: { karte: Karte }) {
     <div className="mx-auto max-w-5xl">
       {/* Kopf */}
       <div className="mb-1 flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-text-schwach">
-        <MapPin size={13} aria-hidden /> Karte {karte.dmOnly && <DmBadge />}
+        <MapPin size={13} aria-hidden /> {t('Karte')} {karte.dmOnly && <DmBadge />}
       </div>
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <h1 className="text-3xl">{karte.name}</h1>
@@ -106,13 +109,13 @@ function KartenAnsicht({ karte }: { karte: Karte }) {
               }}
               aria-pressed={bearbeiten}
             >
-              <MapPin size={14} /> {bearbeiten ? 'Fertig' : 'Pins bearbeiten'}
+              <MapPin size={14} /> {bearbeiten ? t('Fertig') : t('Pins bearbeiten')}
             </button>
             <Link
               to={`/karten/${karte.id}/bearbeiten`}
               className="flex items-center gap-1.5 rounded border border-rand px-3 py-1.5 text-sm text-text-normal hover:border-gold hover:text-gold"
             >
-              <Pencil size={14} /> Bearbeiten
+              <Pencil size={14} /> {t('Bearbeiten')}
             </Link>
           </div>
         )}
@@ -121,10 +124,10 @@ function KartenAnsicht({ karte }: { karte: Karte }) {
       {!karte.bild || !kampagne ? (
         <div className="karte flex flex-col items-center gap-2 py-16 text-text-schwach">
           <MapPin size={32} className="text-rand-stark" />
-          <p>Noch keine Kartengrafik.</p>
+          <p>{t('Noch keine Kartengrafik.')}</p>
           {!IST_SPIELER_MODUS && (
             <p className="text-sm">
-              Über <em>Bearbeiten</em> ein Bild hochladen, dann hier Pins setzen.
+              {t('Über „Bearbeiten“ ein Bild hochladen, dann hier Pins setzen.')}
             </p>
           )}
         </div>
@@ -132,7 +135,7 @@ function KartenAnsicht({ karte }: { karte: Karte }) {
         <>
           {bearbeiten && (
             <p className="mb-2 text-sm text-gold">
-              Klick auf die Karte setzt einen Pin · Klick auf einen Pin öffnet ihn.
+              {t('Klick auf die Karte setzt einen Pin · Klick auf einen Pin öffnet ihn.')}
             </p>
           )}
           <div
@@ -144,7 +147,7 @@ function KartenAnsicht({ karte }: { karte: Karte }) {
           >
             <img
               src={bildUrl(kampagne.id, karte.bild)}
-              alt={`Karte: ${karte.name}`}
+              alt={t('Karte: {name}', { name: karte.name })}
               className="block w-full select-none"
               draggable={false}
             />
@@ -177,29 +180,29 @@ function KartenAnsicht({ karte }: { karte: Karte }) {
             <div className="karte karte-ornament mt-3 flex flex-wrap items-end gap-3 p-4">
               <label className="flex flex-col gap-1 text-sm">
                 <span className="text-xs uppercase tracking-wider text-text-schwach">
-                  Verknüpfter Ort
+                  {t('Verknüpfter Ort')}
                 </span>
                 <select
                   className="rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-text-stark"
                   value={bearbeiteterPin.ortId ?? ''}
                   onChange={(e) => pinAendern(bearbeiteterPin.id, { ortId: e.target.value || null })}
                 >
-                  <option value="">– freier Marker –</option>
+                  <option value="">{t('– freier Marker –')}</option>
                   {orte.map((ort) => (
                     <option key={ort.id} value={ort.id}>
-                      {ort.name} {ort.besucht ? '' : '(unbesucht)'}
+                      {ort.name} {ort.besucht ? '' : t('(unbesucht)')}
                     </option>
                   ))}
                 </select>
               </label>
               <label className="flex min-w-48 flex-1 flex-col gap-1 text-sm">
                 <span className="text-xs uppercase tracking-wider text-text-schwach">
-                  Beschriftung (optional)
+                  {t('Beschriftung (optional)')}
                 </span>
                 <input
                   className="rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-text-stark"
                   value={bearbeiteterPin.beschriftung}
-                  placeholder="sonst wird der Ortsname angezeigt"
+                  placeholder={t('sonst wird der Ortsname angezeigt')}
                   onChange={(e) => pinAendern(bearbeiteterPin.id, { beschriftung: e.target.value })}
                 />
               </label>
@@ -207,12 +210,12 @@ function KartenAnsicht({ karte }: { karte: Karte }) {
                 className="rounded border border-rot/40 px-3 py-1.5 text-sm text-rot hover:bg-rot-flaeche"
                 onClick={() => pinLoeschen(bearbeiteterPin.id)}
               >
-                Pin löschen
+                {t('Pin löschen')}
               </button>
               <button
                 className="rounded border border-rand p-1.5 text-text-schwach hover:text-text-stark"
                 onClick={() => setOffenerPin(null)}
-                aria-label="Pin-Editor schließen"
+                aria-label={t('Pin-Editor schließen')}
               >
                 <X size={15} />
               </button>
@@ -247,7 +250,7 @@ function KartenAnsicht({ karte }: { karte: Karte }) {
       {karte.beschreibung.trim() && (
         <section className="mt-6">
           <h2 className="mb-1.5 text-sm uppercase tracking-wider text-text-schwach">
-            Beschreibung / Legende
+            {t('Beschreibung / Legende')}
           </h2>
           <Markdown text={karte.beschreibung} />
         </section>

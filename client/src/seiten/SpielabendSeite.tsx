@@ -9,6 +9,7 @@ import { Tent } from 'lucide-react';
 import type { Notiz, SessionPrep } from '@campanium/shared';
 import { entityConfigs, sammleLinkZiele } from '@campanium/shared';
 import { pfadFuer } from '../hilfen';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { Badge, DmBadge } from '../komponenten/Badge';
 import { Markdown } from '../komponenten/Markdown';
@@ -16,6 +17,7 @@ import { entityIcon } from '../komponenten/icons';
 
 export function SpielabendSeite() {
   const { entitaeten, perName } = useStore();
+  const { t } = useI18n();
 
   // Das Prep mit der höchsten Session-Nummer gilt als „heutiger Abend“.
   const prep = entitaeten
@@ -46,9 +48,9 @@ export function SpielabendSeite() {
     return (
       <div className="py-16 text-center text-text-schwach">
         <Tent size={40} className="mx-auto mb-3 text-rand-stark" />
-        <p>Kein Session-Prep vorhanden.</p>
+        <p>{t('Kein Session-Prep vorhanden.')}</p>
         <p className="mt-1 text-sm">
-          Lege auf dem Dashboard über „Neue Session vorbereiten“ eines an.
+          {t('Lege auf dem Dashboard über „Neue Session vorbereiten“ eines an.')}
         </p>
       </div>
     );
@@ -57,12 +59,12 @@ export function SpielabendSeite() {
   return (
     <div>
       <h1 className="mb-1 flex items-center gap-2.5 text-2xl">
-        <Tent size={22} className="text-blut-hell" aria-hidden /> Spielabend <DmBadge />
+        <Tent size={22} className="text-blut-hell" aria-hidden /> {t('Spielabend')} <DmBadge />
       </h1>
       <p className="mb-6 text-sm text-text-schwach">
-        Prep für Session #{prep.sessionNummer} ·{' '}
+        {t('Prep für Session')} #{prep.sessionNummer} ·{' '}
         <Link to={`${pfadFuer(prep)}/bearbeiten`} className="wikilink">
-          bearbeiten
+          {t('bearbeiten')}
         </Link>
       </p>
 
@@ -75,7 +77,7 @@ export function SpielabendSeite() {
             return (
               <section key={abschnitt.feld} className="karte karte-ornament p-4">
                 <h2 className="mb-2 text-sm uppercase tracking-wider text-text-schwach">
-                  {abschnitt.titel}
+                  {t(abschnitt.titel)}
                 </h2>
                 <Markdown text={text} />
               </section>
@@ -87,10 +89,10 @@ export function SpielabendSeite() {
         <div className="space-y-5">
           <section>
             <h2 className="mb-2 text-sm uppercase tracking-wider text-text-schwach">
-              Benötigte NSCs & Orte
+              {t('Benötigte NSCs & Orte')}
             </h2>
             {verknuepfte.length === 0 && (
-              <p className="text-sm text-text-schwach">Keine [[Verknüpfungen]] im Prep gefunden.</p>
+              <p className="text-sm text-text-schwach">{t('Keine [[Verknüpfungen]] im Prep gefunden.')}</p>
             )}
             <div className="space-y-2">
               {verknuepfte.map((e) => {
@@ -122,12 +124,11 @@ export function SpielabendSeite() {
 
           <section>
             <h2 className="mb-2 text-sm uppercase tracking-wider text-text-schwach">
-              Referenzen am Tisch
+              {t('Referenzen am Tisch')}
             </h2>
             {referenzen.length === 0 && (
               <p className="text-sm text-text-schwach">
-                Notizen mit dem Tag <code>referenz</code> erscheinen hier (z. B.
-                Zufallsbegegnungen).
+                {t('Notizen mit dem Tag „referenz“ erscheinen hier (z. B. Zufallsbegegnungen).')}
               </p>
             )}
             <div className="space-y-2">

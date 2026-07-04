@@ -9,6 +9,7 @@ import type { Quest, QuestStatus } from '@campanium/shared';
 import { QUEST_STATUS } from '@campanium/shared';
 import { IST_SPIELER_MODUS } from '../api';
 import { pfadFuer } from '../hilfen';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { DmBadge } from '../komponenten/Badge';
 
@@ -21,6 +22,7 @@ const SPALTEN_TITEL: Record<QuestStatus, string> = {
 
 export function QuestBoard() {
   const { entitaeten, aktualisieren, perId } = useStore();
+  const { t } = useI18n();
   const [dragId, setDragId] = useState<string | null>(null);
   const [ueberSpalte, setUeberSpalte] = useState<QuestStatus | null>(null);
 
@@ -55,7 +57,7 @@ export function QuestBoard() {
             onDrop={() => ablegen(status)}
           >
             <h2 className="mb-2.5 px-1 text-xs uppercase tracking-[0.15em] text-text-schwach">
-              {SPALTEN_TITEL[status]}{' '}
+              {t(SPALTEN_TITEL[status])}{' '}
               <span className="text-text-schwach/60">({spalte.length})</span>
             </h2>
             <div className="space-y-2">

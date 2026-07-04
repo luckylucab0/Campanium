@@ -11,6 +11,7 @@ import type { Entitaet, Session } from '@campanium/shared';
 import { fuzzyFilter, type EntityConfig, configVonRoute } from '@campanium/shared';
 import { bildUrl, IST_SPIELER_MODUS } from '../api';
 import { formatDatum, pfadFuer } from '../hilfen';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { Badge, DmBadge } from '../komponenten/Badge';
 import { entityIcon } from '../komponenten/icons';
@@ -23,14 +24,16 @@ type Sortierung = 'name' | 'geaendert' | 'nummer';
 
 export function EntityListeSeite() {
   const { route = '' } = useParams();
+  const { t } = useI18n();
   const config = configVonRoute(route);
-  if (!config) return <p className="text-text-schwach">Unbekannter Bereich.</p>;
+  if (!config) return <p className="text-text-schwach">{t('Unbekannter Bereich.')}</p>;
   // key erzwingt frischen Filter-State beim Wechsel zwischen Typen.
   return <Liste key={config.typ} config={config} />;
 }
 
 function Liste({ config }: { config: EntityConfig }) {
   const { entitaeten, perId } = useStore();
+  const { t, locale } = useI18n();
   const { oeffneNeuDialog } = useUi();
   const [ansicht, setAnsicht] = useState<Ansicht>('karten');
   const [suche, setSuche] = useState('');
@@ -59,11 +62,11 @@ function Liste({ config }: { config: EntityConfig }) {
           const nb = b as unknown as { nummer?: number; sessionNummer?: number };
           return (nb.nummer ?? nb.sessionNummer ?? 0) - (na.nummer ?? na.sessionNummer ?? 0);
         }
-        return a.name.localeCompare(b.name, 'de');
+        return a.name.localeCompare(b.name, locale);
       });
     }
     return liste;
-  }, [entitaeten, config.typ, filterWerte, suche, sortierung]);
+  }, [entitaeten, config.typ, filterWerte, suche, sortierung, locale]);
 
   const Icon = entityIcon(config.icon);
 
@@ -71,7 +74,7 @@ function Liste({ config }: { config: EntityConfig }) {
     <div>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <h1 className="flex items-center gap-2.5 text-2xl">
-          <Icon size={22} className="text-blut-hell" aria-hidden /> {config.labelPlural}
+          <Icon size={22} className="text-blut-hell" aria-hidden /> {t(config.labelPlural)}
           <span className="text-base text-text-schwach">({eintraege.length})</span>
         </h1>
         {!IST_SPIELER_MODUS && (
@@ -79,7 +82,7 @@ function Liste({ config }: { config: EntityConfig }) {
             className="flex items-center gap-1.5 rounded bg-blut px-3 py-1.5 text-sm font-medium text-white hover:bg-blut-hell"
             onClick={() => oeffneNeuDialog('', config.typ)}
           >
-            <Plus size={15} /> {config.label} anlegen
+            <Plus size={15} /> {t('{label} anlegen', { label: t(config.label) })}
           </button>
         )}
       </div>
@@ -88,10 +91,10 @@ function Liste({ config }: { config: EntityConfig }) {
       <div className="mb-5 flex flex-wrap items-center gap-2">
         <input
           className="w-48 rounded border border-rand bg-flaeche-2 px-2.5 py-1.5 text-sm"
-          placeholder="Filtern …"
+          placeholder={t('Filtern …')}
           value={suche}
           onChange={(e) => setSuche(e.target.value)}
-          aria-label={`${config.labelPlural} durchsuchen`}
+          aria-label={t('{label} durchsuchen', { label: t(config.labelPlural) })}
         />
         {config.filter.map((filter) => (
           <select
@@ -99,19 +102,21 @@ function Liste({ config }: { config: EntityConfig }) {
             className="rounded border border-rand bg-flaeche-2 px-2 py-1.5 text-sm text-text-normal"
             value={filterWerte[filter.feld] ?? ''}
             onChange={(e) => setFilterWerte((f) => ({ ...f, [filter.feld]: e.target.value }))}
-            aria-label={`Nach ${filter.label} filtern`}
+            aria-label={t('Nach {label} filtern', { label: t(filter.label) })}
           >
-            <option value="">{filter.label}: alle</option>
+            <option value="">
+              {t(filter.label)}: {t('alle')}
+            </option>
             {filter.art === 'boolean' && (
               <>
-                <option value="true">ja</option>
-                <option value="false">nein</option>
+                <option value="true">{t('ja')}</option>
+                <option value="false">{t('nein')}</option>
               </>
             )}
             {filter.art === 'select' &&
               (filter.optionen ?? []).map((o) => (
                 <option key={o} value={o}>
-                  {o}
+                  {t(o)}
                 </option>
               ))}
             {/* 'werte': Optionen sind die tatsächlich vorkommenden Werte
@@ -127,7 +132,7 @@ function Liste({ config }: { config: EntityConfig }) {
                     .filter(Boolean),
                 ),
               ]
-                .sort((a, b) => a.localeCompare(b, 'de'))
+                .sort((a, b) => a.localeCompare(b, locale))
                 .map((wert) => (
                   <option key={wert} value={wert}>
                     {wert}
@@ -136,7 +141,7 @@ function Liste({ config }: { config: EntityConfig }) {
             {filter.art === 'ref' &&
               entitaeten
                 .filter((e) => filter.refTypen?.includes(e.typ))
-                .sort((a, b) => a.name.localeCompare(b.name, 'de'))
+                .sort((a, b) => a.name.localeCompare(b.name, locale))
                 .map((e) => (
                   <option key={e.id} value={e.id}>
                     {e.name}
@@ -148,19 +153,23 @@ function Liste({ config }: { config: EntityConfig }) {
           className="rounded border border-rand bg-flaeche-2 px-2 py-1.5 text-sm text-text-normal"
           value={sortierung}
           onChange={(e) => setSortierung(e.target.value as Sortierung)}
-          aria-label="Sortierung"
+          aria-label={t('Sortierung')}
         >
-          <option value="name">Sortierung: Name</option>
-          <option value="geaendert">Sortierung: zuletzt geändert</option>
+          <option value="name">{t('Sortierung: Name')}</option>
+          <option value="geaendert">{t('Sortierung: zuletzt geändert')}</option>
           {(config.typ === 'session' || config.typ === 'sessionPrep') && (
-            <option value="nummer">Sortierung: Session-Nr.</option>
+            <option value="nummer">{t('Sortierung: Session-Nr.')}</option>
           )}
         </select>
-        <div className="ml-auto flex rounded border border-rand" role="group" aria-label="Ansicht">
+        <div
+          className="ml-auto flex rounded border border-rand"
+          role="group"
+          aria-label={t('Ansicht')}
+        >
           <button
             className={`p-1.5 ${ansicht === 'karten' ? 'bg-flaeche-3 text-gold' : 'text-text-schwach'}`}
             onClick={() => setAnsicht('karten')}
-            aria-label="Kartenansicht"
+            aria-label={t('Kartenansicht')}
             aria-pressed={ansicht === 'karten'}
           >
             <LayoutGrid size={15} />
@@ -168,7 +177,7 @@ function Liste({ config }: { config: EntityConfig }) {
           <button
             className={`p-1.5 ${ansicht === 'tabelle' ? 'bg-flaeche-3 text-gold' : 'text-text-schwach'}`}
             onClick={() => setAnsicht('tabelle')}
-            aria-label="Tabellenansicht"
+            aria-label={t('Tabellenansicht')}
             aria-pressed={ansicht === 'tabelle'}
           >
             <Table2 size={15} />
@@ -177,7 +186,7 @@ function Liste({ config }: { config: EntityConfig }) {
             <button
               className={`p-1.5 ${ansicht === 'board' ? 'bg-flaeche-3 text-gold' : 'text-text-schwach'}`}
               onClick={() => setAnsicht('board')}
-              aria-label="Kanban-Board"
+              aria-label={t('Kanban-Board')}
               aria-pressed={ansicht === 'board'}
             >
               <Columns3 size={15} />
@@ -189,8 +198,8 @@ function Liste({ config }: { config: EntityConfig }) {
       {eintraege.length === 0 && (
         <div className="flex flex-col items-center gap-3 py-16 text-text-schwach">
           <Burg size={56} className="text-rand-stark" />
-          <p>{config.beschreibung}</p>
-          <p className="text-sm">Noch keine Einträge.</p>
+          <p>{t(config.beschreibung)}</p>
+          <p className="text-sm">{t('Noch keine Einträge.')}</p>
         </div>
       )}
 
@@ -212,6 +221,7 @@ function Liste({ config }: { config: EntityConfig }) {
 /** Eine Karte im Kartenraster. */
 export function EntityKarte({ entitaet, config }: { entitaet: Entitaet; config: EntityConfig }) {
   const { kampagne } = useStore();
+  const { locale } = useI18n();
   const werte = entitaet as unknown as Record<string, unknown>;
   const untertitel = config.untertitelFeld ? String(werte[config.untertitelFeld] ?? '') : '';
   return (
@@ -241,7 +251,7 @@ export function EntityKarte({ entitaet, config }: { entitaet: Entitaet; config: 
           ))}
         {entitaet.typ === 'session' && (
           <span className="text-xs text-text-schwach">
-            #{(entitaet as Session).nummer} · {formatDatum((entitaet as Session).datum)}
+            #{(entitaet as Session).nummer} · {formatDatum((entitaet as Session).datum, locale)}
           </span>
         )}
       </div>
@@ -259,6 +269,7 @@ function Tabelle({
   eintraege: Entitaet[];
   perId: (id: string) => Entitaet | undefined;
 }) {
+  const { t } = useI18n();
   const spalten = config.felder.filter((f) =>
     ['select', 'boolean', 'ref', 'nummer'].includes(f.art),
   );
@@ -268,14 +279,14 @@ function Tabelle({
         <thead>
           <tr className="border-b border-rand text-left">
             <th className="px-3 py-2 text-[11px] uppercase tracking-wider text-text-schwach">
-              Name
+              {t('Name')}
             </th>
             {spalten.map((s) => (
               <th
                 key={s.feld}
                 className="px-3 py-2 text-[11px] uppercase tracking-wider text-text-schwach"
               >
-                {s.label}
+                {t(s.label)}
               </th>
             ))}
           </tr>
@@ -303,9 +314,9 @@ function Tabelle({
                         <Badge wert={wert} />
                       ) : s.art === 'boolean' ? (
                         wert ? (
-                          'Ja'
+                          t('Ja')
                         ) : (
-                          'Nein'
+                          t('Nein')
                         )
                       ) : s.art === 'ref' && typeof wert === 'string' ? (
                         (perId(wert)?.name ?? '–')

@@ -243,16 +243,20 @@ export async function ladeKiStatus(): Promise<KiStatus> {
   }
 }
 
-/** Sendet den Gesprächsverlauf an den Assistenten der aktiven Kampagne. */
+/**
+ * Sendet den Gesprächsverlauf an den Assistenten der aktiven Kampagne.
+ * `sprache` steuert die Antwortsprache und die Aktions-Beschreibungen.
+ */
 export async function sendeKiChat(
   kid: string,
   nachrichten: { rolle: 'nutzer' | 'assistent'; text: string }[],
+  sprache: string = 'de',
 ): Promise<{ antwort: string; aktionen: KiAktion[] }> {
   const antwort = await pruefe(
     await fetch(`/api/kampagnen/${kid}/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nachrichten }),
+      body: JSON.stringify({ nachrichten, sprache }),
     }),
   );
   return antwort.json();

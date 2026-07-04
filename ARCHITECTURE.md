@@ -110,6 +110,43 @@ konfigurierbar – die Curse-of-Strahd-Demo zeigt die Belegung:
 | Kalender            | Monate/Längen/Ära frei, Ereignisse  | 12 fiktive Monate, Jahr 735 BK |
 | Karten              | Grafik + Pins auf Orte              | „Die Nebelmark“, 3 Pins        |
 
+## Mehrsprachigkeit (i18n)
+
+Die UI ist mehrsprachig (aktuell Deutsch & Englisch), ohne zusätzliche
+Abhängigkeit – umgesetzt in `client/src/i18n/`:
+
+- **Deutsch ist die Quellsprache.** Übersetzbare Texte stehen als deutscher
+  Originaltext im Code und laufen durch `t('…')` (Hook `useI18n()`).
+  Pro weiterer Sprache gibt es ein Wörterbuch „deutscher Text →
+  Übersetzung“ (`en.ts`). Fehlende Einträge fallen sichtbar auf Deutsch
+  zurück – eine unvollständige Übersetzung bricht nie die UI.
+- **Daten bleiben sprachneutral.** JSON-Schlüssel (`ortId`,
+  `geheimnisseDm`, …) und Enum-Werte (`status: "lebendig"`,
+  `haltung: "verbündet"`) sind stabile Bezeichner und werden nur für die
+  **Anzeige** übersetzt (zentral z. B. in der `Badge`-Komponente) – nie
+  beim Speichern. Kampagnen sind dadurch zwischen Sprachen portabel.
+- **Registry bleibt einsprachig.** Die Labels/Hinweise in
+  `entityConfig.ts` sind die deutschen Quelltexte; der Client übersetzt
+  sie an der Anzeigestelle mit `t(config.label)` usw. Ein Test
+  (`i18n/uebersetzung.test.ts`) erzwingt, dass das englische Wörterbuch
+  alle Registry-Texte und Enum-Werte abdeckt.
+- **Platzhalter** wie `{name}` werden zur Laufzeit ersetzt:
+  `t('Tag {nr}', { nr: 3 })`.
+- **KI-Assistent:** Der Client schickt die UI-Sprache mit
+  (`POST …/chat`, Feld `sprache`); der Server passt Antwortsprache und
+  Aktions-Beschreibungen an (`server/src/ki/tools.ts`).
+- Die Sprachwahl liegt in `localStorage`, initial entscheidet die
+  Browser-Sprache; `<html lang>` wird mitgeführt. Datumsformate und
+  Sortierung nutzen die Locale der aktiven Sprache.
+
+**Neue Sprache hinzufügen** (z. B. Französisch):
+
+1. `client/src/i18n/fr.ts` anlegen – Kopie von `en.ts`, Werte übersetzen.
+2. In `client/src/i18n/index.tsx` bei `SPRACHEN` und `WOERTERBUECHER`
+   registrieren – der Umschalter in der Sidebar zeigt sie automatisch.
+3. Optional: `KiSprache` in `server/src/ki/tools.ts` erweitern, damit auch
+   der KI-Assistent in der neuen Sprache antwortet.
+
 ## Spoiler-Trennung (wichtigste Invariante)
 
 1. **Feld-Ebene:** DM-Felder enden per Konvention auf `Dm`
@@ -137,7 +174,10 @@ Beispiel: Typ „Monster“.
 4. **`shared/src/playerFilter.ts`** – bewusst entscheiden, welche Felder
    spielersicher sind, und sie in `FELD_WHITELIST` eintragen.
    **Kein Eintrag = Typ wird nie exportiert** (sicherer Default).
-5. Optional: Icon-Name in `client/src/komponenten/icons.ts` mappen,
+5. **`client/src/i18n/en.ts`** – die neuen Labels/Hinweise übersetzen.
+   Der Vollständigkeits-Test (`i18n/uebersetzung.test.ts`) schlägt sonst
+   fehl – vergessene Übersetzungen fallen also im CI auf.
+6. Optional: Icon-Name in `client/src/komponenten/icons.ts` mappen,
    Tests ergänzen.
 
 Server, Storage, Suche, Backlinks und Spieler-Build greifen die neue Art

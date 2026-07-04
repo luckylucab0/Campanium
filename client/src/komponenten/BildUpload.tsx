@@ -6,6 +6,7 @@
 import { useRef, useState } from 'react';
 import { ImagePlus, Trash2 } from 'lucide-react';
 import { bildUrl, ladeBildHoch } from '../api';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 
 export function BildUpload({
@@ -20,6 +21,7 @@ export function BildUpload({
   alt: string;
 }) {
   const { kampagne } = useStore();
+  const { t } = useI18n();
   const eingabe = useRef<HTMLInputElement>(null);
   const [laedt, setLaedt] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
@@ -31,7 +33,7 @@ export function BildUpload({
     try {
       onChange(await ladeBildHoch(kampagne.id, datei));
     } catch (e) {
-      setFehler(e instanceof Error ? e.message : 'Upload fehlgeschlagen');
+      setFehler(e instanceof Error ? e.message : t('Upload fehlgeschlagen'));
     } finally {
       setLaedt(false);
     }
@@ -68,7 +70,7 @@ export function BildUpload({
             onClick={() => eingabe.current?.click()}
             disabled={laedt}
           >
-            {laedt ? 'Lädt …' : wert ? 'Bild ersetzen' : 'Bild hochladen'}
+            {laedt ? t('Lädt …') : wert ? t('Bild ersetzen') : t('Bild hochladen')}
           </button>
           {wert && (
             <button
@@ -76,14 +78,14 @@ export function BildUpload({
               className="flex items-center gap-1 rounded border border-rand px-2.5 py-1 text-xs text-text-schwach hover:text-rot"
               onClick={() => onChange(null)}
             >
-              <Trash2 size={12} /> Entfernen
+              <Trash2 size={12} /> {t('Entfernen')}
             </button>
           )}
         </div>
         {fehler ? (
           <p className="text-xs text-rot">{fehler}</p>
         ) : (
-          <p className="text-xs text-text-schwach">PNG, JPEG, WebP oder GIF · max. 10 MB</p>
+          <p className="text-xs text-text-schwach">{t('PNG, JPEG, WebP oder GIF · max. 10 MB')}</p>
         )}
       </div>
     </div>

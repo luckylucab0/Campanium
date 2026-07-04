@@ -6,6 +6,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { useNavigate } from 'react-router-dom';
 import { ENTITY_TYPEN, entityConfigs, type EntityTyp } from '@campanium/shared';
 import { IST_SPIELER_MODUS } from '../api';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 
 type Theme = 'dunkel' | 'pergament';
@@ -63,6 +64,7 @@ function NeuDialog({
   schliessen: () => void;
 }) {
   const { erstellen } = useStore();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [name, setName] = useState(initial.name);
   const [typ, setTyp] = useState<EntityTyp>(initial.typ);
@@ -75,7 +77,7 @@ function NeuDialog({
       schliessen();
       navigate(`/${entityConfigs[typ].route}/${neu.id}/bearbeiten`);
     } catch (e) {
-      setFehler(e instanceof Error ? e.message : 'Unbekannter Fehler');
+      setFehler(e instanceof Error ? e.message : t('Unbekannter Fehler'));
     }
   };
 
@@ -85,27 +87,29 @@ function NeuDialog({
       onClick={schliessen}
       role="dialog"
       aria-modal="true"
-      aria-label="Neue Entität anlegen"
+      aria-label={t('Neue Entität anlegen')}
     >
       <div
         className="karte karte-ornament w-full max-w-md p-5"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-4 text-lg">Neu anlegen</h2>
-        <label className="mb-1 block text-xs uppercase tracking-wider text-text-schwach">Art</label>
+        <h2 className="mb-4 text-lg">{t('Neu anlegen')}</h2>
+        <label className="mb-1 block text-xs uppercase tracking-wider text-text-schwach">
+          {t('Art')}
+        </label>
         <select
           className="mb-3 w-full rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-text-stark"
           value={typ}
           onChange={(e) => setTyp(e.target.value as EntityTyp)}
         >
-          {ENTITY_TYPEN.map((t) => (
-            <option key={t} value={t}>
-              {entityConfigs[t].label}
+          {ENTITY_TYPEN.map((eintrag) => (
+            <option key={eintrag} value={eintrag}>
+              {t(entityConfigs[eintrag].label)}
             </option>
           ))}
         </select>
         <label className="mb-1 block text-xs uppercase tracking-wider text-text-schwach">
-          Name
+          {t('Name')}
         </label>
         <input
           autoFocus
@@ -123,13 +127,13 @@ function NeuDialog({
             className="rounded border border-rand px-3 py-1.5 text-sm hover:bg-flaeche-3"
             onClick={schliessen}
           >
-            Abbrechen
+            {t('Abbrechen')}
           </button>
           <button
             className="rounded bg-blut px-3 py-1.5 text-sm font-medium text-white hover:bg-blut-hell"
             onClick={() => void anlegen()}
           >
-            Anlegen
+            {t('Anlegen')}
           </button>
         </div>
       </div>

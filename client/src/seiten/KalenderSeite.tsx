@@ -21,6 +21,7 @@ import {
   vorlageZwoelfMonate,
 } from '@campanium/shared';
 import { pfadFuer } from '../hilfen';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 
 export function KalenderSeite() {
@@ -40,14 +41,14 @@ function Einrichtung({
   kalender: Kalender;
   speichere: (neu: Kalender) => void;
 }) {
+  const { t } = useI18n();
   return (
     <div className="mx-auto max-w-2xl">
       <h1 className="mb-1 flex items-center gap-2.5 text-2xl">
-        <CalendarDays size={22} className="text-blut-hell" aria-hidden /> Kalender
+        <CalendarDays size={22} className="text-blut-hell" aria-hidden /> {t('Kalender')}
       </h1>
       <p className="mb-6 text-sm text-text-schwach">
-        Richte den Kalender deiner Spielwelt ein – Monatsnamen und -längen sind frei wählbar und
-        lassen sich später jederzeit anpassen.
+        {t('Richte den Kalender deiner Spielwelt ein – Monatsnamen und -längen sind frei wählbar und lassen sich später jederzeit anpassen.')}
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
         <button
@@ -56,9 +57,9 @@ function Einrichtung({
             speichere({ ...kalender, monate: vorlageZwoelfMonate(), aktuell: { jahr: 1, monat: 1, tag: 1 } })
           }
         >
-          <div className="mb-1 font-display text-text-stark">12 Monate à 30 Tage</div>
+          <div className="mb-1 font-display text-text-stark">{t('12 Monate à 30 Tage')}</div>
           <p className="text-sm text-text-schwach">
-            Neutraler Fantasy-Kalender – Monatsnamen anschließend umbenennen.
+            {t('Neutraler Fantasy-Kalender – Monatsnamen anschließend umbenennen.')}
           </p>
         </button>
         <button
@@ -67,9 +68,9 @@ function Einrichtung({
             speichere({ ...kalender, monate: vorlageIrdisch(), aktuell: { jahr: 1, monat: 1, tag: 1 } })
           }
         >
-          <div className="mb-1 font-display text-text-stark">Irdischer Kalender</div>
+          <div className="mb-1 font-display text-text-stark">{t('Irdischer Kalender')}</div>
           <p className="text-sm text-text-schwach">
-            Januar bis Dezember mit echten Monatslängen (ohne Schaltjahre).
+            {t('Januar bis Dezember mit echten Monatslängen (ohne Schaltjahre).')}
           </p>
         </button>
       </div>
@@ -79,6 +80,7 @@ function Einrichtung({
 
 function KalenderAnsicht() {
   const { kalender, setzeKalender, entitaeten, perId } = useStore();
+  const { t } = useI18n();
   /** Angezeigter Monat (unabhängig vom aktuellen Datum blätterbar). */
   const [ansicht, setAnsicht] = useState<{ jahr: number; monat: number }>({
     jahr: kalender.aktuell.jahr,
@@ -126,10 +128,10 @@ function KalenderAnsicht() {
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="mb-1 flex items-center gap-2.5 text-2xl">
-            <CalendarDays size={22} className="text-blut-hell" aria-hidden /> Kalender
+            <CalendarDays size={22} className="text-blut-hell" aria-hidden /> {t('Kalender')}
           </h1>
           <p className="font-serif text-lg italic text-gold-hell">
-            Heute: {formatKalenderDatum(kalender, kalender.aktuell)}
+            {t('Heute:')} {formatKalenderDatum(kalender, kalender.aktuell)}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -137,13 +139,13 @@ function KalenderAnsicht() {
             className="rounded border border-rand px-3 py-1.5 text-sm hover:border-gold hover:text-gold"
             onClick={() => tagWechseln(-1)}
           >
-            −1 Tag
+            {t('−1 Tag')}
           </button>
           <button
             className="rounded bg-blut px-3 py-1.5 text-sm font-medium text-white hover:bg-blut-hell"
             onClick={() => tagWechseln(1)}
           >
-            +1 Tag
+            {t('+1 Tag')}
           </button>
           <button
             className={`rounded border p-1.5 ${
@@ -152,7 +154,7 @@ function KalenderAnsicht() {
                 : 'border-rand text-text-schwach hover:text-gold'
             }`}
             onClick={() => setEinstellungenOffen((o) => !o)}
-            aria-label="Kalender-Einstellungen"
+            aria-label={t('Kalender-Einstellungen')}
             aria-pressed={einstellungenOffen}
           >
             <Settings2 size={16} />
@@ -167,7 +169,7 @@ function KalenderAnsicht() {
         <button
           className="rounded border border-rand p-1.5 text-text-schwach hover:text-gold"
           onClick={() => blaettern(-1)}
-          aria-label="Voriger Monat"
+          aria-label={t('Voriger Monat')}
         >
           <ChevronLeft size={16} />
         </button>
@@ -178,7 +180,7 @@ function KalenderAnsicht() {
         <button
           className="rounded border border-rand p-1.5 text-text-schwach hover:text-gold"
           onClick={() => blaettern(1)}
-          aria-label="Nächster Monat"
+          aria-label={t('Nächster Monat')}
         >
           <ChevronRight size={16} />
         </button>
@@ -198,7 +200,7 @@ function KalenderAnsicht() {
                 istHeute ? 'border-gold bg-gold/10' : ''
               } ${istGewaehlt ? 'ring-1 ring-gold' : ''}`}
               onClick={() => setGewaehlterTag(istGewaehlt ? null : datum)}
-              aria-label={`Tag ${i + 1}${ereignisse.length ? `, ${ereignisse.length} Ereignis(se)` : ''}`}
+              aria-label={t('Tag {nr}', { nr: i + 1 }) + (ereignisse.length ? t(', {n} Ereignis(se)', { n: ereignisse.length }) : '')}
             >
               <span
                 className={`text-xs ${istHeute ? 'font-semibold text-gold' : 'text-text-schwach'}`}
@@ -211,7 +213,7 @@ function KalenderAnsicht() {
                 </p>
               ))}
               {ereignisse.length > 2 && (
-                <p className="text-[10px] text-text-schwach">+{ereignisse.length - 2} weitere</p>
+                <p className="text-[10px] text-text-schwach">{t('+{n} weitere', { n: ereignisse.length - 2 })}</p>
               )}
             </button>
           );
@@ -251,6 +253,7 @@ function TagesPanel({
   entitaeten: ReturnType<typeof useStore>['entitaeten'];
   perId: ReturnType<typeof useStore>['perId'];
 }) {
+  const { t, locale } = useI18n();
   const [titel, setTitel] = useState('');
   const [entitaetId, setEntitaetId] = useState('');
   const istHeute = gleichesDatum(datum, kalender.aktuell);
@@ -280,13 +283,13 @@ function TagesPanel({
             className="rounded border border-rand px-2.5 py-1 text-xs hover:border-gold hover:text-gold"
             onClick={() => setzeAktuell(datum)}
           >
-            Als aktuellen Tag setzen
+            {t('Als aktuellen Tag setzen')}
           </button>
         )}
       </div>
 
       {ereignisse.length === 0 && (
-        <p className="mb-3 text-sm text-text-schwach">Keine Ereignisse an diesem Tag.</p>
+        <p className="mb-3 text-sm text-text-schwach">{t('Keine Ereignisse an diesem Tag.')}</p>
       )}
       <ul className="mb-3 space-y-1.5">
         {ereignisse.map((e) => {
@@ -302,7 +305,7 @@ function TagesPanel({
               <button
                 className="ml-auto text-text-schwach hover:text-rot"
                 onClick={() => loeschen(e.id)}
-                aria-label={`Ereignis „${e.titel}“ löschen`}
+                aria-label={t('Ereignis „{name}“ löschen', { name: e.titel })}
               >
                 <Trash2 size={13} />
               </button>
@@ -314,7 +317,7 @@ function TagesPanel({
       <div className="flex flex-wrap items-center gap-2">
         <input
           className="min-w-40 flex-1 rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-sm"
-          placeholder="Neues Ereignis, z. B. „Kerzenfest in Nebelfurt“"
+          placeholder={t('Neues Ereignis, z. B. „Kerzenfest in Nebelfurt“')}
           value={titel}
           onChange={(e) => setTitel(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && hinzufuegen()}
@@ -323,11 +326,11 @@ function TagesPanel({
           className="rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-sm text-text-normal"
           value={entitaetId}
           onChange={(e) => setEntitaetId(e.target.value)}
-          aria-label="Ereignis mit Entität verknüpfen"
+          aria-label={t('Ereignis mit Entität verknüpfen')}
         >
-          <option value="">– keine Verknüpfung –</option>
+          <option value="">{t('– keine Verknüpfung –')}</option>
           {[...entitaeten]
-            .sort((a, b) => a.name.localeCompare(b.name, 'de'))
+            .sort((a, b) => a.name.localeCompare(b.name, locale))
             .map((e) => (
               <option key={e.id} value={e.id}>
                 {e.name}
@@ -338,7 +341,7 @@ function TagesPanel({
           className="flex items-center gap-1 rounded bg-blut px-2.5 py-1.5 text-sm font-medium text-white hover:bg-blut-hell"
           onClick={hinzufuegen}
         >
-          <Plus size={14} /> Eintragen
+          <Plus size={14} /> {t('Eintragen')}
         </button>
       </div>
     </div>
@@ -353,6 +356,7 @@ function Einstellungen({
   kalender: Kalender;
   speichere: (neu: Kalender) => void;
 }) {
+  const { t } = useI18n();
   const monateAendern = (monate: Kalender['monate']) => {
     if (monate.length === 0) return;
     const neu = { ...kalender, monate };
@@ -363,16 +367,16 @@ function Einstellungen({
     <div className="karte karte-ornament mb-5 p-4">
       <label className="mb-3 flex max-w-60 flex-col gap-1 text-sm">
         <span className="text-xs uppercase tracking-wider text-text-schwach">
-          Ära / Jahreszählung (optional)
+          {t('Ära / Jahreszählung (optional)')}
         </span>
         <input
           className="rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-text-stark"
           value={kalender.aera}
-          placeholder="z. B. „BC“"
+          placeholder={t('z. B. „BC“')}
           onChange={(e) => speichere({ ...kalender, aera: e.target.value })}
         />
       </label>
-      <h3 className="mb-2 text-xs uppercase tracking-wider text-text-schwach">Monate</h3>
+      <h3 className="mb-2 text-xs uppercase tracking-wider text-text-schwach">{t('Monate')}</h3>
       {kalender.monate.map((monat, i) => (
         <div key={i} className="mb-1.5 flex items-center gap-2">
           <span className="w-5 shrink-0 text-right font-display text-xs text-gold">{i + 1}</span>
@@ -384,7 +388,7 @@ function Einstellungen({
                 kalender.monate.map((m, j) => (j === i ? { ...m, name: e.target.value } : m)),
               )
             }
-            aria-label={`Name Monat ${i + 1}`}
+            aria-label={t('Name Monat {nr}', { nr: i + 1 })}
           />
           <input
             type="number"
@@ -399,13 +403,13 @@ function Einstellungen({
                 ),
               )
             }
-            aria-label={`Tage Monat ${i + 1}`}
+            aria-label={t('Tage Monat {nr}', { nr: i + 1 })}
           />
           <button
             className="text-text-schwach hover:text-rot disabled:opacity-30"
             disabled={kalender.monate.length <= 1}
             onClick={() => monateAendern(kalender.monate.filter((_, j) => j !== i))}
-            aria-label={`Monat ${i + 1} entfernen`}
+            aria-label={t('Monat {nr} entfernen', { nr: i + 1 })}
           >
             <Trash2 size={14} />
           </button>
@@ -416,11 +420,11 @@ function Einstellungen({
         onClick={() =>
           monateAendern([
             ...kalender.monate,
-            { name: `${kalender.monate.length + 1}. Monat`, tage: 30 },
+            { name: t('{nr}. Monat', { nr: kalender.monate.length + 1 }), tage: 30 },
           ])
         }
       >
-        + Monat
+        + {t('Monat')}
       </button>
     </div>
   );

@@ -9,6 +9,7 @@ import { Search } from 'lucide-react';
 import type { Entitaet, EntityTyp } from '@campanium/shared';
 import { entityConfigs, fuzzyScore } from '@campanium/shared';
 import { pfadFuer } from '../hilfen';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { entityIcon } from './icons';
 
@@ -32,6 +33,7 @@ function score(suche: string, e: Entitaet): number {
 
 export function SearchPalette({ schliessen }: { schliessen: () => void }) {
   const { entitaeten } = useStore();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [suche, setSuche] = useState('');
   const [auswahl, setAuswahl] = useState(0);
@@ -72,7 +74,7 @@ export function SearchPalette({ schliessen }: { schliessen: () => void }) {
       onClick={schliessen}
       role="dialog"
       aria-modal="true"
-      aria-label="Globale Suche"
+      aria-label={t('Globale Suche')}
     >
       <div
         className="karte karte-ornament w-full max-w-xl overflow-hidden"
@@ -83,7 +85,7 @@ export function SearchPalette({ schliessen }: { schliessen: () => void }) {
           <input
             ref={eingabe}
             className="flex-1 bg-transparent text-text-stark outline-none placeholder:text-text-schwach/60"
-            placeholder="Suchen … (Name, Tags, Volltext)"
+            placeholder={t('Suchen … (Name, Tags, Volltext)')}
             value={suche}
             onChange={(e) => {
               setSuche(e.target.value);
@@ -104,14 +106,14 @@ export function SearchPalette({ schliessen }: { schliessen: () => void }) {
                 if (ziel) oeffnen(ziel);
               }
             }}
-            aria-label="Suchbegriff"
+            aria-label={t('Suchbegriff')}
           />
           <kbd className="rounded border border-rand px-1.5 text-[10px] text-text-schwach">esc</kbd>
         </div>
         <div className="max-h-[50vh] overflow-y-auto py-1">
           {suche.trim() && flach.length === 0 && (
             <p className="px-4 py-6 text-center text-sm text-text-schwach">
-              Nichts gefunden – die Nebel geben es nicht her.
+              {t('Nichts gefunden – die Nebel geben es nicht her.')}
             </p>
           )}
           {gruppen.map(([typ, liste]) => {
@@ -120,7 +122,7 @@ export function SearchPalette({ schliessen }: { schliessen: () => void }) {
             return (
               <div key={typ}>
                 <div className="px-4 pt-2 pb-1 text-[10px] uppercase tracking-[0.2em] text-text-schwach">
-                  {config.labelPlural}
+                  {t(config.labelPlural)}
                 </div>
                 {liste.map((e) => {
                   const index = flach.indexOf(e);

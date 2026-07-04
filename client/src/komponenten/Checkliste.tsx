@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import type { ChecklistEintrag } from '@campanium/shared';
+import { useI18n } from '../i18n';
 
 interface Props {
   eintraege: ChecklistEintrag[];
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function Checkliste({ eintraege, onChange, bearbeitbar = false }: Props) {
+  const { t } = useI18n();
   const [neuerText, setNeuerText] = useState('');
   const readOnly = !onChange;
 
@@ -49,7 +51,7 @@ export function Checkliste({ eintraege, onChange, bearbeitbar = false }: Props) 
             {bearbeitbar && onChange && (
               <button
                 type="button"
-                aria-label={`„${eintrag.text}“ entfernen`}
+                aria-label={t('„{name}“ entfernen', { name: eintrag.text })}
                 className="invisible text-text-schwach hover:text-rot group-hover:visible"
                 onClick={() => onChange(eintraege.filter((_, j) => j !== i))}
               >
@@ -63,7 +65,7 @@ export function Checkliste({ eintraege, onChange, bearbeitbar = false }: Props) 
         <div className="mt-2 flex gap-2">
           <input
             className="flex-1 rounded border border-rand bg-flaeche-3 px-2 py-1 text-sm"
-            placeholder="Neuer Punkt …"
+            placeholder={t('Neuer Punkt …')}
             value={neuerText}
             onChange={(e) => setNeuerText(e.target.value)}
             onKeyDown={(e) => {
@@ -77,7 +79,7 @@ export function Checkliste({ eintraege, onChange, bearbeitbar = false }: Props) 
             type="button"
             className="rounded border border-rand px-2 text-text-schwach hover:text-gold"
             onClick={hinzufuegen}
-            aria-label="Punkt hinzufügen"
+            aria-label={t('Punkt hinzufügen')}
           >
             <Plus size={16} />
           </button>

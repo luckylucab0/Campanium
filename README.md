@@ -4,7 +4,7 @@ A self-hosted **campaign management tool for D&D** (and similar tabletop RPGs), 
 
 It ships with a fully fleshed-out (and entirely fictional) **Curse of Strahd** demo campaign, but nothing about the tool is CoS-specific: the nemesis tracker, the oracle/reading module, escalation stages, regions and all counters are freely configurable per campaign.
 
-> **UI language: German.** The interface, seed data and in-code documentation are written in German; this README is in English for the wider community.
+> **UI languages: German & English.** Switch the language any time from the sidebar (the choice is remembered); more languages are planned and easy to add — see [ARCHITECTURE.md](ARCHITECTURE.md#mehrsprachigkeit-i18n). Seed data and in-code documentation are written in German; this README is in English for the wider community.
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
@@ -38,6 +38,7 @@ The tool runs in two modes:
 
 ### Features
 
+- **Two UI languages, more to come** — German and English out of the box, switchable at runtime (player build included); your campaign data stays untouched, only the interface is translated. The optional AI assistant answers in the selected language, too. Adding another language is a single dictionary file.
 - **Multiple campaigns** — each campaign is its own folder under `data/`; switch between them from the sidebar, create new ones in-app. Wikilinks, search and backlinks are always scoped to the active campaign.
 - **Entities with templates** — NPCs, quests, locations, player characters, sessions, session preps, items, factions, maps and free-form reference notes, each with a sensible section structure and per-entity campaign log.
 - **Images & portraits** — attach an image to any entity (PNG/JPEG/WebP/GIF, stored as plain files inside your campaign folder): portraits on detail pages and list cards, artwork for locations and items.

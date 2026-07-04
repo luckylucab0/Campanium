@@ -10,6 +10,7 @@ import type { ChecklistEintrag, Entitaet, Quest } from '@campanium/shared';
 import { configVonRoute, entityConfigs, type EntityConfig } from '@campanium/shared';
 import { bildUrl, IST_SPIELER_MODUS } from '../api';
 import { formatDatum, pfadFuer } from '../hilfen';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { Badge, DmBadge } from '../komponenten/Badge';
 import { Checkliste } from '../komponenten/Checkliste';
@@ -19,19 +20,21 @@ import { entityIcon } from '../komponenten/icons';
 
 export function EntityDetailSeite() {
   const { route = '', id = '' } = useParams();
+  const { t } = useI18n();
   const config = configVonRoute(route);
   const { perId } = useStore();
   const entitaet = perId(id);
 
-  if (!config) return <p className="text-text-schwach">Unbekannter Bereich.</p>;
+  if (!config) return <p className="text-text-schwach">{t('Unbekannter Bereich.')}</p>;
   if (!entitaet || entitaet.typ !== config.typ) {
-    return <p className="text-text-schwach">Eintrag nicht gefunden.</p>;
+    return <p className="text-text-schwach">{t('Eintrag nicht gefunden.')}</p>;
   }
   return <Detail config={config} entitaet={entitaet} />;
 }
 
 function Detail({ config, entitaet }: { config: EntityConfig; entitaet: Entitaet }) {
   const { kampagne, perId, backlinks, aktualisieren } = useStore();
+  const { t, locale } = useI18n();
   const werte = entitaet as unknown as Record<string, unknown>;
   const Icon = entityIcon(config.icon);
   const erwaehnungen = backlinks(entitaet.id);
@@ -42,13 +45,13 @@ function Detail({ config, entitaet }: { config: EntityConfig; entitaet: Entitaet
       {entitaet.bild && kampagne && (
         <img
           src={bildUrl(kampagne.id, entitaet.bild)}
-          alt={`Bild von ${entitaet.name}`}
+          alt={t('Bild von {name}', { name: entitaet.name })}
           className="float-right mb-3 ml-5 w-36 rounded border border-rand object-cover shadow-md sm:w-48"
         />
       )}
       {/* Kopf */}
       <div className="mb-1 flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-text-schwach">
-        <Icon size={13} aria-hidden /> {config.label}
+        <Icon size={13} aria-hidden /> {t(config.label)}
         {(entitaet.dmOnly || config.immerDm) && <DmBadge />}
       </div>
       <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
@@ -58,7 +61,7 @@ function Detail({ config, entitaet }: { config: EntityConfig; entitaet: Entitaet
             to={`${pfadFuer(entitaet)}/bearbeiten`}
             className="flex items-center gap-1.5 rounded border border-rand px-3 py-1.5 text-sm text-text-normal hover:border-gold hover:text-gold"
           >
-            <Pencil size={14} /> Bearbeiten
+            <Pencil size={14} /> {t('Bearbeiten')}
           </Link>
         )}
       </div>
@@ -99,16 +102,16 @@ function Detail({ config, entitaet }: { config: EntityConfig; entitaet: Entitaet
                 '–'
               );
             } else if (feld.art === 'boolean') {
-              anzeige = wert ? 'Ja' : 'Nein';
+              anzeige = wert ? t('Ja') : t('Nein');
             } else if (feld.art === 'datum') {
-              anzeige = formatDatum(String(wert));
+              anzeige = formatDatum(String(wert), locale);
             } else {
               anzeige = String(wert);
             }
             return (
               <div key={feld.feld} className="text-sm">
                 <dt className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-text-schwach">
-                  {feld.label} {feld.dm && <DmBadge />}
+                  {t(feld.label)} {feld.dm && <DmBadge />}
                 </dt>
                 <dd className="mt-0.5 text-text-stark">{anzeige}</dd>
               </div>
@@ -119,7 +122,9 @@ function Detail({ config, entitaet }: { config: EntityConfig; entitaet: Entitaet
       {/* Quest-Fortschritt: direkt auf der Detailseite abhakbar */}
       {entitaet.typ === 'quest' && (entitaet as Quest).fortschritt.length > 0 && (
         <section className="mb-6">
-          <h2 className="mb-2 text-sm uppercase tracking-wider text-text-schwach">Fortschritt</h2>
+          <h2 className="mb-2 text-sm uppercase tracking-wider text-text-schwach">
+            {t('Fortschritt')}
+          </h2>
           <Checkliste
             eintraege={(entitaet as Quest).fortschritt}
             onChange={
@@ -139,7 +144,7 @@ function Detail({ config, entitaet }: { config: EntityConfig; entitaet: Entitaet
         return (
           <section key={abschnitt.feld} className={`mb-6 ${abschnitt.dm ? 'dm-bereich pl-3' : ''}`}>
             <h2 className="mb-1.5 flex items-center gap-2 text-sm uppercase tracking-wider text-text-schwach">
-              {abschnitt.titel} {abschnitt.dm && <DmBadge />}
+              {t(abschnitt.titel)} {abschnitt.dm && <DmBadge />}
             </h2>
             <Markdown text={text} />
           </section>
@@ -152,7 +157,7 @@ function Detail({ config, entitaet }: { config: EntityConfig; entitaet: Entitaet
           <Trennlinie className="my-6" />
           <section className="mb-6">
             <h2 className="mb-2 text-sm uppercase tracking-wider text-text-schwach">
-              Kampagnen-Log
+              {t('Kampagnen-Log')}
             </h2>
             <ol className="space-y-1.5">
               {[...entitaet.kampagnenLog]
@@ -176,7 +181,7 @@ function Detail({ config, entitaet }: { config: EntityConfig; entitaet: Entitaet
           <Trennlinie className="my-6" />
           <section>
             <h2 className="mb-2 text-sm uppercase tracking-wider text-text-schwach">
-              Erwähnt in …
+              {t('Erwähnt in …')}
             </h2>
             <ul className="flex flex-wrap gap-2">
               {erwaehnungen.map((quelle) => (
@@ -186,7 +191,7 @@ function Detail({ config, entitaet }: { config: EntityConfig; entitaet: Entitaet
                     className="karte inline-flex items-center gap-1.5 px-2.5 py-1 text-sm text-text-normal hover:border-gold hover:text-gold"
                   >
                     <span className="text-[10px] uppercase tracking-wider text-text-schwach">
-                      {entityConfigs[quelle.typ].label}
+                      {t(entityConfigs[quelle.typ].label)}
                     </span>
                     {quelle.name}
                   </Link>
