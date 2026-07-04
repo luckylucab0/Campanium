@@ -50,7 +50,7 @@ export function LesungSeite() {
       <h1 className="mb-1 flex items-center gap-2.5 text-2xl">
         <Sparkles size={22} className="text-arkan" aria-hidden />
         <input
-          className="min-w-0 border-b border-transparent bg-transparent font-display text-2xl text-text-stark hover:border-rand focus:border-gold focus:outline-none"
+          className="min-w-0 flex-1 border-b border-transparent bg-transparent font-display text-2xl text-text-stark hover:border-rand focus:border-gold focus:outline-none"
           value={lesung.titel}
           placeholder={t('Titel, z. B. „Tarokka-Lesung“ …')}
           onChange={(e) => void setzeLesung({ ...lesung, titel: e.target.value })}

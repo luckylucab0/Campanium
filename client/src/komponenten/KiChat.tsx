@@ -98,7 +98,7 @@ export function KiChat() {
       {/* Chat-Drawer */}
       {offen && (
         <div
-          className="karte karte-ornament fixed bottom-5 right-5 z-40 flex h-[70vh] w-[min(26rem,calc(100vw-2.5rem))] flex-col shadow-2xl"
+          className="karte karte-ornament fixed! bottom-5 right-5 z-40 flex h-[70vh] w-[min(26rem,calc(100vw-2.5rem))] flex-col shadow-2xl"
           role="dialog"
           aria-label={t('KI-Assistent')}
           onKeyDown={(e) => e.key === 'Escape' && setOffen(false)}

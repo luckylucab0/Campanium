@@ -60,7 +60,7 @@ export function WidersacherSeite() {
       <h1 className="mb-1 flex items-center gap-2.5 text-2xl">
         <Castle size={22} className="text-blut-hell" aria-hidden />
         <input
-          className="min-w-0 border-b border-transparent bg-transparent font-display text-2xl text-text-stark hover:border-rand focus:border-gold focus:outline-none"
+          className="min-w-0 flex-1 border-b border-transparent bg-transparent font-display text-2xl text-text-stark hover:border-rand focus:border-gold focus:outline-none"
           value={widersacher.name}
           placeholder={t('Name des Widersachers …')}
           onChange={(e) => void setzeWidersacher({ ...widersacher, name: e.target.value })}

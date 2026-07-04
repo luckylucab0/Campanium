@@ -25,4 +25,4 @@ jobs:
       - name: Build (DM-Client)
         run: npm run build
       - name: Spieler-Build mit Demo-Daten (inkl. Spoiler-Paranoia-Prüfung)
-        run: DATA_DIR=data.example KAMPAGNE=curse-of-strahd npm run build:player
+        run: DATA_DIR=data.example KAMPAGNE=nebelmark-kampagne npm run build:player

@@ -1,8 +1,8 @@
 {
-  "titel": "Tarokka-Lesung",
+  "titel": "Kartenlegung der Salzmutter",
   "karten": [
     {
-      "aspekt": "Artefakt: Tome of Strahd",
+      "aspekt": "Artefakt: Chronik des Grafen",
       "karte": "Der Bergfried",
       "aufgeloestId": "alte-windmuehle",
       "aufgeloestText": "",

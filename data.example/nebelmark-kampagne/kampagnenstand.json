@@ -3,18 +3,18 @@
   "ingameTag": 9,
   "ingameDatumText": "9. Tag seit dem Nebel – grauer Morgen, Krähen auf den Dächern",
   "eskalation": {
-    "titel": "Strahds Eskalation",
+    "titel": "Vessimirs Eskalation",
     "stufe": 2,
     "stufen": [
-      "Stufe 1 – Beobachten: Strahd schickt Spione und beobachtet die Neuankömmlinge.",
+      "Stufe 1 – Beobachten: Vessimir schickt Spione und beobachtet die Neuankömmlinge.",
       "Stufe 2 – Spielen: Erste persönliche Auftritte, Einladungen, Charme.",
       "Stufe 3 – Testen: Gezielte Proben der Stärke, Druck auf Verbündete.",
       "Stufe 4 – Strafen: Offene Konsequenzen, Verluste für die Party.",
-      "Stufe 5 – Endspiel: Strahd zieht alle Register, die Jagd ist eröffnet."
+      "Stufe 5 – Endspiel: Vessimir zieht alle Register, die Jagd ist eröffnet."
     ]
   },
   "customTracker": [
-    { "id": "ireenas-bisse", "name": "Ireenas Bisse", "aktuell": 1, "max": 3 },
+    { "id": "selainestes-bisse", "name": "Selainestes Bisse", "aktuell": 1, "max": 3 },
     { "id": "kerzenwachen-gunst", "name": "Gunst der Kerzenwächter", "aktuell": 2, "max": 5 }
   ]
 }

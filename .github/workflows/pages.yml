@@ -46,7 +46,7 @@ jobs:
             npm run build:player -w client
           else
             echo '::warning::Keine player-data.json committet – baue Demo-Daten.'
-            DATA_DIR=data.example KAMPAGNE=curse-of-strahd npm run build:player
+            DATA_DIR=data.example KAMPAGNE=nebelmark-kampagne npm run build:player
           fi
       - uses: actions/upload-pages-artifact@v3
         with:
