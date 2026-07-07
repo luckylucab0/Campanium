@@ -30,7 +30,9 @@ import { istEntityTyp, KampagnenVerwaltung, type Storage } from './storage';
 import { fuehreChatAus } from './ki/chat';
 import type { KiNachricht, KiProvider } from './ki/provider';
 import type { KiSprache } from './ki/tools';
-import { planErlaubt } from '@campanium/shared';
+import { erzeugeSitzungsprep, importiereCharakter, naechsteSessionNummer } from './ki/funktionen';
+import type { BildProvider } from './ki/bild';
+import { planErlaubt, type KiFeature } from '@campanium/shared';
 import {
   adminPflicht,
   adminRouter,
@@ -56,6 +58,7 @@ export function erstelleApp(
   verwaltung: KampagnenVerwaltung | null,
   kiProvider: KiProvider | null = null,
   saas: SaasKontext | null = null,
+  bildProvider: BildProvider | null = null,
 ): express.Express {
   const app = express();
   app.use(express.json({ limit: '5mb' }));
@@ -89,6 +92,10 @@ export function erstelleApp(
     if (!eintrag) return res.status(404).json({ fehler: `Kampagne nicht gefunden: ${kid}` });
     handler(eintrag.storage);
   };
+
+  /** Reicht der Plan des Requests für ein KI-Feature? (Self-Host: immer ja.) */
+  const planReichtFuer = (req: express.Request, feature: KiFeature): boolean =>
+    !saas || planErlaubt(planVon(saas, req), feature);
 
   // ---- Kampagnen -----------------------------------------------------------
 
@@ -293,6 +300,11 @@ export function erstelleApp(
     );
   });
 
+  /** Ist die KI-Kartengenerierung serverseitig konfiguriert? (Bild-Provider) */
+  app.get('/api/ki/bild-status', (_req, res) => {
+    res.json(bildProvider ? { aktiv: true, modell: bildProvider.modell } : { aktiv: false });
+  });
+
   /**
    * Chat-Anfrage: nimmt den bisherigen Gesprächsverlauf (nur Nutzer-/
    * Assistent-Texte) entgegen und führt den Agent-Loop inkl. Werkzeugen
@@ -345,6 +357,92 @@ export function erstelleApp(
     });
   });
 
+  // ---- KI-Zusatzfunktionen (Phase 3, hinter den Abo-Stufen) -----------------
+
+  /** KI-Sitzungsprep (Plus): erzeugt einen sessionPrep-Entwurf. */
+  app.post('/api/kampagnen/:kid/ki/sitzungsprep', (req, res) => {
+    if (!kiProvider) return res.status(503).json({ fehler: KI_UNKONFIGURIERT });
+    if (!planReichtFuer(req, 'ki-erweitert')) return sendePlanGate(res, 'plus');
+    mitKampagne(req, res, req.params.kid, (storage) => {
+      const eintrag = verwaltungFuer(req).holen(req.params.kid)!;
+      const sprache: KiSprache = req.body?.sprache === 'en' ? 'en' : 'de';
+      const fokus = typeof req.body?.fokus === 'string' ? req.body.fokus.slice(0, 500) : undefined;
+      erzeugeSitzungsprep(kiProvider, eintrag.kampagne, storage, sprache, fokus)
+        .then((entwurf) => {
+          const nummer = naechsteSessionNummer(storage.alle());
+          const name = `Prep – Session ${nummer}`;
+          const id = eindeutigerSlug(name, storage.vorhandeneIds());
+          const template = neueEntitaet('sessionPrep', id, name);
+          const entitaet = validiereEntitaet('sessionPrep', {
+            ...template,
+            ...entwurf,
+            sessionNummer: nummer,
+          });
+          storage.speichern(entitaet);
+          res.status(201).json(entitaet);
+        })
+        .catch((fehler: unknown) => sendeKiFehler(res, fehler));
+    });
+  });
+
+  /** Charakterbogen-/Statblock-Import (Plus): Freitext → SC/NSC. */
+  app.post('/api/kampagnen/:kid/ki/charakter-import', (req, res) => {
+    if (!kiProvider) return res.status(503).json({ fehler: KI_UNKONFIGURIERT });
+    if (!planReichtFuer(req, 'ki-erweitert')) return sendePlanGate(res, 'plus');
+    const typ: 'sc' | 'nsc' = req.body?.typ === 'nsc' ? 'nsc' : 'sc';
+    const text = typeof req.body?.text === 'string' ? req.body.text : '';
+    if (text.trim().length < 10) {
+      return res.status(400).json({ fehler: 'Bitte einen Statblock/Charakterbogen einfügen' });
+    }
+    mitKampagne(req, res, req.params.kid, (storage) => {
+      const sprache: KiSprache = req.body?.sprache === 'en' ? 'en' : 'de';
+      importiereCharakter(kiProvider, typ, text.slice(0, 8000), sprache)
+        .then((roh) => {
+          const name = typeof roh.name === 'string' && roh.name.trim() ? roh.name.trim() : 'Import';
+          const id = eindeutigerSlug(name, storage.vorhandeneIds());
+          const template = neueEntitaet(typ, id, name);
+          const entitaet = validiereEntitaet(typ, { ...template, ...roh, id, typ, name });
+          storage.speichern(entitaet);
+          res.status(201).json(entitaet);
+        })
+        .catch((fehler: unknown) => sendeKiFehler(res, fehler));
+    });
+  });
+
+  /** KI-Kartengenerierung (Premium): Bild-Provider → Karte mit Grafik. */
+  app.post('/api/kampagnen/:kid/ki/karte', (req, res) => {
+    if (!bildProvider) {
+      return res
+        .status(503)
+        .json({ fehler: 'KI-Kartengenerierung ist nicht konfiguriert (AI_IMAGE_* in .env)' });
+    }
+    if (!planReichtFuer(req, 'ki-kartengenerierung')) return sendePlanGate(res, 'premium');
+    const prompt = typeof req.body?.prompt === 'string' ? req.body.prompt.trim() : '';
+    if (!prompt) return res.status(400).json({ fehler: 'Bitte eine Bildbeschreibung angeben' });
+    const name =
+      typeof req.body?.name === 'string' && req.body.name.trim()
+        ? req.body.name.trim()
+        : prompt.slice(0, 60);
+    mitKampagne(req, res, req.params.kid, (storage) => {
+      bildProvider
+        .generiere(prompt.slice(0, 1500))
+        .then((buffer) => {
+          const datei = `ki-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.png`;
+          storage.speichereBild(datei, buffer);
+          const id = eindeutigerSlug(name, storage.vorhandeneIds());
+          const template = neueEntitaet('karte', id, name);
+          const entitaet = validiereEntitaet('karte', {
+            ...template,
+            bild: datei,
+            beschreibung: prompt,
+          });
+          storage.speichern(entitaet);
+          res.status(201).json(entitaet);
+        })
+        .catch((fehler: unknown) => sendeKiFehler(res, fehler));
+    });
+  });
+
   app.put('/api/kampagnen/:kid/lesung', (req, res) => {
     mitKampagne(req, res, req.params.kid, (storage) => {
       try {
@@ -370,6 +468,24 @@ export function erstelleApp(
   });
 
   return app;
+}
+
+/** Fehlermeldung, wenn kein Text-KI-Provider konfiguriert ist. */
+const KI_UNKONFIGURIERT = 'KI-Assistent ist nicht konfiguriert (siehe .env.example)';
+
+/** 402-Antwort für ein Feature, das eine höhere Abo-Stufe verlangt. */
+function sendePlanGate(res: express.Response, benoetigt: 'basis' | 'plus' | 'premium') {
+  return res
+    .status(402)
+    .json({ fehler: `Diese KI-Funktion erfordert mindestens den ${benoetigt}-Plan`, benoetigt });
+}
+
+/** KI-Fehler melden: kaputte KI-Ausgabe → 400 (Zod), Provider-/Netzfehler → 502. */
+function sendeKiFehler(res: express.Response, fehler: unknown) {
+  if (fehler instanceof ZodError) return sendeValidierungsfehler(res, fehler);
+  const meldung = fehler instanceof Error ? fehler.message : 'KI-Anfrage fehlgeschlagen';
+  console.error('KI-Fehler:', meldung);
+  return res.status(502).json({ fehler: meldung });
 }
 
 /** Übersetzt Zod-Fehler in eine lesbare 400-Antwort. */

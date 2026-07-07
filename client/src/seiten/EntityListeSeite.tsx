@@ -18,6 +18,7 @@ import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { Badge, DmBadge } from '../komponenten/Badge';
 import { entityIcon } from '../komponenten/icons';
+import { KiCharakterImportKnopf, KiKarteKnopf } from '../komponenten/KiWerkzeuge';
 import { Burg } from '../komponenten/Ornament';
 import { useUi } from '../komponenten/UiContext';
 import { QuestBoard } from './QuestBoard';
@@ -81,12 +82,18 @@ function Liste({ config }: { config: EntityConfig }) {
           <span className="text-base text-text-schwach">({eintraege.length})</span>
         </h1>
         {!IST_SPIELER_MODUS && (
-          <button
-            className="flex items-center gap-1.5 rounded bg-blut px-3 py-1.5 text-sm font-medium text-white hover:bg-blut-hell"
-            onClick={() => oeffneNeuDialog('', config.typ)}
-          >
-            <Plus size={15} /> {t('{label} anlegen', { label: t(config.label) })}
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            {(config.typ === 'sc' || config.typ === 'nsc') && (
+              <KiCharakterImportKnopf typ={config.typ} />
+            )}
+            {config.typ === 'karte' && <KiKarteKnopf />}
+            <button
+              className="flex items-center gap-1.5 rounded bg-blut px-3 py-1.5 text-sm font-medium text-white hover:bg-blut-hell"
+              onClick={() => oeffneNeuDialog('', config.typ)}
+            >
+              <Plus size={15} /> {t('{label} anlegen', { label: t(config.label) })}
+            </button>
+          </div>
         )}
       </div>
 

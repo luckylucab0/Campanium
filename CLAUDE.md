@@ -107,6 +107,11 @@ Alles unten ist **umgesetzt** (der Handoff führte einige davon noch als
   Anthropic/OpenAI/Google/Mistral/Ollama; arbeitet über die Zod-validierte
   Storage-Schicht, kann nichts löschen; Guardrails (nur Kampagnen-Themen,
   Verlaufslimits).
+- **KI-Zusatzfunktionen** (Ein-Schritt, kein Agent-Loop): **Sitzungsprep**-
+  Entwurf aus dem Kampagnenstand, **Charakterbogen-/Statblock-Import**
+  (Freitext → Zod-validierter SC/NSC) und **KI-Kartengenerierung** (eigener
+  Bild-Provider `AI_IMAGE_*`, OpenAI-kompatibel → Grafik an eine Karte). Im
+  Self-Host frei nutzbar (eigener Key); im SaaS an Plus bzw. Premium gebunden.
 - **Spieler-Modus / Spoiler-Filter**: statischer, schreibgeschützter Export
   (`npm run build:player`) per **Whitelist** (neue Felder sind automatisch
   DM-only). Wikilinks auf versteckte Entitäten werden neutralisiert; ein

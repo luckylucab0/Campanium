@@ -246,6 +246,69 @@ export async function ladeKiStatus(): Promise<KiStatus> {
   }
 }
 
+/** Ist die KI-Kartengenerierung (Bild-Provider) serverseitig konfiguriert? */
+export async function ladeBildStatus(): Promise<{ aktiv: boolean }> {
+  if (IST_SPIELER_MODUS) return { aktiv: false };
+  try {
+    const antwort = await fetch('/api/ki/bild-status');
+    if (!antwort.ok) return { aktiv: false };
+    return (await antwort.json()) as { aktiv: boolean };
+  } catch {
+    return { aktiv: false };
+  }
+}
+
+// ---- KI-Zusatzfunktionen (Phase 3, hinter den Abo-Stufen) -------------------
+
+/** Erzeugt einen Sitzungsprep-Entwurf (Plan Plus). Liefert die neue Entität. */
+export async function erzeugeSitzungsprep(
+  kid: string,
+  sprache: string = 'de',
+  fokus?: string,
+): Promise<Entitaet> {
+  const antwort = await pruefe(
+    await fetch(`/api/kampagnen/${kid}/ki/sitzungsprep`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sprache, fokus }),
+    }),
+  );
+  return antwort.json();
+}
+
+/** Importiert einen SC/NSC aus Freitext (Plan Plus). Liefert die neue Entität. */
+export async function importiereCharakter(
+  kid: string,
+  typ: 'sc' | 'nsc',
+  text: string,
+  sprache: string = 'de',
+): Promise<Entitaet> {
+  const antwort = await pruefe(
+    await fetch(`/api/kampagnen/${kid}/ki/charakter-import`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ typ, text, sprache }),
+    }),
+  );
+  return antwort.json();
+}
+
+/** Generiert eine Kartengrafik (Plan Premium). Liefert die neue Karte. */
+export async function generiereKarte(
+  kid: string,
+  prompt: string,
+  name: string,
+): Promise<Entitaet> {
+  const antwort = await pruefe(
+    await fetch(`/api/kampagnen/${kid}/ki/karte`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, name }),
+    }),
+  );
+  return antwort.json();
+}
+
 /**
  * Sendet den Gesprächsverlauf an den Assistenten der aktiven Kampagne.
  * `sprache` steuert die Antwortsprache und die Aktions-Beschreibungen.

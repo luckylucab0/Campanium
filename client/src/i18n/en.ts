@@ -55,6 +55,28 @@ export const en: Record<string, string> = {
   'Alle KI-Funktionen außer Kartengenerierung.': 'All AI features except map generation.',
   'Zusätzlich KI-Kartengenerierung.': 'Plus AI map generation.',
 
+  // ---- KI-Zusatzfunktionen (Phase 3) ----------------------------------------
+  'KI: Prep': 'AI: Prep',
+  'KI: Prep erstellen': 'AI: Create prep',
+  'KI: Import': 'AI: Import',
+  'KI: Karte': 'AI: Map',
+  'KI: Karte generieren': 'AI: Generate map',
+  'erzeugt …': 'generating …',
+  'importiert …': 'importing …',
+  'generiert …': 'generating …',
+  Importieren: 'Import',
+  Generieren: 'Generate',
+  Bildbeschreibung: 'Image description',
+  'Charakter aus Statblock importieren': 'Import character from stat block',
+  'Statblock oder Charakterbogen einfügen – die KI extrahiert Werte und Attribute.':
+    'Paste a stat block or character sheet – the AI extracts values and attributes.',
+  'z. B. „Aria, Elfe Waldläuferin, Stufe 3, AC 15, HP 24, STR 12 DEX 16 …“':
+    'e.g. “Aria, elf ranger, level 3, AC 15, HP 24, STR 12 DEX 16 …”',
+  'Karte mit KI generieren': 'Generate map with AI',
+  'z. B. „Hafenstadt Salzhaven“': 'e.g. “Port town of Salthaven”',
+  'z. B. „Vogelperspektive einer nebelverhangenen Küstenstadt, Fantasy-Kartenstil“':
+    'e.g. “Bird’s-eye view of a fog-shrouded coastal town, fantasy map style”',
+
   // ---- Allgemeine UI-Bausteine ----------------------------------------------
   Abbrechen: 'Cancel',
   Anlegen: 'Create',

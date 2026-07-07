@@ -15,6 +15,7 @@ import { pfadFuer } from '../hilfen';
 import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { Badge, DmBadge } from '../komponenten/Badge';
+import { KiSitzungsprepKnopf } from '../komponenten/KiWerkzeuge';
 import { Markdown } from '../komponenten/Markdown';
 import { entityIcon } from '../komponenten/icons';
 
@@ -55,15 +56,21 @@ export function SpielabendSeite() {
         <p className="mt-1 text-sm">
           {t('Lege auf dem Dashboard über „Neue Session vorbereiten“ eines an.')}
         </p>
+        <div className="mt-4 flex justify-center">
+          <KiSitzungsprepKnopf />
+        </div>
       </div>
     );
   }
 
   return (
     <div>
-      <h1 className="mb-1 flex items-center gap-2.5 text-2xl">
-        <Tent size={22} className="text-blut-hell" aria-hidden /> {t('Spielabend')} <DmBadge />
-      </h1>
+      <div className="mb-1 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="flex items-center gap-2.5 text-2xl">
+          <Tent size={22} className="text-blut-hell" aria-hidden /> {t('Spielabend')} <DmBadge />
+        </h1>
+        <KiSitzungsprepKnopf />
+      </div>
       <p className="mb-6 text-sm text-text-schwach">
         {t('Prep für Session')} #{prep.sessionNummer} ·{' '}
         <Link to={`${pfadFuer(prep)}/bearbeiten`} className="wikilink">
