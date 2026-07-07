@@ -30,29 +30,57 @@ import { istEntityTyp, KampagnenVerwaltung, type Storage } from './storage';
 import { fuehreChatAus } from './ki/chat';
 import type { KiNachricht, KiProvider } from './ki/provider';
 import type { KiSprache } from './ki/tools';
+import { authPflicht, authRouter, type SaasKontext } from './auth/routes';
 
+/**
+ * Baut die Express-App.
+ *
+ * @param verwaltung Globale Kampagnen-Verwaltung im Self-Host-Modus. Im
+ *                   SaaS-Modus null – dort löst der `saas`-Kontext die
+ *                   Verwaltung pro angemeldetem Konto auf.
+ * @param kiProvider Optionaler KI-Provider (Self-Host: eigener Key via .env).
+ * @param saas       Nur gesetzt, wenn CAMPANIUM_SAAS aktiv ist: schaltet Auth
+ *                   + Multi-Tenancy scharf. Ohne ihn verhält sich die App
+ *                   exakt wie bisher (Self-Host, keine Konten, keine Gates).
+ */
 export function erstelleApp(
-  verwaltung: KampagnenVerwaltung,
+  verwaltung: KampagnenVerwaltung | null,
   kiProvider: KiProvider | null = null,
+  saas: SaasKontext | null = null,
 ): express.Express {
   const app = express();
   app.use(express.json({ limit: '5mb' }));
 
+  // Bootstrap-Endpunkt: der Client fragt vor allem anderen ab, ob er im
+  // SaaS-Modus läuft (Login-Pflicht) oder Self-Host (direkter Zugriff).
+  app.get('/api/config', (_req, res) => res.json({ saas: !!saas }));
+
+  if (saas) {
+    // Konten-Routen sind öffentlich; alles unter /api/kampagnen ist geschützt.
+    app.use('/api/auth', authRouter(saas));
+    app.use('/api/kampagnen', authPflicht(saas));
+  }
+
+  /** Die für diesen Request zuständige Verwaltung (Self-Host: global; SaaS: pro Konto). */
+  const verwaltungFuer = (req: express.Request): KampagnenVerwaltung =>
+    saas ? saas.register.fuer((req as express.Request & { nutzerId?: string }).nutzerId!) : verwaltung!;
+
   /** Löst :kid auf; antwortet selbst mit 404, wenn die Kampagne fehlt. */
   const mitKampagne = (
+    req: express.Request,
     res: express.Response,
     kid: string | undefined,
     handler: (storage: Storage) => void,
   ) => {
-    const eintrag = kid ? verwaltung.holen(kid) : undefined;
+    const eintrag = kid ? verwaltungFuer(req).holen(kid) : undefined;
     if (!eintrag) return res.status(404).json({ fehler: `Kampagne nicht gefunden: ${kid}` });
     handler(eintrag.storage);
   };
 
   // ---- Kampagnen -----------------------------------------------------------
 
-  app.get('/api/kampagnen', (_req, res) => {
-    res.json(verwaltung.liste());
+  app.get('/api/kampagnen', (req, res) => {
+    res.json(verwaltungFuer(req).liste());
   });
 
   app.post('/api/kampagnen', (req, res) => {
@@ -60,11 +88,12 @@ export function erstelleApp(
     if (!name) return res.status(400).json({ fehler: 'Name darf nicht leer sein' });
     const beschreibung =
       typeof req.body?.beschreibung === 'string' ? req.body.beschreibung.trim() : '';
-    return res.status(201).json(verwaltung.anlegen(name, beschreibung));
+    return res.status(201).json(verwaltungFuer(req).anlegen(name, beschreibung));
   });
 
   app.put('/api/kampagnen/:kid', (req, res) => {
     const { kid } = req.params;
+    const verwaltung = verwaltungFuer(req);
     if (!verwaltung.holen(kid)) {
       return res.status(404).json({ fehler: `Kampagne nicht gefunden: ${kid}` });
     }
@@ -79,7 +108,7 @@ export function erstelleApp(
 
   /** Kompletter Datenbestand einer Kampagne – der Client lädt alles beim Wechsel. */
   app.get('/api/kampagnen/:kid/alles', (req, res) => {
-    mitKampagne(res, req.params.kid, (storage) => {
+    mitKampagne(req, res, req.params.kid, (storage) => {
       res.json({
         entitaeten: storage.alle(),
         kampagnenstand: storage.kampagnenstand,
@@ -95,7 +124,7 @@ export function erstelleApp(
   app.post('/api/kampagnen/:kid/entitaeten/:typ', (req, res) => {
     const { typ } = req.params;
     if (!istEntityTyp(typ)) return res.status(404).json({ fehler: `Unbekannter Typ: ${typ}` });
-    mitKampagne(res, req.params.kid, (storage) => {
+    mitKampagne(req, res, req.params.kid, (storage) => {
       const name = typeof req.body?.name === 'string' ? req.body.name.trim() : '';
       if (!name) return res.status(400).json({ fehler: 'Name darf nicht leer sein' });
 
@@ -126,7 +155,7 @@ export function erstelleApp(
   app.put('/api/kampagnen/:kid/entitaeten/:typ/:id', (req, res) => {
     const { typ, id } = req.params;
     if (!istEntityTyp(typ)) return res.status(404).json({ fehler: `Unbekannter Typ: ${typ}` });
-    mitKampagne(res, req.params.kid, (storage) => {
+    mitKampagne(req, res, req.params.kid, (storage) => {
       const vorhanden = storage.holen(id);
       if (!vorhanden || vorhanden.typ !== typ) {
         return res.status(404).json({ fehler: `Nicht gefunden: ${typ}/${id}` });
@@ -154,7 +183,7 @@ export function erstelleApp(
 
   app.delete('/api/kampagnen/:kid/entitaeten/:typ/:id', (req, res) => {
     const { typ, id } = req.params;
-    mitKampagne(res, req.params.kid, (storage) => {
+    mitKampagne(req, res, req.params.kid, (storage) => {
       const vorhanden = storage.holen(id);
       if (!vorhanden || vorhanden.typ !== typ) {
         return res.status(404).json({ fehler: `Nicht gefunden: ${typ}/${id}` });
@@ -183,7 +212,7 @@ export function erstelleApp(
     '/api/kampagnen/:kid/bilder',
     express.raw({ type: 'image/*', limit: '10mb' }),
     (req, res) => {
-      mitKampagne(res, req.params.kid, (storage) => {
+      mitKampagne(req, res, req.params.kid, (storage) => {
         const contentType = (req.headers['content-type'] ?? '').split(';')[0]!.trim();
         const endung = BILD_FORMATE[contentType];
         if (!endung) {
@@ -203,7 +232,7 @@ export function erstelleApp(
   );
 
   app.get('/api/kampagnen/:kid/bilder/:datei', (req, res) => {
-    mitKampagne(res, req.params.kid, (storage) => {
+    mitKampagne(req, res, req.params.kid, (storage) => {
       const pfad = storage.bildPfad(req.params.datei);
       if (!pfad) return res.status(404).json({ fehler: 'Bild nicht gefunden' });
       return res.sendFile(pfad);
@@ -213,7 +242,7 @@ export function erstelleApp(
   // ---- Singletons -------------------------------------------------------------
 
   app.put('/api/kampagnen/:kid/kampagnenstand', (req, res) => {
-    mitKampagne(res, req.params.kid, (storage) => {
+    mitKampagne(req, res, req.params.kid, (storage) => {
       try {
         storage.kampagnenstand = kampagnenstandSchema.parse(req.body);
         storage.speichereSingleton('kampagnenstand', storage.kampagnenstand);
@@ -225,7 +254,7 @@ export function erstelleApp(
   });
 
   app.put('/api/kampagnen/:kid/widersacher', (req, res) => {
-    mitKampagne(res, req.params.kid, (storage) => {
+    mitKampagne(req, res, req.params.kid, (storage) => {
       try {
         storage.widersacher = widersacherTrackerSchema.parse(req.body);
         storage.speichereSingleton('widersacher', storage.widersacher);
@@ -266,8 +295,8 @@ export function erstelleApp(
         .status(503)
         .json({ fehler: 'KI-Assistent ist nicht konfiguriert (siehe .env.example)' });
     }
-    mitKampagne(res, req.params.kid, (storage) => {
-      const eintrag = verwaltung.holen(req.params.kid)!;
+    mitKampagne(req, res, req.params.kid, (storage) => {
+      const eintrag = verwaltungFuer(req).holen(req.params.kid)!;
       const roh = Array.isArray(req.body?.nachrichten) ? req.body.nachrichten : [];
       const verlauf: KiNachricht[] = [];
       for (const n of roh.slice(-CHAT_MAX_NACHRICHTEN)) {
@@ -294,7 +323,7 @@ export function erstelleApp(
   });
 
   app.put('/api/kampagnen/:kid/lesung', (req, res) => {
-    mitKampagne(res, req.params.kid, (storage) => {
+    mitKampagne(req, res, req.params.kid, (storage) => {
       try {
         storage.lesung = lesungSchema.parse(req.body);
         storage.speichereSingleton('lesung', storage.lesung);
@@ -306,7 +335,7 @@ export function erstelleApp(
   });
 
   app.put('/api/kampagnen/:kid/kalender', (req, res) => {
-    mitKampagne(res, req.params.kid, (storage) => {
+    mitKampagne(req, res, req.params.kid, (storage) => {
       try {
         storage.kalender = kalenderSchema.parse(req.body);
         storage.speichereSingleton('kalender', storage.kalender);

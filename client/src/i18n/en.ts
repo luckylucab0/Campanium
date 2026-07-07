@@ -10,6 +10,21 @@
  * {platzhalter} bleiben unverändert und werden zur Laufzeit ersetzt.
  */
 export const en: Record<string, string> = {
+  // ---- Konten & Anmeldung (nur SaaS-Modus) ----------------------------------
+  'Bei Campanium anmelden': 'Sign in to Campanium',
+  'Konto erstellen': 'Create account',
+  'Deine Kampagnen sind privat und nur mit deinem Konto zugänglich.':
+    'Your campaigns are private and accessible only with your account.',
+  'E-Mail': 'Email',
+  Passwort: 'Password',
+  'Passwort (mind. 8 Zeichen)': 'Password (min. 8 characters)',
+  Anmelden: 'Sign in',
+  Registrieren: 'Register',
+  'Anmeldung fehlgeschlagen': 'Sign-in failed',
+  'Noch kein Konto? Jetzt registrieren': 'No account yet? Register now',
+  'Bereits ein Konto? Anmelden': 'Already have an account? Sign in',
+  Abmelden: 'Sign out',
+
   // ---- Allgemeine UI-Bausteine ----------------------------------------------
   Abbrechen: 'Cancel',
   Anlegen: 'Create',

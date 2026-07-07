@@ -15,6 +15,7 @@ import {
   Dices,
   Home,
   Languages,
+  LogOut,
   Menu,
   Moon,
   Plus,
@@ -27,6 +28,7 @@ import {
 } from 'lucide-react';
 import { ENTITY_TYPEN, entityConfigs } from '@campanium/shared';
 import { IST_SPIELER_MODUS } from '../api';
+import { useAuth } from '../auth';
 import { SPRACHEN, useI18n, type Sprache } from '../i18n';
 import { useStore } from '../store';
 import { entityIcon } from './icons';
@@ -47,6 +49,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const { oeffneNeuDialog, theme, wechsleTheme } = useUi();
   const { t, sprache, setzeSprache } = useI18n();
   const { speicherFehler, quittiereSpeicherFehler } = useStore();
+  const { saasModus, nutzer, abmelden } = useAuth();
   const [sucheOffen, setSucheOffen] = useState(false);
   const [wuerfelOffen, setWuerfelOffen] = useState(false);
   const [menueOffen, setMenueOffen] = useState(false);
@@ -206,6 +209,21 @@ export function Layout({ children }: { children: ReactNode }) {
               </p>
             )}
           </div>
+
+          {/* Konto-Fuß (nur SaaS-Modus): E-Mail + Abmelden. */}
+          {saasModus && nutzer && (
+            <div className="border-t border-rand px-4 py-3">
+              <div className="truncate text-xs text-text-schwach" title={nutzer.email}>
+                {nutzer.email}
+              </div>
+              <button
+                className="mt-1.5 flex items-center gap-2 text-sm text-text-normal hover:text-gold"
+                onClick={() => void abmelden()}
+              >
+                <LogOut size={15} /> {t('Abmelden')}
+              </button>
+            </div>
+          )}
         </div>
       </aside>
 
