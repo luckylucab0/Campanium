@@ -12,10 +12,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@fontsource/cinzel": "^5.0.0",
-    "@fontsource/cormorant-garamond": "^5.0.0",
-    "@fontsource/inter": "^5.0.0",
     "@campanium/shared": "*",
+    "@fontsource/cormorant-garamond": "^5.0.0",
+    "@fontsource/jetbrains-mono": "^5.2.8",
+    "@fontsource/newsreader": "^5.2.10",
+    "@fontsource/space-grotesk": "^5.2.10",
     "dompurify": "^3.2.0",
     "lucide-react": "^0.510.0",
     "marked": "^15.0.0",

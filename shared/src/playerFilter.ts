@@ -68,6 +68,9 @@ const FELD_WHITELIST: Partial<Record<EntityTyp, readonly string[]>> = {
     'ac',
     'hp',
     'passiveWahrnehmung',
+    // Attribute sind spielersichtbar (Spieler sehen ihre eigenen Werte).
+    // Für NSCs bewusst NICHT gewhitelistet → Kampfwerte bleiben DM-Info.
+    'attribute',
     'ziele',
     'beziehungen',
     'besonderes',

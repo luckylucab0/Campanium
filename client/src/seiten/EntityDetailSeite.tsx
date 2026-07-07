@@ -9,10 +9,15 @@
 import type { ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Pencil } from 'lucide-react';
-import type { ChecklistEintrag, Entitaet, Quest } from '@campanium/shared';
-import { configVonRoute, entityConfigs, type EntityConfig } from '@campanium/shared';
+import type { Attribute, ChecklistEintrag, Entitaet, Quest } from '@campanium/shared';
+import {
+  ATTRIBUT_FELDER,
+  configVonRoute,
+  entityConfigs,
+  type EntityConfig,
+} from '@campanium/shared';
 import { bildUrl, IST_SPIELER_MODUS } from '../api';
-import { formatDatum, pfadFuer } from '../hilfen';
+import { formatDatum, formatModifikator, pfadFuer } from '../hilfen';
 import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { Badge, DmBadge } from '../komponenten/Badge';
@@ -86,10 +91,10 @@ function Detail({ config, entitaet }: { config: EntityConfig; entitaet: Entitaet
         ))}
       </div>
 
-      {/* Metadaten */}
+      {/* Metadaten (Attribute werden separat als Block gerendert) */}
       <dl className="karte karte-ornament mb-6 grid gap-x-6 gap-y-2 p-4 sm:grid-cols-2">
         {config.felder
-          .filter((f) => f.art !== 'select')
+          .filter((f) => f.art !== 'select' && f.art !== 'attribute')
           .map((feld) => {
             const wert = werte[feld.feld];
             if (wert === null || wert === undefined || wert === '') return null;
@@ -121,6 +126,34 @@ function Detail({ config, entitaet }: { config: EntityConfig; entitaet: Entitaet
             );
           })}
       </dl>
+
+      {/* Attribute-Block (Werte + Modifikatoren) */}
+      {config.felder
+        .filter((f) => f.art === 'attribute')
+        .map((feld) => {
+          const attr = werte[feld.feld] as Attribute | null;
+          if (!attr || (feld.dm && IST_SPIELER_MODUS)) return null;
+          return (
+            <section key={feld.feld} className="mb-6">
+              <h2 className="mb-2 flex items-center gap-2 text-sm uppercase tracking-wider text-text-schwach">
+                {t(feld.label)} {feld.dm && <DmBadge />}
+              </h2>
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+                {ATTRIBUT_FELDER.map(({ feld: k, kurz }) => (
+                  <div key={k} className="karte flex flex-col items-center gap-0.5 p-2">
+                    <span className="font-mono text-[10px] tracking-wider text-text-schwach">
+                      {t(kurz)}
+                    </span>
+                    <span className="font-display text-xl text-text-stark">{attr[k]}</span>
+                    <span className="font-mono text-xs text-gold">
+                      {formatModifikator(attr[k])}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        })}
 
       {/* Quest-Fortschritt: direkt auf der Detailseite abhakbar */}
       {entitaet.typ === 'quest' && (entitaet as Quest).fortschritt.length > 0 && (

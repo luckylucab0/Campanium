@@ -163,6 +163,26 @@ describe('filterFuerSpieler (Whitelist)', () => {
     expect(ergebnis.entitaeten[0]?.bild).toBe('portrait.png');
   });
 
+  it('exportiert SC-Attribute (spielersichtbar), aber NICHT NSC-Attribute (DM-Werte)', () => {
+    const werte = {
+      staerke: 16,
+      geschicklichkeit: 12,
+      konstitution: 14,
+      intelligenz: 10,
+      weisheit: 13,
+      charisma: 8,
+    };
+    const held = { ...neueEntitaet('sc', 'lena', 'Lena'), attribute: werte } as Entitaet;
+    const nsc = getroffenerNsc('Gregor', { attribute: werte });
+
+    const ergebnis = filterFuerSpieler(kampagne, [held, nsc], stand);
+    const exportierterSc = ergebnis.entitaeten.find((e) => e.typ === 'sc');
+    const exportierterNsc = ergebnis.entitaeten.find((e) => e.typ === 'nsc');
+    expect((exportierterSc as { attribute?: unknown }).attribute).toEqual(werte);
+    // NSC-Attribute stehen NICHT auf der Whitelist → fehlen komplett.
+    expect((exportierterNsc as { attribute?: unknown }).attribute).toBeUndefined();
+  });
+
   it('exportiert KEINE Bild-Dateinamen nicht sichtbarer Entitäten', () => {
     const geheim = getroffenerNsc('Spion', { dmOnly: true, bild: 'geheim.png' });
     const ergebnis = filterFuerSpieler(kampagne, [geheim], stand);

@@ -1,92 +1,106 @@
 /*
- * Design-System „Gothic Barovia“.
+ * Design-System „Arkanes Nachtfirmament“.
  *
- * Alle Farben sind als Design-Tokens (CSS-Variablen) definiert und werden
- * über @theme an Tailwind v4 durchgereicht. Zwei Themes:
- *   [data-theme="dunkel"]    – Standard: Nachthimmel über Barovia
- *   [data-theme="pergament"] – helles, warmes Pergament-Theme
+ * Mystisches Dark-Fantasy: tiefes arkanes Nachtviolett mit Sternenfeld,
+ * Indigo als Primärfarbe, mystisches Gold für Akzente/Premium, Rosé für den
+ * Widersacher. Alle Farben sind Design-Tokens (CSS-Variablen) und werden über
+ * @theme an Tailwind v4 durchgereicht. Zwei Themes:
+ *   [data-theme="dunkel"]    – Standard: arkanes Nachtfirmament (Sternenfeld)
+ *   [data-theme="pergament"] – helles, violett-getöntes Pergament-Theme
+ *
+ * Hinweis: Aus historischen Gründen heißen die Primär-Tokens noch --blut*;
+ * sie tragen im aktuellen Design das arkane Indigo (Primärfarbe der App).
  */
 @import 'tailwindcss';
 
 /* Lokale Fonts (gebundelt via Fontsource – kein CDN, läuft offline). */
-@import '@fontsource/cinzel/400.css';
-@import '@fontsource/cinzel/600.css';
-@import '@fontsource/cinzel/700.css';
-@import '@fontsource/inter/400.css';
-@import '@fontsource/inter/500.css';
-@import '@fontsource/inter/600.css';
-@import '@fontsource/cormorant-garamond/400.css';
+@import '@fontsource/newsreader/400.css';
+@import '@fontsource/newsreader/500.css';
+@import '@fontsource/newsreader/600.css';
+@import '@fontsource/newsreader/400-italic.css';
+@import '@fontsource/space-grotesk/400.css';
+@import '@fontsource/space-grotesk/500.css';
+@import '@fontsource/space-grotesk/600.css';
+@import '@fontsource/space-grotesk/700.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
 @import '@fontsource/cormorant-garamond/500.css';
 @import '@fontsource/cormorant-garamond/600.css';
-@import '@fontsource/cormorant-garamond/400-italic.css';
+@import '@fontsource/cormorant-garamond/500-italic.css';
 
 /* ---- Design-Tokens ------------------------------------------------------ */
 
 :root,
 [data-theme='dunkel'] {
-  /* Flächen: dunkles Blauschwarz, leicht abgestuft statt reinem Schwarz */
-  --flaeche-0: #0b0d14; /* tiefste Ebene (Body) */
-  --flaeche-1: #111420; /* Panels, Sidebar */
-  --flaeche-2: #181c2b; /* Karten */
-  --flaeche-3: #212638; /* Hover, Eingabefelder */
-  --rand: #2c3145;
-  --rand-stark: #3d4359;
+  /* Flächen: arkanes Nachtviolett, leicht abgestuft */
+  --flaeche-0: #0a0812; /* tiefste Ebene (Body) */
+  --flaeche-1: #100b22; /* Panels, Sidebar */
+  --flaeche-2: #150e2e; /* Karten */
+  --flaeche-3: #1a1240; /* Hover, Eingabefelder */
+  --rand: rgba(150, 130, 235, 0.16);
+  --rand-stark: rgba(150, 130, 235, 0.3);
 
-  /* Text: Nebelgrau-Hierarchie */
-  --text-stark: #e8e6df;
-  --text: #b8b6ae;
-  --text-schwach: #7c7a74;
+  /* Text: helles Lavendel bis gedämpftes Violettgrau */
+  --text-stark: #eae6f7;
+  --text: #9a90c0;
+  --text-schwach: #7d76a6;
 
   /* Akzente */
-  --blut: #9e2b25; /* Primär: tiefes Blutrot (Strahd) */
-  --blut-hell: #c4453d;
-  --blut-flaeche: rgba(158, 43, 37, 0.14);
-  --gold: #c9a227; /* Sekundär: Kerzengold/Bernstein */
-  --gold-hell: #e3c35c;
-  --gold-flaeche: rgba(201, 162, 39, 0.12);
-  --arkan: #8a6fc9; /* Magisches / Tarokka: kühles Violett */
-  --arkan-flaeche: rgba(138, 111, 201, 0.14);
+  --blut: #8b7bf0; /* Primär: arkanes Indigo (Token-Name historisch) */
+  --blut-hell: #a99cf5;
+  --blut-flaeche: rgba(139, 123, 240, 0.14);
+  --gold: #d8b266; /* Sekundär: mystisches Gold (Premium/Akzente) */
+  --gold-hell: #e3c682;
+  --gold-flaeche: rgba(216, 178, 102, 0.12);
+  --arkan: #a99cf5; /* Orakel/KI: helles Violett */
+  --arkan-flaeche: rgba(169, 156, 245, 0.14);
 
   /* Semantik (Haltung/Status) */
-  --gruen: #5d9e6c;
-  --gruen-flaeche: rgba(93, 158, 108, 0.14);
-  --rot: #c4453d;
-  --rot-flaeche: rgba(196, 69, 61, 0.14);
-  --grau-flaeche: rgba(124, 122, 116, 0.14);
+  --gruen: #5f8a68; /* Verbündet */
+  --gruen-hell: #8dc49a;
+  --gruen-flaeche: rgba(95, 138, 104, 0.16);
+  --rot: #d37c9e; /* Widersacher/Feindlich: Rosé */
+  --rot-hell: #e59ab6;
+  --rot-flaeche: rgba(211, 124, 158, 0.16);
+  --gefahr: #e08a5a; /* Warnung/Gefahr: Bernstein-Orange */
+  --grau-flaeche: rgba(150, 130, 235, 0.08);
 
-  --vignette: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.45) 100%);
-  --nebel: linear-gradient(180deg, rgba(138, 111, 201, 0.06), transparent 70%);
+  --vignette: radial-gradient(ellipse at center, transparent 58%, rgba(0, 0, 0, 0.5) 100%);
+  --nebel: linear-gradient(180deg, rgba(139, 123, 240, 0.08), transparent 70%);
 }
 
 [data-theme='pergament'] {
-  --flaeche-0: #ece4d2;
-  --flaeche-1: #f3ecdc;
-  --flaeche-2: #f9f3e6;
-  --flaeche-3: #e7ddc8;
-  --rand: #d4c8ac;
-  --rand-stark: #b8a987;
+  --flaeche-0: #efe9df;
+  --flaeche-1: #f5f0e8;
+  --flaeche-2: #faf6ef;
+  --flaeche-3: #e8e0d2;
+  --rand: rgba(95, 75, 196, 0.2);
+  --rand-stark: rgba(95, 75, 196, 0.34);
 
-  --text-stark: #2a2118;
-  --text: #443a2d;
-  --text-schwach: #7d7159;
+  --text-stark: #241a3a;
+  --text: #4a4066;
+  --text-schwach: #7a7095;
 
-  --blut: #8c2520;
-  --blut-hell: #a93a33;
-  --blut-flaeche: rgba(140, 37, 32, 0.1);
-  --gold: #94701c;
-  --gold-hell: #7a5c14;
-  --gold-flaeche: rgba(148, 112, 28, 0.12);
-  --arkan: #6a4fa9;
-  --arkan-flaeche: rgba(106, 79, 169, 0.12);
+  --blut: #5f4bc4;
+  --blut-hell: #4a37a8;
+  --blut-flaeche: rgba(95, 75, 196, 0.1);
+  --gold: #b7873a;
+  --gold-hell: #966d2a;
+  --gold-flaeche: rgba(183, 135, 58, 0.12);
+  --arkan: #5f4bc4;
+  --arkan-flaeche: rgba(95, 75, 196, 0.1);
 
   --gruen: #3f7a4e;
+  --gruen-hell: #2e6b3d;
   --gruen-flaeche: rgba(63, 122, 78, 0.14);
-  --rot: #a93a33;
-  --rot-flaeche: rgba(169, 58, 51, 0.12);
-  --grau-flaeche: rgba(125, 113, 89, 0.14);
+  --rot: #b3547a;
+  --rot-hell: #9a3f63;
+  --rot-flaeche: rgba(179, 84, 122, 0.12);
+  --gefahr: #c56a2f;
+  --grau-flaeche: rgba(95, 75, 196, 0.08);
 
-  --vignette: radial-gradient(ellipse at center, transparent 65%, rgba(94, 75, 42, 0.18) 100%);
-  --nebel: linear-gradient(180deg, rgba(106, 79, 169, 0.05), transparent 70%);
+  --vignette: radial-gradient(ellipse at center, transparent 65%, rgba(60, 45, 110, 0.14) 100%);
+  --nebel: linear-gradient(180deg, rgba(95, 75, 196, 0.06), transparent 70%);
 }
 
 /* Tokens für Tailwind-Utilities verfügbar machen (bg-flaeche-2, text-gold, …). */
@@ -109,14 +123,18 @@
   --color-arkan: var(--arkan);
   --color-arkan-flaeche: var(--arkan-flaeche);
   --color-gruen: var(--gruen);
+  --color-gruen-hell: var(--gruen-hell);
   --color-gruen-flaeche: var(--gruen-flaeche);
   --color-rot: var(--rot);
+  --color-rot-hell: var(--rot-hell);
   --color-rot-flaeche: var(--rot-flaeche);
+  --color-gefahr: var(--gefahr);
   --color-grau-flaeche: var(--grau-flaeche);
 
-  --font-display: 'Cinzel', serif;
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Newsreader', Georgia, serif;
+  --font-sans: 'Space Grotesk', system-ui, sans-serif;
   --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
 /* ---- Grundlayout --------------------------------------------------------- */
@@ -126,6 +144,33 @@ body {
   color: var(--text);
   font-family: var(--font-sans);
   font-size: 15px;
+}
+
+/* Sternenfeld über dem gesamten Viewport – arkane Atmosphäre (nur im
+   dunklen Theme; im Pergament-Theme ausgeblendet). */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1; /* hinter dem Inhalt, vor der Body-Grundfarbe */
+  opacity: 0.7;
+  background-image:
+    radial-gradient(1.4px 1.4px at 8% 18%, rgba(215, 205, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 32% 52%, rgba(200, 190, 255, 0.5), transparent),
+    radial-gradient(1.6px 1.6px at 61% 22%, rgba(230, 220, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 78% 62%, rgba(190, 180, 255, 0.45), transparent),
+    radial-gradient(1.2px 1.2px at 48% 12%, rgba(215, 205, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 19% 74%, rgba(190, 180, 255, 0.4), transparent),
+    radial-gradient(1.5px 1.5px at 88% 34%, rgba(225, 215, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 5% 48%, rgba(190, 180, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 42% 84%, rgba(200, 190, 255, 0.35), transparent),
+    radial-gradient(1px 1px at 71% 78%, rgba(200, 190, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 27% 32%, rgba(180, 170, 255, 0.3), transparent),
+    radial-gradient(1.3px 1.3px at 93% 68%, rgba(210, 200, 255, 0.5), transparent);
+}
+[data-theme='pergament'] body::before {
+  display: none;
 }
 
 /* Feine Vignette über dem gesamten Viewport – reine Atmosphäre. */
@@ -204,8 +249,8 @@ h3 {
   border-bottom-style: solid;
 }
 .wikilink-kaputt {
-  color: var(--blut-hell);
-  border-bottom: 1px dashed var(--blut);
+  color: var(--rot-hell);
+  border-bottom: 1px dashed var(--rot);
   cursor: pointer;
 }
 
@@ -292,11 +337,37 @@ h3 {
 
 /* ---- DM-only-Markierung --------------------------------------------------- */
 
-/* DM-Inhalte bekommen im DM-Modus einen blutroten Seitenstreifen. */
+/* DM-Inhalte bekommen im DM-Modus einen Rosé-Seitenstreifen (Widersacher-/
+   Geheim-Semantik, deutlich abgesetzt von der Indigo-Primärfarbe). */
 .dm-bereich {
-  border-left: 2px solid var(--blut);
-  background: linear-gradient(90deg, var(--blut-flaeche), transparent 30%);
+  border-left: 2px solid var(--rot);
+  background: linear-gradient(90deg, var(--rot-flaeche), transparent 30%);
   border-radius: 2px;
+}
+
+/* ---- Runen-Trenner -------------------------------------------------------- */
+
+.rune-trenner {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  color: var(--gold);
+}
+.rune-trenner::before,
+.rune-trenner::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-flaeche), var(--rand-stark));
+}
+.rune-trenner::after {
+  background: linear-gradient(90deg, var(--rand-stark), var(--gold-flaeche), transparent);
+}
+.rune-trenner span {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.35em;
+  opacity: 0.75;
 }
 
 /* ---- Kerzenflackern (nur als dezentes Hover-Detail) ----------------------- */
@@ -318,6 +389,25 @@ h3 {
 }
 .kerze:hover {
   animation: kerzenflackern 1.6s infinite;
+}
+
+/* Würfel-Wurf: kurzes Taumeln des Ergebnisses. */
+@keyframes wuerfel-tumble {
+  0% {
+    transform: rotate(-16deg) scale(0.6);
+    opacity: 0;
+  }
+  55% {
+    transform: rotate(10deg) scale(1.12);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(0) scale(1);
+    opacity: 1;
+  }
+}
+.wuerfelt {
+  animation: wuerfel-tumble 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
