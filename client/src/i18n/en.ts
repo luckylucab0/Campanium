@@ -228,7 +228,7 @@ export const en: Record<string, string> = {
   Fehlgeschlagen: 'Failed',
 
   // ---- Listen, Detail & Formular ----------------------------------------------
-  'Sortierung': 'Sort',
+  Sortierung: 'Sort',
   'Sortierung: Name': 'Sort: name',
   'Sortierung: zuletzt geändert': 'Sort: last modified',
   'Sortierung: Session-Nr.': 'Sort: session no.',
@@ -424,4 +424,9 @@ export const en: Record<string, string> = {
   'denkt nach …': 'thinking …',
   'Was ist passiert?': 'What happened?',
   'Nachricht an den KI-Assistenten': 'Message to the AI assistant',
+  'Nicht gefunden – klicken zum Anlegen': 'Not found – click to create',
+  'Diese Seite ist auf einen Fehler gestoßen.': 'This page ran into an error.',
+  'Wähle links einen anderen Bereich oder lade die Seite neu.':
+    'Pick another section on the left or reload the page.',
+  'Neu laden': 'Reload',
 };

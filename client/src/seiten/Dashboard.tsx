@@ -11,7 +11,7 @@ import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Castle, Minus, Pencil, Plus, Sparkles, Tent, Trash2 } from 'lucide-react';
 import type { Entitaet, Nsc, Quest, Session } from '@campanium/shared';
-import { formatKalenderDatum, kalenderAktiv, slugify } from '@campanium/shared';
+import { eindeutigerSlug, formatKalenderDatum, kalenderAktiv } from '@campanium/shared';
 import { IST_SPIELER_MODUS } from '../api';
 import { formatDatum, pfadFuer } from '../hilfen';
 import { useI18n } from '../i18n';
@@ -84,10 +84,7 @@ export function Dashboard() {
           </div>
           {/* Ist der Kalender eingerichtet, erscheint hier das formatierte Datum. */}
           {!IST_SPIELER_MODUS && kalenderAktiv(kalender) && (
-            <Link
-              to="/kalender"
-              className="mt-1 block text-sm text-gold-hell hover:text-gold"
-            >
+            <Link to="/kalender" className="mt-1 block text-sm text-gold-hell hover:text-gold">
               {formatKalenderDatum(kalender, kalender.aktuell)}
             </Link>
           )}
@@ -213,7 +210,9 @@ export function Dashboard() {
                   <span className="font-display text-text-stark">
                     #{session.nummer} · {session.name}
                   </span>
-                  <span className="text-xs text-text-schwach">{formatDatum(session.datum, locale)}</span>
+                  <span className="text-xs text-text-schwach">
+                    {formatDatum(session.datum, locale)}
+                  </span>
                 </div>
               </Link>
             ))}
@@ -383,7 +382,9 @@ function EskalationsKarte() {
         max={eskalation.stufen.length}
         onChange={(v) => speichere({ ...eskalation, stufe: v })}
       >
-        <span className="font-display text-2xl text-text-stark">{t('Stufe {nr}', { nr: eskalation.stufe })}</span>
+        <span className="font-display text-2xl text-text-stark">
+          {t('Stufe {nr}', { nr: eskalation.stufe })}
+        </span>
       </ZaehlerKnoepfe>
       <p className="mt-1 line-clamp-2 text-xs text-text-schwach">
         {eskalation.stufen[eskalation.stufe - 1]}
@@ -505,11 +506,18 @@ function NeuerTrackerKnopf() {
           className="ml-auto rounded bg-blut px-2.5 py-1 text-xs font-medium text-white hover:bg-blut-hell"
           onClick={() => {
             if (!name.trim()) return;
+            // Eindeutige ID gegen bestehende Tracker: sonst teilen sich zwei
+            // gleichnamige (oder nur-Sonderzeichen-)Tracker eine ID, und
+            // +/-/Löschen würde beide gleichzeitig treffen.
+            const id = eindeutigerSlug(
+              name,
+              new Set(kampagnenstand.customTracker.map((tr) => tr.id)),
+            );
             void setzeKampagnenstand({
               ...kampagnenstand,
               customTracker: [
                 ...kampagnenstand.customTracker,
-                { id: slugify(name), name: name.trim(), aktuell: 0, max },
+                { id, name: name.trim(), aktuell: 0, max },
               ],
             });
             setName('');

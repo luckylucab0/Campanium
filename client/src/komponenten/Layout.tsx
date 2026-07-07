@@ -44,13 +44,14 @@ const navKlasse = ({ isActive }: { isActive: boolean }) =>
 export function Layout({ children }: { children: ReactNode }) {
   const { oeffneNeuDialog, theme, wechsleTheme } = useUi();
   const { t, sprache, setzeSprache } = useI18n();
+  const { speicherFehler, quittiereSpeicherFehler } = useStore();
   const [sucheOffen, setSucheOffen] = useState(false);
   const [menueOffen, setMenueOffen] = useState(false);
 
   // Cmd/Ctrl+K öffnet die globale Suche.
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setSucheOffen((s) => !s);
       }
@@ -168,9 +169,7 @@ export function Layout({ children }: { children: ReactNode }) {
               className="flex w-full items-center gap-2.5 rounded px-3 py-1.5 text-sm text-text-normal hover:bg-flaeche-3 hover:text-text-stark"
               onClick={wechsleTheme}
               aria-label={
-                theme === 'dunkel'
-                  ? t('Pergament-Theme aktivieren')
-                  : t('Dunkles Theme aktivieren')
+                theme === 'dunkel' ? t('Pergament-Theme aktivieren') : t('Dunkles Theme aktivieren')
               }
             >
               {theme === 'dunkel' ? <Sun size={16} /> : <Moon size={16} />}
@@ -231,6 +230,26 @@ export function Layout({ children }: { children: ReactNode }) {
 
       {sucheOffen && <SearchPalette schliessen={() => setSucheOffen(false)} />}
       {!IST_SPIELER_MODUS && <KiChat />}
+
+      {/* Toast bei fehlgeschlagenem Speichern (optimistische Writes wurden
+          zurückgerollt) – sonst ginge ein Fehler still verloren. */}
+      {speicherFehler && (
+        <div
+          className="fixed inset-x-0 bottom-4 z-100 mx-auto flex max-w-md items-start gap-3 rounded border border-rot/50 bg-rot-flaeche px-4 py-3 text-sm text-rot shadow-xl"
+          role="alert"
+        >
+          <span className="flex-1">
+            {t('Speichern fehlgeschlagen')}: {speicherFehler}
+          </span>
+          <button
+            className="shrink-0 text-rot hover:text-text-stark"
+            onClick={quittiereSpeicherFehler}
+            aria-label={t('Schließen')}
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

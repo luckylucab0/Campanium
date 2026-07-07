@@ -123,6 +123,16 @@ export class Storage {
     this.entitaeten.delete(id);
     const datei = path.join(this.datenOrdner, entitaet.typ, `${id}.json`);
     if (fs.existsSync(datei)) fs.unlinkSync(datei);
+    // Zugehörige Bilddatei mit entfernen, damit gelöschte Entitäten keine
+    // verwaisten Dateien im bilder/-Ordner hinterlassen (Karten sind groß).
+    // Nur wenn kein anderer Eintrag dasselbe Bild referenziert.
+    if (entitaet.bild && Storage.istSichererDateiname(entitaet.bild)) {
+      const nochGenutzt = [...this.entitaeten.values()].some((e) => e.bild === entitaet.bild);
+      if (!nochGenutzt) {
+        const bild = path.join(this.bilderOrdner, entitaet.bild);
+        if (fs.existsSync(bild)) fs.unlinkSync(bild);
+      }
+    }
     return true;
   }
 

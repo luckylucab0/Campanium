@@ -7,10 +7,11 @@
  * GitHub Pages ohne Server-Rewrites funktioniert.
  */
 import { useState } from 'react';
-import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { IST_SPIELER_MODUS } from './api';
 import { I18nProvider, useI18n } from './i18n';
 import { useStore, StoreProvider } from './store';
+import { ErrorBoundary } from './komponenten/ErrorBoundary';
 import { Layout } from './komponenten/Layout';
 import { UiProvider } from './komponenten/UiContext';
 import { Fledermaus } from './komponenten/Ornament';
@@ -43,6 +44,7 @@ export default function App() {
 function Inhalt() {
   const { geladen, ladeFehler, kampagne } = useStore();
   const { t } = useI18n();
+  const location = useLocation();
 
   if (ladeFehler) {
     return (
@@ -74,26 +76,30 @@ function Inhalt() {
 
   return (
     <Layout>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        {/* Sessions haben eine eigene Timeline statt der generischen Liste. */}
-        <Route path="/sessions" element={<SessionTimelineSeite />} />
-        <Route path="/graph" element={<GraphSeite />} />
-        {!IST_SPIELER_MODUS && (
-          <>
-            <Route path="/spielabend" element={<SpielabendSeite />} />
-            <Route path="/widersacher" element={<WidersacherSeite />} />
-            <Route path="/lesung" element={<LesungSeite />} />
-            <Route path="/kalender" element={<KalenderSeite />} />
-            <Route path="/:route/:id/bearbeiten" element={<EntityFormSeite />} />
-          </>
-        )}
-        {/* Karten haben eine eigene Detailseite mit Pin-Overlay. */}
-        <Route path="/karten/:id" element={<KarteSeite />} />
-        <Route path="/:route" element={<EntityListeSeite />} />
-        <Route path="/:route/:id" element={<EntityDetailSeite />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      {/* key={pathname}: ein Seitenwechsel setzt die Fehlergrenze zurück,
+          sodass ein Crash auf einer Seite die App nicht dauerhaft blockiert. */}
+      <ErrorBoundary key={location.pathname}>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          {/* Sessions haben eine eigene Timeline statt der generischen Liste. */}
+          <Route path="/sessions" element={<SessionTimelineSeite />} />
+          <Route path="/graph" element={<GraphSeite />} />
+          {!IST_SPIELER_MODUS && (
+            <>
+              <Route path="/spielabend" element={<SpielabendSeite />} />
+              <Route path="/widersacher" element={<WidersacherSeite />} />
+              <Route path="/lesung" element={<LesungSeite />} />
+              <Route path="/kalender" element={<KalenderSeite />} />
+              <Route path="/:route/:id/bearbeiten" element={<EntityFormSeite />} />
+            </>
+          )}
+          {/* Karten haben eine eigene Detailseite mit Pin-Overlay. */}
+          <Route path="/karten/:id" element={<KarteSeite />} />
+          <Route path="/:route" element={<EntityListeSeite />} />
+          <Route path="/:route/:id" element={<EntityDetailSeite />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </ErrorBoundary>
     </Layout>
   );
 }
@@ -120,7 +126,9 @@ function ErsteKampagneAnlegen() {
       <Fledermaus size={40} className="mb-4 text-blut-hell" />
       <h1 className="mb-1 text-2xl">{t('Willkommen bei Campanium')}</h1>
       <p className="mb-6 max-w-md text-center text-sm text-text-schwach">
-        {t('Noch keine Kampagne vorhanden. Lege deine erste an – oder kopiere die Beispieldaten mit')}{' '}
+        {t(
+          'Noch keine Kampagne vorhanden. Lege deine erste an – oder kopiere die Beispieldaten mit',
+        )}{' '}
         <code className="rounded bg-flaeche-3 px-1">npm run seed</code>.
       </p>
       <div className="karte karte-ornament w-full max-w-md p-5">

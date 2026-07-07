@@ -9,7 +9,7 @@
  * Ohne eingerichtete Monate zeigt die Seite den Einrichtungs-Bildschirm
  * mit zwei Vorlagen; die Monatsliste bleibt danach jederzeit editierbar.
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarDays, ChevronLeft, ChevronRight, Plus, Settings2, Trash2 } from 'lucide-react';
 import type { Kalender, KalenderDatum, KalenderEreignis } from '@campanium/shared';
@@ -51,13 +51,19 @@ function Einrichtung({
         <CalendarDays size={22} className="text-blut-hell" aria-hidden /> {t('Kalender')}
       </h1>
       <p className="mb-6 text-sm text-text-schwach">
-        {t('Richte den Kalender deiner Spielwelt ein – Monatsnamen und -längen sind frei wählbar und lassen sich später jederzeit anpassen.')}
+        {t(
+          'Richte den Kalender deiner Spielwelt ein – Monatsnamen und -längen sind frei wählbar und lassen sich später jederzeit anpassen.',
+        )}
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
         <button
           className="karte karte-ornament p-4 text-left hover:border-gold"
           onClick={() =>
-            speichere({ ...kalender, monate: vorlageZwoelfMonate(), aktuell: { jahr: 1, monat: 1, tag: 1 } })
+            speichere({
+              ...kalender,
+              monate: vorlageZwoelfMonate(),
+              aktuell: { jahr: 1, monat: 1, tag: 1 },
+            })
           }
         >
           <div className="mb-1 font-display text-text-stark">{t('12 Monate à 30 Tage')}</div>
@@ -68,7 +74,11 @@ function Einrichtung({
         <button
           className="karte karte-ornament p-4 text-left hover:border-gold"
           onClick={() =>
-            speichere({ ...kalender, monate: vorlageIrdisch(), aktuell: { jahr: 1, monat: 1, tag: 1 } })
+            speichere({
+              ...kalender,
+              monate: vorlageIrdisch(),
+              aktuell: { jahr: 1, monat: 1, tag: 1 },
+            })
           }
         >
           <div className="mb-1 font-display text-text-stark">{t('Irdischer Kalender')}</div>
@@ -93,7 +103,21 @@ function KalenderAnsicht() {
   const [einstellungenOffen, setEinstellungenOffen] = useState(false);
 
   const speichere = (neu: Kalender) => void setzeKalender(neu);
-  const monat = kalender.monate[ansicht.monat - 1]!;
+
+  // Nach dem Löschen/Verkürzen der Monatsliste kann der zuvor angezeigte
+  // Monat außerhalb des gültigen Bereichs liegen. Hart klemmen, damit der
+  // Lookup NIE undefined ergibt – sonst würde das Rendern werfen und (ohne
+  // ErrorBoundary) die ganze App leeren. (monate.length ≥ 1, siehe
+  // monateAendern-Guard und KalenderSeite-Early-Return.)
+  const angezeigterMonat = Math.min(Math.max(1, ansicht.monat), kalender.monate.length);
+  const monat = kalender.monate[angezeigterMonat - 1]!;
+
+  // State nachziehen, falls geklemmt wurde (hält Navigation/Blättern konsistent).
+  useEffect(() => {
+    if (ansicht.monat !== angezeigterMonat) {
+      setAnsicht((a) => ({ ...a, monat: angezeigterMonat }));
+    }
+  }, [ansicht.monat, angezeigterMonat]);
 
   const blaettern = (richtung: 1 | -1) => {
     setGewaehlterTag(null);
@@ -192,7 +216,7 @@ function KalenderAnsicht() {
       {/* Tages-Raster (ohne Wochenstruktur – Fantasy-Kalender haben keine) */}
       <div className="grid grid-cols-5 gap-1.5 sm:grid-cols-7">
         {Array.from({ length: monat.tage }, (_, i) => {
-          const datum: KalenderDatum = { jahr: ansicht.jahr, monat: ansicht.monat, tag: i + 1 };
+          const datum: KalenderDatum = { jahr: ansicht.jahr, monat: angezeigterMonat, tag: i + 1 };
           const istHeute = gleichesDatum(datum, kalender.aktuell);
           const istGewaehlt = gewaehlterTag !== null && gleichesDatum(datum, gewaehlterTag);
           const ereignisse = ereignisseAm(datum);
@@ -203,7 +227,10 @@ function KalenderAnsicht() {
                 istHeute ? 'border-gold bg-gold/10' : ''
               } ${istGewaehlt ? 'ring-1 ring-gold' : ''}`}
               onClick={() => setGewaehlterTag(istGewaehlt ? null : datum)}
-              aria-label={t('Tag {nr}', { nr: i + 1 }) + (ereignisse.length ? t(', {n} Ereignis(se)', { n: ereignisse.length }) : '')}
+              aria-label={
+                t('Tag {nr}', { nr: i + 1 }) +
+                (ereignisse.length ? t(', {n} Ereignis(se)', { n: ereignisse.length }) : '')
+              }
             >
               <span
                 className={`text-xs ${istHeute ? 'font-semibold text-gold' : 'text-text-schwach'}`}
@@ -211,12 +238,17 @@ function KalenderAnsicht() {
                 {i + 1}
               </span>
               {ereignisse.slice(0, 2).map((e) => (
-                <p key={e.id} className="mt-0.5 truncate text-[11px] leading-tight text-text-normal">
+                <p
+                  key={e.id}
+                  className="mt-0.5 truncate text-[11px] leading-tight text-text-normal"
+                >
                   {e.titel}
                 </p>
               ))}
               {ereignisse.length > 2 && (
-                <p className="text-[10px] text-text-schwach">{t('+{n} weitere', { n: ereignisse.length - 2 })}</p>
+                <p className="text-[10px] text-text-schwach">
+                  {t('+{n} weitere', { n: ereignisse.length - 2 })}
+                </p>
               )}
             </button>
           );

@@ -70,6 +70,10 @@ interface StoreWert {
   setzeWidersacher: (tracker: WidersacherTracker) => Promise<void>;
   setzeLesung: (lesung: Lesung) => Promise<void>;
   setzeKalender: (kalender: Kalender) => Promise<void>;
+  /** Meldung eines fehlgeschlagenen Schreibvorgangs (null = keiner). */
+  speicherFehler: string | null;
+  /** Blendet die Fehlermeldung wieder aus. */
+  quittiereSpeicherFehler: () => void;
 }
 
 const StoreContext = createContext<StoreWert | null>(null);
@@ -93,6 +97,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
   const [lesung, setLesungState] = useState<Lesung>(null as unknown as Lesung);
   const [kalender, setKalenderState] = useState<Kalender>(null as unknown as Kalender);
+  /** Fehler eines optimistischen Schreibvorgangs (für den Toast im Layout). */
+  const [speicherFehler, setSpeicherFehler] = useState<string | null>(null);
 
   // Schritt 1: Kampagnen-Liste laden und Start-Kampagne bestimmen.
   useEffect(() => {
@@ -144,6 +150,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setLesungState(daten.lesung);
     setKalenderState(daten.kalender);
   }, [aktuelleId]);
+
+  /**
+   * Klammert einen optimistischen Singleton-Schreibvorgang: schlägt der
+   * Server-PUT fehl, wird der Fehler für den Toast gemerkt und der lokale
+   * Zustand aus der Serverwahrheit zurückgerollt (statt still zu divergieren).
+   */
+  const schreibeSicher = useCallback(
+    async (aktion: () => Promise<unknown>) => {
+      try {
+        await aktion();
+      } catch (fehler) {
+        setSpeicherFehler(fehler instanceof Error ? fehler.message : 'Speichern fehlgeschlagen');
+        await neuLaden().catch(() => {});
+      }
+    },
+    [neuLaden],
+  );
 
   const wechsleKampagne = useCallback((id: string) => {
     localStorage.setItem(KAMPAGNE_STORAGE_KEY, id);
@@ -248,33 +271,33 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const setzeKampagnenstand = useCallback(
     async (stand: Kampagnenstand) => {
       setKampagnenstandState(stand); // optimistisch, Tracker sollen sofort reagieren
-      await api.speichereKampagnenstand(kid(), stand);
+      await schreibeSicher(() => api.speichereKampagnenstand(kid(), stand));
     },
-    [kid],
+    [kid, schreibeSicher],
   );
 
   const setzeWidersacher = useCallback(
     async (tracker: WidersacherTracker) => {
       setWidersacherState(tracker);
-      await api.speichereWidersacher(kid(), tracker);
+      await schreibeSicher(() => api.speichereWidersacher(kid(), tracker));
     },
-    [kid],
+    [kid, schreibeSicher],
   );
 
   const setzeLesung = useCallback(
     async (neu: Lesung) => {
       setLesungState(neu);
-      await api.speichereLesung(kid(), neu);
+      await schreibeSicher(() => api.speichereLesung(kid(), neu));
     },
-    [kid],
+    [kid, schreibeSicher],
   );
 
   const setzeKalender = useCallback(
     async (neu: Kalender) => {
       setKalenderState(neu);
-      await api.speichereKalender(kid(), neu);
+      await schreibeSicher(() => api.speichereKalender(kid(), neu));
     },
-    [kid],
+    [kid, schreibeSicher],
   );
 
   const wert: StoreWert = {
@@ -301,6 +324,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setzeWidersacher,
     setzeLesung,
     setzeKalender,
+    speicherFehler,
+    quittiereSpeicherFehler: () => setSpeicherFehler(null),
   };
 
   return <StoreContext.Provider value={wert}>{children}</StoreContext.Provider>;
