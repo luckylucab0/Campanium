@@ -36,7 +36,7 @@ export function DmBadge() {
   const { t } = useI18n();
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-sm border border-blut/40 bg-blut-flaeche px-1.5 py-0.5 text-[11px] font-medium uppercase tracking-wide text-blut-hell"
+      className="inline-flex items-center gap-1 rounded-sm border border-rot/40 bg-rot-flaeche px-1.5 py-0.5 text-[11px] font-medium uppercase tracking-wide text-rot-hell"
       title={t('Nur für den DM sichtbar – wird im Spieler-Build entfernt')}
     >
       <EyeOff size={11} aria-hidden /> DM

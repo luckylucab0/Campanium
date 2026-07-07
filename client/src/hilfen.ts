@@ -13,6 +13,18 @@ export function pfadFuer(e: Pick<Entitaet, 'typ' | 'id'>): string {
   return `/${entityConfigs[e.typ].route}/${e.id}`;
 }
 
+/** D&D-Attribut-Modifikator: floor((Wert − 10) / 2). */
+export function modifikator(wert: number): number {
+  return Math.floor((wert - 10) / 2);
+}
+
+/** Modifikator mit Vorzeichen, z. B. „+2“ / „−1“ / „±0“. */
+export function formatModifikator(wert: number): string {
+  const m = modifikator(wert);
+  if (m === 0) return '±0';
+  return m > 0 ? `+${m}` : `−${Math.abs(m)}`;
+}
+
 /** Formatiert ein ISO-Datum gemäß Locale (12.06.2026 bzw. 06/12/2026). */
 export function formatDatum(iso: string, locale = 'de-DE'): string {
   if (!iso) return '–';

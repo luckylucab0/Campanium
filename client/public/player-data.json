@@ -183,6 +183,7 @@
       "ac": 15,
       "hp": 25,
       "passiveWahrnehmung": 16,
+      "attribute": null,
       "ziele": "Lyra sucht ihre Schwester, die vor Jahren im Nebel verschwand. Sie trägt die [[Wachslaterne der Wahrheit]] und gibt sie nicht mehr her.",
       "beziehungen": "- [[Mara Wachsherz]] – vertraut ihr seit Session 2 blind\n- [[Gregor der Kerzenmacher]] – kauft bei ihm, redet aber kaum",
       "besonderes": "Die Laterne brennt in Gegenwart von Lügen **blau** – das weiß bisher nur sie."

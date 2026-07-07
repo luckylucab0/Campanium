@@ -14,7 +14,7 @@ import { useStore, StoreProvider } from './store';
 import { ErrorBoundary } from './komponenten/ErrorBoundary';
 import { Layout } from './komponenten/Layout';
 import { UiProvider } from './komponenten/UiContext';
-import { Fledermaus } from './komponenten/Ornament';
+import { Astrolab } from './komponenten/Ornament';
 import { Dashboard } from './seiten/Dashboard';
 import { EntityDetailSeite } from './seiten/EntityDetailSeite';
 import { EntityFormSeite } from './seiten/EntityFormSeite';
@@ -49,7 +49,7 @@ function Inhalt() {
   if (ladeFehler) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 text-center">
-        <Fledermaus size={36} className="text-blut-hell" />
+        <Astrolab size={40} className="text-gold" />
         <h1 className="text-xl">{t('Daten konnten nicht geladen werden')}</h1>
         <p className="max-w-md text-sm text-text-schwach">
           {ladeFehler}
@@ -123,7 +123,7 @@ function ErsteKampagneAnlegen() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
-      <Fledermaus size={40} className="mb-4 text-blut-hell" />
+      <Astrolab size={44} className="mb-4 text-gold" />
       <h1 className="mb-1 text-2xl">{t('Willkommen bei Campanium')}</h1>
       <p className="mb-6 max-w-md text-center text-sm text-text-schwach">
         {t(

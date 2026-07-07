@@ -14,7 +14,15 @@ import type { EntityTyp } from './types';
 import { HALTUNGEN, NSC_STATUS, QUEST_STATUS, SC_STATUS } from './types';
 
 /** Art eines Kopffeldes (oberhalb der Markdown-Abschnitte). */
-export type FeldArt = 'text' | 'nummer' | 'boolean' | 'select' | 'ref' | 'datum';
+export type FeldArt =
+  | 'text'
+  | 'nummer'
+  | 'boolean'
+  | 'select'
+  | 'ref'
+  | 'datum'
+  /** Die sechs Charakter-Attribute als eigener Block (Werte + Modifikatoren). */
+  | 'attribute';
 
 /** Beschreibung eines Kopffeldes für Formular & Detailansicht. */
 export interface FeldConfig {
@@ -110,6 +118,7 @@ export const entityConfigs: Record<EntityTyp, EntityConfig> = {
         hinweis: 'z. B. „MM S. 25“ – nur für dich',
       },
       { feld: 'buchSeiteDm', label: 'Buchseite', art: 'text', dm: true },
+      { feld: 'attribute', label: 'Attribute (Werte)', art: 'attribute', dm: true },
     ],
     abschnitte: [
       { feld: 'beschreibung', titel: 'Beschreibung & Auftreten' },
@@ -201,6 +210,7 @@ export const entityConfigs: Record<EntityTyp, EntityConfig> = {
       { feld: 'ac', label: 'Rüstungsklasse (AC)', art: 'nummer' },
       { feld: 'hp', label: 'Trefferpunkte (HP)', art: 'nummer' },
       { feld: 'passiveWahrnehmung', label: 'Passive Wahrnehmung', art: 'nummer' },
+      { feld: 'attribute', label: 'Attribute (Werte)', art: 'attribute' },
     ],
     abschnitte: [
       { feld: 'ziele', titel: 'Ziele & Motivation' },

@@ -71,6 +71,29 @@ export type Haltung = (typeof HALTUNGEN)[number];
 export const NSC_STATUS = ['lebendig', 'tot', 'untot', 'unbekannt'] as const;
 export type NscStatus = (typeof NSC_STATUS)[number];
 
+/**
+ * Die sechs klassischen Charakter-Attribute (D&D-Stil). `null` an einer
+ * Entität bedeutet „keine Werte erfasst" (ersetzt ein hasStats-Flag).
+ */
+export interface Attribute {
+  staerke: number;
+  geschicklichkeit: number;
+  konstitution: number;
+  intelligenz: number;
+  weisheit: number;
+  charisma: number;
+}
+
+/** Reihenfolge & Kurzformen der Attribute für die Anzeige. */
+export const ATTRIBUT_FELDER = [
+  { feld: 'staerke', kurz: 'STÄ' },
+  { feld: 'geschicklichkeit', kurz: 'GES' },
+  { feld: 'konstitution', kurz: 'KON' },
+  { feld: 'intelligenz', kurz: 'INT' },
+  { feld: 'weisheit', kurz: 'WEI' },
+  { feld: 'charisma', kurz: 'CHA' },
+] as const satisfies ReadonlyArray<{ feld: keyof Attribute; kurz: string }>;
+
 /** Nichtspielercharakter. */
 export interface Nsc extends BasisEntitaet {
   typ: 'nsc';
@@ -88,6 +111,8 @@ export interface Nsc extends BasisEntitaet {
   will: string;
   /** Referenz auf den Statblock (z. B. Buch + Seite) – DM-only. */
   statblockRefDm: string;
+  /** Optionale Kampfwerte – DM-only (nie im Spieler-Build). null = keine. */
+  attribute: Attribute | null;
   /** Abschnitt: Beschreibung & Auftreten (Markdown). */
   beschreibung: string;
   /** Abschnitt: Was er/sie weiß oder verbirgt – DM-only (Markdown). */
@@ -151,6 +176,8 @@ export interface Sc extends BasisEntitaet {
   ac: number;
   hp: number;
   passiveWahrnehmung: number;
+  /** Optionale Attribute (spielersichtbar). null = keine erfasst. */
+  attribute: Attribute | null;
   /** Abschnitt: Ziele & Motivation (Markdown). */
   ziele: string;
   /** Abschnitt: Bindungen & Schwächen / DM-Hooks – DM-only (Markdown). */

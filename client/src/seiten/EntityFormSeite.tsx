@@ -10,9 +10,14 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Save, Trash2 } from 'lucide-react';
-import type { ChecklistEintrag, Entitaet, KampagnenLogEintrag } from '@campanium/shared';
-import { configVonRoute, type EntityConfig, type FeldConfig } from '@campanium/shared';
-import { pfadFuer } from '../hilfen';
+import type { Attribute, ChecklistEintrag, Entitaet, KampagnenLogEintrag } from '@campanium/shared';
+import {
+  ATTRIBUT_FELDER,
+  configVonRoute,
+  type EntityConfig,
+  type FeldConfig,
+} from '@campanium/shared';
+import { formatModifikator, pfadFuer } from '../hilfen';
 import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { BildUpload } from '../komponenten/BildUpload';
@@ -21,6 +26,16 @@ import { DmBadge } from '../komponenten/Badge';
 import { MarkdownEditor } from '../komponenten/MarkdownEditor';
 
 type Werte = Record<string, unknown>;
+
+/** Volle Attributnamen (für aria-labels; Kurzformen kommen aus ATTRIBUT_FELDER). */
+const ATTR_NAME: Record<keyof Attribute, string> = {
+  staerke: 'Stärke',
+  geschicklichkeit: 'Geschicklichkeit',
+  konstitution: 'Konstitution',
+  intelligenz: 'Intelligenz',
+  weisheit: 'Weisheit',
+  charisma: 'Charisma',
+};
 
 export function EntityFormSeite() {
   const { route = '', id = '' } = useParams();
@@ -263,6 +278,58 @@ function Feld({
   const basisKlasse = 'rounded border border-rand bg-flaeche-3 px-2 py-1.5 text-text-stark';
 
   switch (feld.art) {
+    case 'attribute': {
+      const attr = (wert as Attribute | null) ?? null;
+      const standard: Attribute = {
+        staerke: 10,
+        geschicklichkeit: 10,
+        konstitution: 10,
+        intelligenz: 10,
+        weisheit: 10,
+        charisma: 10,
+      };
+      return (
+        <div className="flex flex-col gap-2 sm:col-span-2">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              className="accent-(--blut)"
+              checked={attr !== null}
+              onChange={(e) => setze(feld.feld, e.target.checked ? standard : null)}
+            />
+            {label}
+          </label>
+          {attr && (
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+              {ATTRIBUT_FELDER.map(({ feld: k, kurz }) => (
+                <label key={k} className="flex flex-col items-center gap-1">
+                  <span className="font-mono text-[10px] tracking-wider text-text-schwach">
+                    {t(kurz)}
+                  </span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={30}
+                    className="w-full rounded border border-rand bg-flaeche-3 px-1 py-1 text-center text-text-stark"
+                    value={attr[k]}
+                    onChange={(e) =>
+                      setze(feld.feld, {
+                        ...attr,
+                        [k]: Math.max(1, Math.min(30, Number(e.target.value))),
+                      })
+                    }
+                    aria-label={t(ATTR_NAME[k])}
+                  />
+                  <span className="font-mono text-[11px] text-gold">
+                    {formatModifikator(attr[k])}
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
     case 'boolean':
       return (
         <label className="flex items-center gap-2 self-end pb-1.5 text-sm">

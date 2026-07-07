@@ -12,6 +12,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
   CalendarDays,
   Castle,
+  Dices,
   Home,
   Languages,
   Menu,
@@ -29,9 +30,10 @@ import { IST_SPIELER_MODUS } from '../api';
 import { SPRACHEN, useI18n, type Sprache } from '../i18n';
 import { useStore } from '../store';
 import { entityIcon } from './icons';
-import { Fledermaus } from './Ornament';
+import { Astrolab } from './Ornament';
 import { KiChat } from './KiChat';
 import { SearchPalette } from './SearchPalette';
+import { Wuerfelorakel } from './Wuerfelorakel';
 import { useUi } from './UiContext';
 
 const navKlasse = ({ isActive }: { isActive: boolean }) =>
@@ -46,6 +48,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const { t, sprache, setzeSprache } = useI18n();
   const { speicherFehler, quittiereSpeicherFehler } = useStore();
   const [sucheOffen, setSucheOffen] = useState(false);
+  const [wuerfelOffen, setWuerfelOffen] = useState(false);
   const [menueOffen, setMenueOffen] = useState(false);
 
   // Cmd/Ctrl+K öffnet die globale Suche.
@@ -78,7 +81,7 @@ export function Layout({ children }: { children: ReactNode }) {
             className="kerze flex items-center gap-2.5 border-b border-rand px-4 py-4"
             onClick={() => setMenueOffen(false)}
           >
-            <Fledermaus size={22} className="text-blut-hell" />
+            <Astrolab size={26} className="text-gold" />
             <div>
               <div className="font-display text-base font-semibold tracking-wide text-text-stark">
                 Campanium
@@ -157,6 +160,12 @@ export function Layout({ children }: { children: ReactNode }) {
                 ⌘K
               </kbd>
             </button>
+            <button
+              className="flex w-full items-center gap-2.5 rounded px-3 py-1.5 text-sm text-text-normal hover:bg-flaeche-3 hover:text-text-stark"
+              onClick={() => setWuerfelOffen(true)}
+            >
+              <Dices size={16} /> {t('Würfel werfen')}
+            </button>
             {!IST_SPIELER_MODUS && (
               <button
                 className="flex w-full items-center gap-2.5 rounded px-3 py-1.5 text-sm text-text-normal hover:bg-flaeche-3 hover:text-text-stark"
@@ -229,6 +238,7 @@ export function Layout({ children }: { children: ReactNode }) {
       </div>
 
       {sucheOffen && <SearchPalette schliessen={() => setSucheOffen(false)} />}
+      {wuerfelOffen && <Wuerfelorakel schliessen={() => setWuerfelOffen(false)} />}
       {!IST_SPIELER_MODUS && <KiChat />}
 
       {/* Toast bei fehlgeschlagenem Speichern (optimistische Writes wurden

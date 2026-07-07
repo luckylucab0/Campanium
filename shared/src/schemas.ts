@@ -52,6 +52,16 @@ const basisSchema = z.object({
 /** Optionale Verknüpfung auf eine andere Entität (per ID). */
 const refSchema = z.string().min(1).nullable();
 
+/** Die sechs Charakter-Attribute (je 1..30). */
+const attributeSchema = z.object({
+  staerke: z.number().int().min(1).max(30),
+  geschicklichkeit: z.number().int().min(1).max(30),
+  konstitution: z.number().int().min(1).max(30),
+  intelligenz: z.number().int().min(1).max(30),
+  weisheit: z.number().int().min(1).max(30),
+  charisma: z.number().int().min(1).max(30),
+});
+
 export const nscSchema = basisSchema.extend({
   typ: z.literal('nsc'),
   status: z.enum(NSC_STATUS),
@@ -62,6 +72,8 @@ export const nscSchema = basisSchema.extend({
   wer: z.string(),
   will: z.string(),
   statblockRefDm: z.string(),
+  // default(null): Bestandsdaten ohne attribute-Feld bleiben gültig.
+  attribute: attributeSchema.nullable().default(null),
   beschreibung: z.string(),
   weissVerbirgtDm: z.string(),
   beziehungen: z.string(),
@@ -102,6 +114,7 @@ export const scSchema = basisSchema.extend({
   ac: z.number().int().nonnegative(),
   hp: z.number().int().nonnegative(),
   passiveWahrnehmung: z.number().int().nonnegative(),
+  attribute: attributeSchema.nullable().default(null),
   ziele: z.string(),
   hooksDm: z.string(),
   beziehungen: z.string(),
@@ -332,6 +345,7 @@ export function neueEntitaet(typ: EntityTyp, id: string, name: string): Entitaet
         wer: '',
         will: '',
         statblockRefDm: '',
+        attribute: null,
         beschreibung: '',
         weissVerbirgtDm: '',
         beziehungen: '',
@@ -375,6 +389,7 @@ export function neueEntitaet(typ: EntityTyp, id: string, name: string): Entitaet
         ac: 10,
         hp: 10,
         passiveWahrnehmung: 10,
+        attribute: null,
         ziele: '',
         hooksDm: '',
         beziehungen: '',
