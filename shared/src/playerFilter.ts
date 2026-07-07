@@ -24,8 +24,18 @@
  *     deren Slug bereits Namen verraten könnte.
  *  8. Karten-Pins überleben nur, wenn ihr verknüpfter Ort exportiert ist;
  *     freie Marker und DM-Beschriftungen werden entfernt.
+ *  9. [[Wikilinks]] in exportierten Textfeldern (inkl. Log-/Fortschritts-
+ *     Texten), deren Ziel eine NICHT exportierte Entität ist, werden
+ *     neutralisiert – sonst würde der volle Name der versteckten Entität
+ *     wörtlich im Spieler-Build stehen. Mit Alias bleibt der Anzeigetext,
+ *     ohne Alias wird redigiert. Regel 7 nullt nur strukturierte IDs; diese
+ *     Regel schützt die Freitextfelder.
  */
 import type { Entitaet, EntityTyp, Kampagne, Kampagnenstand } from './types';
+import { ersetzeWikilinks, parseWikilinks } from './wikilink';
+
+/** Platzhalter für einen redigierten Wikilink auf eine versteckte Entität. */
+const REDIGIERT = '…';
 
 /** Basisfelder, die für jede exportierte Entität spielersicher sind. */
 const BASIS_WHITELIST = [
@@ -145,6 +155,62 @@ function bereinigePins(e: Entitaet, exportierteIds: ReadonlySet<string>): Entita
 }
 
 /**
+ * Ersetzt in einem Text alle Wikilinks, deren Ziel NICHT exportiert ist:
+ * mit Alias bleibt der Anzeigetext, ohne Alias wird redigiert. Links auf
+ * exportierte Entitäten bleiben unangetastet (die Spieler-UI löst sie auf).
+ */
+function ersetzeVersteckteLinks(text: string, exportierteNamen: ReadonlySet<string>): string {
+  return ersetzeWikilinks(text, (treffer) => {
+    if (exportierteNamen.has(treffer.ziel.toLowerCase())) return treffer.roh;
+    // Ziel ist versteckt: Alias (nach „|“) behalten, sonst redigieren.
+    return treffer.roh.includes('|') ? treffer.anzeige : REDIGIERT;
+  });
+}
+
+/**
+ * Läuft rekursiv durch eine Entität und neutralisiert in JEDEM String-Wert
+ * (Top-Level-Felder, Kampagnen-Log-Texte, Quest-Fortschritt, …) die
+ * Wikilinks auf nicht exportierte Ziele (Regel 9).
+ */
+function bereinigeWikilinks<T>(wert: T, exportierteNamen: ReadonlySet<string>): T {
+  if (typeof wert === 'string') {
+    return ersetzeVersteckteLinks(wert, exportierteNamen) as unknown as T;
+  }
+  if (Array.isArray(wert)) {
+    return wert.map((v) => bereinigeWikilinks(v, exportierteNamen)) as unknown as T;
+  }
+  if (wert && typeof wert === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const [key, v] of Object.entries(wert)) out[key] = bereinigeWikilinks(v, exportierteNamen);
+    return out as unknown as T;
+  }
+  return wert;
+}
+
+/**
+ * Prüft ein fertig gefiltertes Datenpaket auf überlebende Wikilinks, deren
+ * Ziel nicht exportiert ist. Liefert die geleakten Ziel-Namen (leer = sauber).
+ * Wird vom Build-Skript als Paranoia-Gate genutzt (Defense-in-Depth).
+ */
+export function findeVersteckteLinks(daten: PlayerDaten): string[] {
+  const exportierteNamen = new Set(daten.entitaeten.map((e) => e.name.toLowerCase()));
+  const geleakt = new Set<string>();
+  const pruefe = (wert: unknown): void => {
+    if (typeof wert === 'string') {
+      for (const t of parseWikilinks(wert)) {
+        if (!exportierteNamen.has(t.ziel.toLowerCase())) geleakt.add(t.ziel);
+      }
+    } else if (Array.isArray(wert)) {
+      wert.forEach(pruefe);
+    } else if (wert && typeof wert === 'object') {
+      Object.values(wert).forEach(pruefe);
+    }
+  };
+  daten.entitaeten.forEach(pruefe);
+  return [...geleakt];
+}
+
+/**
  * Wendet alle Regeln an und liefert das spielersichere Datenpaket.
  * Das ist die einzige Funktion, die der Spieler-Build (scripts/build-player.ts)
  * zum Filtern verwendet – Single Source of Truth.
@@ -156,7 +222,10 @@ export function filterFuerSpieler(
 ): PlayerDaten {
   const sichtbar = entitaeten.filter(istSpielerSichtbar);
   const ids = new Set(sichtbar.map((e) => e.id));
-  const gefiltert = sichtbar.map((e) => bereinigePins(bereinigeRefs(filtereFelder(e), ids), ids));
+  const exportierteNamen = new Set(sichtbar.map((e) => e.name.toLowerCase()));
+  const gefiltert = sichtbar.map((e) =>
+    bereinigePins(bereinigeRefs(bereinigeWikilinks(filtereFelder(e), exportierteNamen), ids), ids),
+  );
 
   const standGefiltert: Record<string, unknown> = {};
   for (const key of KAMPAGNENSTAND_WHITELIST) {

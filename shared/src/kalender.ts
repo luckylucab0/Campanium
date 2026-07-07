@@ -27,6 +27,9 @@ export function klemmeDatum(kalender: Kalender, datum: KalenderDatum): KalenderD
 
 /** Der Tag danach – rollt über Monats- und Jahresgrenzen. */
 export function naechsterTag(kalender: Kalender, datum: KalenderDatum): KalenderDatum {
+  // Ohne eingerichtete Monate gibt es keine Arithmetik – Datum unverändert
+  // zurück, statt in monate[…] zu laufen (DEFAULT_KALENDER ist ein gültiger Input).
+  if (!kalenderAktiv(kalender)) return datum;
   const d = klemmeDatum(kalender, datum);
   if (d.tag < kalender.monate[d.monat - 1]!.tage) return { ...d, tag: d.tag + 1 };
   if (d.monat < kalender.monate.length) return { jahr: d.jahr, monat: d.monat + 1, tag: 1 };
@@ -35,6 +38,7 @@ export function naechsterTag(kalender: Kalender, datum: KalenderDatum): Kalender
 
 /** Der Tag davor – rollt über Monats- und Jahresgrenzen. */
 export function vorherigerTag(kalender: Kalender, datum: KalenderDatum): KalenderDatum {
+  if (!kalenderAktiv(kalender)) return datum;
   const d = klemmeDatum(kalender, datum);
   if (d.tag > 1) return { ...d, tag: d.tag - 1 };
   if (d.monat > 1) {

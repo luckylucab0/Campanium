@@ -29,6 +29,16 @@ describe('Kalender-Arithmetik', () => {
     expect(kalenderAktiv({ ...kalender, monate: [] })).toBe(false);
   });
 
+  it('wirft nicht auf einem nicht eingerichteten Kalender (leere Monatsliste)', () => {
+    const leer: Kalender = { ...kalender, monate: [] };
+    const d = { jahr: 1, monat: 1, tag: 1 };
+    // Latenter Kontrakt-Bug: früher liefen die Roll-Funktionen in monate[…]!.
+    expect(() => naechsterTag(leer, d)).not.toThrow();
+    expect(() => vorherigerTag(leer, d)).not.toThrow();
+    expect(naechsterTag(leer, d)).toEqual(d);
+    expect(vorherigerTag(leer, d)).toEqual(d);
+  });
+
   it('zählt innerhalb eines Monats hoch und runter', () => {
     expect(naechsterTag(kalender, { jahr: 735, monat: 1, tag: 12 })).toEqual({
       jahr: 735,

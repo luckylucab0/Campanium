@@ -248,19 +248,46 @@ const kalenderDatumSchema = z.object({
   tag: z.number().int().min(1),
 });
 
-export const kalenderSchema = z.object({
-  aera: z.string(),
-  monate: z.array(z.object({ name: z.string().min(1), tage: z.number().int().min(1).max(999) })),
-  aktuell: kalenderDatumSchema,
-  ereignisse: z.array(
-    z.object({
-      id: z.string().min(1),
-      datum: kalenderDatumSchema,
-      titel: z.string(),
-      entitaetId: refSchema,
-    }),
-  ),
-});
+export const kalenderSchema = z
+  .object({
+    aera: z.string(),
+    monate: z.array(z.object({ name: z.string().min(1), tage: z.number().int().min(1).max(999) })),
+    aktuell: kalenderDatumSchema,
+    ereignisse: z.array(
+      z.object({
+        id: z.string().min(1),
+        datum: kalenderDatumSchema,
+        titel: z.string(),
+        entitaetId: refSchema,
+      }),
+    ),
+  })
+  // Das AKTUELLE Datum treibt die Kalender-Arithmetik (naechsterTag etc.) und
+  // muss darum im gültigen Bereich liegen: Monat ≤ Anzahl Monate, Tag ≤ Tage
+  // dieses Monats. Ereignisse werden BEWUSST nicht begrenzt – ein Ereignis auf
+  // einem später gelöschten Monat ist nur unsichtbar (nicht schädlich) und
+  // taucht wieder auf, wenn die Monate zurückkommen (nicht-destruktiv). Bei
+  // leerer Monatsliste (noch nicht eingerichtet) wird nichts erzwungen.
+  .superRefine((kalender, ctx) => {
+    if (kalender.monate.length === 0) return;
+    const d = kalender.aktuell;
+    if (d.monat > kalender.monate.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['aktuell', 'monat'],
+        message: `monat ${d.monat} liegt außerhalb der ${kalender.monate.length} Monate`,
+      });
+      return;
+    }
+    const tage = kalender.monate[d.monat - 1]!.tage;
+    if (d.tag > tage) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['aktuell', 'tag'],
+        message: `tag ${d.tag} liegt außerhalb der ${tage} Tage dieses Monats`,
+      });
+    }
+  });
 
 export const lesungSchema = z.object({
   titel: z.string(),

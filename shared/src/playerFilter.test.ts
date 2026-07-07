@@ -9,7 +9,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Entitaet, Kampagne, Kampagnenstand, Nsc, Ort } from './types';
 import { DEFAULT_KAMPAGNENSTAND, neueEntitaet } from './schemas';
-import { filterFuerSpieler, istSpielerSichtbar } from './playerFilter';
+import { filterFuerSpieler, findeVersteckteLinks, istSpielerSichtbar } from './playerFilter';
 
 const kampagne: Kampagne = {
   id: 'test-kampagne',
@@ -198,5 +198,59 @@ describe('filterFuerSpieler (Whitelist)', () => {
       name: 'Testkampagne',
       beschreibung: 'Eine Kampagne für Tests',
     });
+  });
+});
+
+describe('Wikilink-Spoiler (Regel 9)', () => {
+  it('leakt keinen Namen einer versteckten Entität über [[Wikilinks]] in Textfeldern', () => {
+    const sichtbar = getroffenerNsc('Der Wirt', {
+      beschreibung:
+        'Er flüstert den Namen [[Graf Vessimir der Verfluchte]] und fürchtet ' +
+        '[[Alte Windmühle|die Mühle]].',
+      // Auch Log- und Beziehungstexte werden bereinigt:
+      kampagnenLog: [{ sessionNr: 1, text: 'Traf heimlich [[Graf Vessimir der Verfluchte]].' }],
+      beziehungen: 'Dient [[Graf Vessimir der Verfluchte|einem Grafen]].',
+    });
+    const versteckterNsc = getroffenerNsc('Graf Vessimir der Verfluchte', { dmOnly: true });
+    const unbesuchterOrt = besuchterOrt('Alte Windmühle', { besucht: false });
+
+    const ergebnis = filterFuerSpieler(kampagne, [sichtbar, versteckterNsc, unbesuchterOrt], stand);
+    const json = JSON.stringify(ergebnis);
+    // Der versteckte Name darf NIRGENDS im Export auftauchen …
+    expect(json).not.toContain('Graf Vessimir der Verfluchte');
+    expect(json).not.toContain('Alte Windmühle');
+    // … der Alias-Anzeigetext bleibt aber erhalten (Lesbarkeit) …
+    const wirt = ergebnis.entitaeten.find((e) => e.name === 'Der Wirt') as Nsc;
+    expect(wirt.beschreibung).toContain('die Mühle');
+    expect(wirt.beziehungen).toContain('einem Grafen');
+    // … und ohne Alias wird redigiert (kein nackter Name).
+    expect(wirt.beschreibung).toContain('…');
+    // Das Gate meldet in diesem sauberen Ergebnis nichts mehr.
+    expect(findeVersteckteLinks(ergebnis)).toEqual([]);
+  });
+
+  it('behält Wikilinks auf exportierte Entitäten unangetastet', () => {
+    const ort = besuchterOrt('Dorfplatz');
+    const nsc = getroffenerNsc('Gregor', {
+      beschreibung: 'Wohnt am [[Dorfplatz]] neben [[Mara|der Wirtin]].',
+    });
+    const ergebnis = filterFuerSpieler(kampagne, [nsc, ort], stand);
+    const gregor = ergebnis.entitaeten.find((e) => e.name === 'Gregor') as Nsc;
+    // Link auf exportierten Ort bleibt (Spieler-UI löst ihn auf) …
+    expect(gregor.beschreibung).toContain('[[Dorfplatz]]');
+    // … Link auf nicht exportierte „Mara" behält nur den Alias.
+    expect(gregor.beschreibung).toContain('der Wirtin');
+    expect(gregor.beschreibung).not.toContain('[[Mara');
+  });
+
+  it('findeVersteckteLinks erkennt ein Leck in ungefilterten Daten', () => {
+    const geleakt = findeVersteckteLinks({
+      kampagne: { name: 'K', beschreibung: '' },
+      kampagnenstand: { partyLevel: 1, ingameTag: 1, ingameDatumText: '' },
+      entitaeten: [
+        { ...getroffenerNsc('Wirt', { beschreibung: 'Fürchtet [[Geheim-NSC]].' }) },
+      ] as Entitaet[],
+    });
+    expect(geleakt).toContain('Geheim-NSC');
   });
 });

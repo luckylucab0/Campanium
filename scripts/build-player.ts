@@ -29,6 +29,7 @@ import {
   DEFAULT_KAMPAGNENSTAND,
   ENTITY_TYPEN,
   filterFuerSpieler,
+  findeVersteckteLinks,
   kampagneSchema,
   kampagnenstandSchema,
   validiereEntitaet,
@@ -111,6 +112,15 @@ if (spielerDaten.entitaeten.some((e) => e.dmOnly || e.typ === 'sessionPrep')) {
   console.error('✗ ABBRUCH: dmOnly-Entität oder Session-Prep im Spieler-Export.');
   process.exit(1);
 }
+// Regel 9: kein [[Wikilink]] darf den Namen einer nicht exportierten Entität
+// verraten (Freitextfelder umgehen sonst die ID-Bereinigung).
+const geleakteLinks = findeVersteckteLinks(spielerDaten);
+if (geleakteLinks.length > 0) {
+  console.error(
+    `✗ ABBRUCH: Wikilinks auf versteckte Entitäten im Spieler-Export: ${geleakteLinks.join(', ')}`,
+  );
+  process.exit(1);
+}
 console.log('→ Paranoia-Prüfung bestanden: keine DM-Inhalte im Export');
 
 // ---- Schritt 5: Schreiben & Client bauen -------------------------------------
@@ -131,6 +141,13 @@ const exportierteBilder = spielerDaten.entitaeten
 if (exportierteBilder.length > 0) {
   fs.mkdirSync(bilderZiel, { recursive: true });
   for (const datei of exportierteBilder) {
+    // Der Spieler-Build ist ein VERÖFFENTLICHTES Artefakt: nur einfache
+    // Dateinamen zulassen, damit ein manipuliertes bild-Feld (z. B. „../x")
+    // nicht aus bilder/ ausbrechen kann.
+    if (datei !== path.basename(datei) || datei.includes('..')) {
+      console.error(`⚠ Unsicherer Bild-Dateiname übersprungen: ${datei}`);
+      continue;
+    }
     const quelle = path.join(bilderQuelle, datei);
     if (!fs.existsSync(quelle)) {
       console.error(`⚠ Bild fehlt und wird übersprungen: ${quelle}`);

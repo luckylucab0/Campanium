@@ -21,13 +21,21 @@ import { entityIcon } from './icons';
  * Die Gewichtung passiert über getrennte Scores statt String-Konkatenation,
  * damit ein Name-Treffer immer vor einem Volltext-Treffer landet.
  */
+/**
+ * Metadaten-Felder, die NICHT in den Volltext-Korpus gehören: sonst würde
+ * eine Jahreszahl über die Zeitstempel jede Entität treffen, ein Typ-Wort
+ * jede Entität dieses Typs und „png"/„jpg" jede mit Bild.
+ */
+const META_FELDER = new Set(['id', 'typ', 'erstellt', 'geaendert', 'bild']);
+
 function score(suche: string, e: Entitaet): number {
   const nameScore = fuzzyScore(suche, e.name);
   if (nameScore > 0) return nameScore + 1000;
   const tagScore = Math.max(0, ...e.tags.map((t) => fuzzyScore(suche, t)));
   if (tagScore > 0) return tagScore + 500;
-  const volltext = Object.values(e)
-    .filter((w): w is string => typeof w === 'string')
+  const volltext = Object.entries(e)
+    .filter(([key, w]) => typeof w === 'string' && !META_FELDER.has(key))
+    .map(([, w]) => w as string)
     .join(' ');
   // Beim Volltext nur exakte Teilstrings werten – Subsequenzen über lange
   // Texte ergeben zu viel Rauschen.
@@ -142,7 +150,9 @@ export function SearchPalette({ schliessen }: { schliessen: () => void }) {
                     >
                       <Icon size={14} className="shrink-0 text-text-schwach" aria-hidden />
                       <span className="truncate">{e.name}</span>
-                      {e.dmOnly && <span className="ml-auto text-[10px] text-blut-hell">DM</span>}
+                      {(e.dmOnly || config.immerDm) && (
+                        <span className="ml-auto text-[10px] text-blut-hell">DM</span>
+                      )}
                     </button>
                   );
                 })}

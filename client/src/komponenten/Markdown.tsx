@@ -20,7 +20,9 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import type { Entitaet } from '@campanium/shared';
 import { entityConfigs, ersetzeWikilinks } from '@campanium/shared';
+import { IST_SPIELER_MODUS } from '../api';
 import { pfadFuer } from '../hilfen';
+import { useI18n } from '../i18n';
 import { useStore } from '../store';
 import { useUi } from './UiContext';
 import { Badge } from './Badge';
@@ -45,6 +47,7 @@ interface VorschauZustand {
 export function Markdown({ text, className = '' }: { text: string; className?: string }) {
   const { perName, perId } = useStore();
   const { oeffneNeuDialog } = useUi();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [vorschau, setVorschau] = useState<VorschauZustand | null>(null);
   const container = useRef<HTMLDivElement>(null);
@@ -58,11 +61,17 @@ export function Markdown({ text, className = '' }: { text: string; className?: s
       if (ziel) {
         return `<a class="wikilink" data-ziel-id="${escapeHtml(ziel.id)}" href="#${pfadFuer(ziel)}">${escapeHtml(treffer.anzeige)}</a>`;
       }
-      return `<a class="wikilink-kaputt" data-ziel-name="${escapeHtml(treffer.ziel)}" title="Nicht gefunden – klicken zum Anlegen" href="#">${escapeHtml(treffer.anzeige)}</a>`;
+      // Im Spieler-Build ist „Anlegen" ein No-op – dann nur gestylter Text
+      // (kein href/Tooltip), damit Spieler nicht zu einer wirkungslosen
+      // Aktion eingeladen werden. Im DM-Modus: klickbarer Anlegen-Link.
+      if (IST_SPIELER_MODUS) {
+        return `<span class="wikilink-kaputt">${escapeHtml(treffer.anzeige)}</span>`;
+      }
+      return `<a class="wikilink-kaputt" data-ziel-name="${escapeHtml(treffer.ziel)}" title="${escapeHtml(t('Nicht gefunden – klicken zum Anlegen'))}" href="#">${escapeHtml(treffer.anzeige)}</a>`;
     });
     // Schritt 2 + 3: Markdown parsen, dann säubern (data-Attribute bleiben erhalten).
     return DOMPurify.sanitize(marked.parse(mitLinks, { async: false }));
-  }, [text, perName]);
+  }, [text, perName, t]);
 
   const beiKlick = (ereignis: MouseEvent) => {
     const link = (ereignis.target as HTMLElement).closest('a[data-ziel-id], a[data-ziel-name]');
