@@ -32,54 +32,62 @@ import type { KiNachricht, KiProvider } from './ki/provider';
 import type { KiSprache } from './ki/tools';
 import { erzeugeSitzungsprep, importiereCharakter, naechsteSessionNummer } from './ki/funktionen';
 import type { BildProvider } from './ki/bild';
-import { planErlaubt, type KiFeature } from '@campanium/shared';
-import {
-  adminPflicht,
-  adminRouter,
-  authPflicht,
-  authRouter,
-  planRouter,
-  planVon,
-  type SaasKontext,
-} from './auth/routes';
+import type { KiFeature } from '@campanium/shared';
+import type { AppErweiterung } from './erweiterung';
 
 /**
- * Baut die Express-App.
+ * Baut die Express-App (Self-Host-Core).
  *
- * @param verwaltung Globale Kampagnen-Verwaltung im Self-Host-Modus. Im
- *                   SaaS-Modus null – dort löst der `saas`-Kontext die
- *                   Verwaltung pro angemeldetem Konto auf.
- * @param kiProvider Optionaler KI-Provider (Self-Host: eigener Key via .env).
- * @param saas       Nur gesetzt, wenn CAMPANIUM_SAAS aktiv ist: schaltet Auth
- *                   + Multi-Tenancy scharf. Ohne ihn verhält sich die App
- *                   exakt wie bisher (Self-Host, keine Konten, keine Gates).
+ * @param verwaltung Globale Kampagnen-Verwaltung. Ein Erweiterungs-Overlay
+ *                   (z. B. SaaS/Multi-Tenancy) darf sie pro Request über
+ *                   `erweiterung.verwaltungFuer` überschreiben (dann null).
+ * @param kiProvider Optionaler KI-Provider (eigener Key via .env).
+ * @param bildProvider Optionaler Bild-Provider (KI-Kartengenerierung).
+ * @param erweiterung Optionale Erweiterungspunkte (Auth, Multi-Tenancy,
+ *                   Plan-Gating). Ohne sie verhält sich die App wie bisher:
+ *                   ein globaler Datenbestand, keine Konten, keine Gates.
  */
 export function erstelleApp(
   verwaltung: KampagnenVerwaltung | null,
   kiProvider: KiProvider | null = null,
-  saas: SaasKontext | null = null,
   bildProvider: BildProvider | null = null,
+  erweiterung: AppErweiterung = {},
 ): express.Express {
   const app = express();
   app.use(express.json({ limit: '5mb' }));
 
-  // Bootstrap-Endpunkt: der Client fragt vor allem anderen ab, ob er im
-  // SaaS-Modus läuft (Login-Pflicht) oder Self-Host (direkter Zugriff).
-  app.get('/api/config', (_req, res) => res.json({ saas: !!saas }));
+  // Bootstrap-Endpunkt: der Client liest hieraus u. a., ob ein Overlay (SaaS)
+  // aktiv ist. Der Core selbst liefert nur, was die Erweiterung beisteuert.
+  app.get('/api/config', (_req, res) => res.json({ ...erweiterung.konfig }));
 
-  if (saas) {
-    // Konten-Routen sind öffentlich; alles Kampagnen-/KI-/Plan-bezogene ist
-    // hinter der Session; /api/admin zusätzlich hinter der Admin-Rolle.
-    app.use('/api/auth', authRouter(saas));
-    app.use('/api/kampagnen', authPflicht(saas));
-    app.use('/api/ki', authPflicht(saas));
-    app.use('/api/plan', authPflicht(saas), planRouter(saas));
-    app.use('/api/admin', authPflicht(saas), adminPflicht(saas), adminRouter(saas));
+  // Erweiterungs-Middleware (z. B. Auth) vor die geschützten Bereiche hängen.
+  for (const mw of erweiterung.middleware ?? []) {
+    app.use('/api/kampagnen', mw);
+    app.use('/api/ki', mw);
+  }
+  // Zusätzliche Router der Erweiterung (z. B. /api/auth, /api/plan, /api/admin).
+  for (const r of erweiterung.router ?? []) {
+    app.use(r.pfad, ...(Array.isArray(r.handler) ? r.handler : [r.handler]));
   }
 
-  /** Die für diesen Request zuständige Verwaltung (Self-Host: global; SaaS: pro Konto). */
-  const verwaltungFuer = (req: express.Request): KampagnenVerwaltung =>
-    saas ? saas.register.fuer((req as express.Request & { nutzerId?: string }).nutzerId!) : verwaltung!;
+  /** Die für diesen Request zuständige Verwaltung (Default: die globale). */
+  const verwaltungFuer = erweiterung.verwaltungFuer ?? (() => verwaltung!);
+
+  /** KI-Gate der Erweiterung (Default: alles erlaubt). */
+  const kiGate = erweiterung.kiGate ?? (() => ({ erlaubt: true }));
+
+  /**
+   * Prüft ein KI-Feature-Gate. Bei Ablehnung schreibt die Erweiterung die
+   * Antwort (SaaS: 402 mit Plan-Info) bzw. es geht ein neutraler 403 raus.
+   * Rückgabe: true = erlaubt (weitermachen), false = bereits beantwortet.
+   */
+  const pruefeKi = (req: express.Request, res: express.Response, feature: KiFeature): boolean => {
+    const entscheidung = kiGate(req, feature);
+    if (entscheidung.erlaubt) return true;
+    if (entscheidung.sende) entscheidung.sende(res);
+    else res.status(403).json({ fehler: 'Dieses KI-Feature ist nicht freigeschaltet' });
+    return false;
+  };
 
   /** Löst :kid auf; antwortet selbst mit 404, wenn die Kampagne fehlt. */
   const mitKampagne = (
@@ -92,10 +100,6 @@ export function erstelleApp(
     if (!eintrag) return res.status(404).json({ fehler: `Kampagne nicht gefunden: ${kid}` });
     handler(eintrag.storage);
   };
-
-  /** Reicht der Plan des Requests für ein KI-Feature? (Self-Host: immer ja.) */
-  const planReichtFuer = (req: express.Request, feature: KiFeature): boolean =>
-    !saas || planErlaubt(planVon(saas, req), feature);
 
   // ---- Kampagnen -----------------------------------------------------------
 
@@ -292,9 +296,9 @@ export function erstelleApp(
    * Self-Host: allein vom Provider abhängig. SaaS: zusätzlich Plan ≥ Basis.
    */
   app.get('/api/ki/status', (req, res) => {
-    const planReicht = !saas || planErlaubt(planVon(saas, req), 'ki-assistent');
+    const gateFrei = kiGate(req, 'ki-assistent').erlaubt;
     res.json(
-      kiProvider && planReicht
+      kiProvider && gateFrei
         ? { aktiv: true, provider: kiProvider.provider, modell: kiProvider.modell }
         : { aktiv: false },
     );
@@ -324,12 +328,8 @@ export function erstelleApp(
         .status(503)
         .json({ fehler: 'KI-Assistent ist nicht konfiguriert (siehe .env.example)' });
     }
-    // SaaS: Der Assistent verlangt mindestens den Basis-Plan.
-    if (saas && !planErlaubt(planVon(saas, req), 'ki-assistent')) {
-      return res
-        .status(402)
-        .json({ fehler: 'Der KI-Assistent erfordert mindestens den Basis-Plan', benoetigt: 'basis' });
-    }
+    // Feature-Gate der Erweiterung (Self-Host: immer frei; SaaS: Plan ≥ Basis).
+    if (!pruefeKi(req, res, 'ki-assistent')) return;
     mitKampagne(req, res, req.params.kid, (storage) => {
       const eintrag = verwaltungFuer(req).holen(req.params.kid)!;
       const roh = Array.isArray(req.body?.nachrichten) ? req.body.nachrichten : [];
@@ -362,7 +362,7 @@ export function erstelleApp(
   /** KI-Sitzungsprep (Plus): erzeugt einen sessionPrep-Entwurf. */
   app.post('/api/kampagnen/:kid/ki/sitzungsprep', (req, res) => {
     if (!kiProvider) return res.status(503).json({ fehler: KI_UNKONFIGURIERT });
-    if (!planReichtFuer(req, 'ki-erweitert')) return sendePlanGate(res, 'plus');
+    if (!pruefeKi(req, res, 'ki-erweitert')) return;
     mitKampagne(req, res, req.params.kid, (storage) => {
       const eintrag = verwaltungFuer(req).holen(req.params.kid)!;
       const sprache: KiSprache = req.body?.sprache === 'en' ? 'en' : 'de';
@@ -388,7 +388,7 @@ export function erstelleApp(
   /** Charakterbogen-/Statblock-Import (Plus): Freitext → SC/NSC. */
   app.post('/api/kampagnen/:kid/ki/charakter-import', (req, res) => {
     if (!kiProvider) return res.status(503).json({ fehler: KI_UNKONFIGURIERT });
-    if (!planReichtFuer(req, 'ki-erweitert')) return sendePlanGate(res, 'plus');
+    if (!pruefeKi(req, res, 'ki-erweitert')) return;
     const typ: 'sc' | 'nsc' = req.body?.typ === 'nsc' ? 'nsc' : 'sc';
     const text = typeof req.body?.text === 'string' ? req.body.text : '';
     if (text.trim().length < 10) {
@@ -416,7 +416,7 @@ export function erstelleApp(
         .status(503)
         .json({ fehler: 'KI-Kartengenerierung ist nicht konfiguriert (AI_IMAGE_* in .env)' });
     }
-    if (!planReichtFuer(req, 'ki-kartengenerierung')) return sendePlanGate(res, 'premium');
+    if (!pruefeKi(req, res, 'ki-kartengenerierung')) return;
     const prompt = typeof req.body?.prompt === 'string' ? req.body.prompt.trim() : '';
     if (!prompt) return res.status(400).json({ fehler: 'Bitte eine Bildbeschreibung angeben' });
     const name =
@@ -472,13 +472,6 @@ export function erstelleApp(
 
 /** Fehlermeldung, wenn kein Text-KI-Provider konfiguriert ist. */
 const KI_UNKONFIGURIERT = 'KI-Assistent ist nicht konfiguriert (siehe .env.example)';
-
-/** 402-Antwort für ein Feature, das eine höhere Abo-Stufe verlangt. */
-function sendePlanGate(res: express.Response, benoetigt: 'basis' | 'plus' | 'premium') {
-  return res
-    .status(402)
-    .json({ fehler: `Diese KI-Funktion erfordert mindestens den ${benoetigt}-Plan`, benoetigt });
-}
 
 /** KI-Fehler melden: kaputte KI-Ausgabe → 400 (Zod), Provider-/Netzfehler → 502. */
 function sendeKiFehler(res: express.Response, fehler: unknown) {

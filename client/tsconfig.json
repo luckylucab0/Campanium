@@ -3,7 +3,10 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "paths": {
+      "campanium:erweiterung": ["./src/erweiterung/leer.tsx"]
+    }
   },
   "include": ["src", "vite.config.ts"]
 }

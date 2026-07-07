@@ -9,10 +9,11 @@
  *  - „aus"     – kein Provider konfiguriert (z. B. Self-Host ohne Bild-KI)
  * Im Self-Host-Modus ist erlaubt() immer true; es zählt nur der Provider.
  */
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ComponentType, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Sparkles, UserPlus, Wand2, X } from 'lucide-react';
+import { Sparkles, UserPlus, Wand2, X } from 'lucide-react';
 import { entityConfigs, type KiFeature } from '@campanium/shared';
+import { erweiterung } from 'campanium:erweiterung';
 import {
   erzeugeSitzungsprep,
   generiereKarte,
@@ -21,18 +22,23 @@ import {
   ladeKiStatus,
 } from '../api';
 import { useI18n } from '../i18n';
-import { usePlan } from '../plan';
 import { useStore } from '../store';
-import { AboModal } from './Abo';
 
-type GateZustand = 'aktiv' | 'gesperrt' | 'aus';
+interface GateErgebnis {
+  zustand: 'aktiv' | 'gesperrt' | 'aus';
+  Sperre?: ComponentType<{ label: string }>;
+}
 
-/** Entscheidet, wie ein KI-Knopf dargestellt wird. */
-function useGate(feature: KiFeature, providerAktiv: boolean): GateZustand {
-  const { saasModus, erlaubt } = usePlan();
-  if (providerAktiv && erlaubt(feature)) return 'aktiv';
-  if (saasModus && !erlaubt(feature)) return 'gesperrt';
-  return 'aus';
+/**
+ * Entscheidet, wie ein KI-Knopf dargestellt wird. Das Gate kommt aus der
+ * Erweiterung (Self-Host: immer erlaubt). „gesperrt" nur, wenn ein Overlay
+ * (SaaS) eine Sperre/Upgrade-UI beisteuert.
+ */
+function useGate(feature: KiFeature, providerAktiv: boolean): GateErgebnis {
+  const { erlaubt, Sperre } = erweiterung.useKiGate(feature);
+  if (providerAktiv && erlaubt) return { zustand: 'aktiv' };
+  if (!erlaubt && Sperre) return { zustand: 'gesperrt', Sperre };
+  return { zustand: 'aus' };
 }
 
 /** Gemeinsame Knopf-Optik. */
@@ -58,22 +64,6 @@ function KiKnopf({
   );
 }
 
-/** Gesperrter Knopf (SaaS, Plan zu niedrig) – öffnet die Abo-Übersicht. */
-function GesperrtKnopf({ label }: { label: string }) {
-  const [abo, setAbo] = useState(false);
-  return (
-    <>
-      <button
-        className="flex items-center gap-1.5 rounded border border-gold/50 px-3 py-1.5 text-sm text-gold hover:bg-gold-flaeche"
-        onClick={() => setAbo(true)}
-      >
-        <Lock size={14} /> {label}
-      </button>
-      {abo && <AboModal schliessen={() => setAbo(false)} />}
-    </>
-  );
-}
-
 // ---- Sitzungsprep -------------------------------------------------------------
 
 export function KiSitzungsprepKnopf() {
@@ -87,8 +77,8 @@ export function KiSitzungsprepKnopf() {
   }, []);
   const gate = useGate('ki-erweitert', status.aktiv);
 
-  if (gate === 'aus') return null;
-  if (gate === 'gesperrt') return <GesperrtKnopf label={t('KI: Prep')} />;
+  if (gate.zustand === 'aus') return null;
+  if (gate.zustand === 'gesperrt') return gate.Sperre ? <gate.Sperre label={t('KI: Prep')} /> : null;
 
   const erzeugen = async () => {
     if (!kampagne || laeuft) return;
@@ -130,8 +120,9 @@ export function KiCharakterImportKnopf({ typ }: { typ: 'sc' | 'nsc' }) {
   }, []);
   const gate = useGate('ki-erweitert', status.aktiv);
 
-  if (gate === 'aus') return null;
-  if (gate === 'gesperrt') return <GesperrtKnopf label={t('KI: Import')} />;
+  if (gate.zustand === 'aus') return null;
+  if (gate.zustand === 'gesperrt')
+    return gate.Sperre ? <gate.Sperre label={t('KI: Import')} /> : null;
 
   const importieren = async () => {
     if (!kampagne || text.trim().length < 10 || laeuft) return;
@@ -225,8 +216,9 @@ export function KiKarteKnopf() {
   }, []);
   const gate = useGate('ki-kartengenerierung', status.aktiv);
 
-  if (gate === 'aus') return null;
-  if (gate === 'gesperrt') return <GesperrtKnopf label={t('KI: Karte')} />;
+  if (gate.zustand === 'aus') return null;
+  if (gate.zustand === 'gesperrt')
+    return gate.Sperre ? <gate.Sperre label={t('KI: Karte')} /> : null;
 
   const generieren = async () => {
     if (!kampagne || !prompt.trim() || laeuft) return;

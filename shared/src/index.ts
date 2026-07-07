@@ -13,4 +13,4 @@ export * from './wikilink';
 export * from './slug';
 export * from './fuzzy';
 export * from './playerFilter';
-export * from './plaene';
+export * from './kiFeature';

@@ -21,6 +21,7 @@
  *  Der Sprachumschalter in der Sidebar zeigt sie automatisch an.
  */
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
+import { erweiterung } from 'campanium:erweiterung';
 import { en } from './en';
 
 export const SPRACHEN = [
@@ -30,8 +31,15 @@ export const SPRACHEN = [
 
 export type Sprache = (typeof SPRACHEN)[number]['code'];
 
-/** Wörterbücher aller Nicht-Quellsprachen (Deutsch braucht keines). */
-const WOERTERBUECHER: Partial<Record<Sprache, Record<string, string>>> = { en };
+/**
+ * Wörterbücher aller Nicht-Quellsprachen (Deutsch braucht keines). Eine
+ * Erweiterung (z. B. SaaS) darf über `i18nZusatz` je Sprache eigene Einträge
+ * beisteuern – sie werden hier eingemischt.
+ */
+const WOERTERBUECHER: Partial<Record<Sprache, Record<string, string>>> = { en: { ...en } };
+for (const [sprache, zusatz] of Object.entries(erweiterung.i18nZusatz ?? {})) {
+  WOERTERBUECHER[sprache as Sprache] = { ...(WOERTERBUECHER[sprache as Sprache] ?? {}), ...zusatz };
+}
 
 const SPRACHE_STORAGE_KEY = 'sprache';
 

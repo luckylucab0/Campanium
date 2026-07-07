@@ -111,29 +111,25 @@ Alles unten ist **umgesetzt** (der Handoff führte einige davon noch als
   Entwurf aus dem Kampagnenstand, **Charakterbogen-/Statblock-Import**
   (Freitext → Zod-validierter SC/NSC) und **KI-Kartengenerierung** (eigener
   Bild-Provider `AI_IMAGE_*`, OpenAI-kompatibel → Grafik an eine Karte). Im
-  Self-Host frei nutzbar (eigener Key); im SaaS an Plus bzw. Premium gebunden.
+  Self-Host mit eigenem Key frei nutzbar.
 - **Spieler-Modus / Spoiler-Filter**: statischer, schreibgeschützter Export
   (`npm run build:player`) per **Whitelist** (neue Felder sind automatisch
   DM-only). Wikilinks auf versteckte Entitäten werden neutralisiert; ein
   Paranoia-Gate bricht den Build ab, falls DM-Inhalte durchrutschen.
-- **Optionaler SaaS-Modus** (`CAMPANIUM_SAAS=true`, standardmäßig **AUS**):
-  schaltet für unseren gehosteten Betrieb Konten (Registrierung/Login,
-  scrypt-Hash + HMAC-Session-Cookie), **Multi-Tenancy** (isolierte Kampagnen
-  je Konto unter `data/<nutzerId>/`) und **Abo-Stufen** (Frei/Basis/Plus/
-  Premium) frei. Gating ist serverseitig durchgesetzt (`shared/plaene.ts`);
-  Admins weisen Stufen unter `/admin` zu (Stripe-fertig strukturiert, kein
-  Live-Bezahlvorgang). **Wichtig:** Die Self-Host-Variante lässt den Schalter
-  aus – dort gibt es **keine** Konten/Pläne/Gates; wer KI will, hängt sein
-  eigenes Modell via `.env` an (alle KI-Funktionen frei).
+- **Erweiterungspunkt (für Overlays)**: Server (`server/src/erweiterung.ts`,
+  `AppErweiterung`) und Client (`client/src/erweiterung/`, `ClientErweiterung`
+  + Vite-Alias `campanium:erweiterung`) bieten optionale Hooks (Middleware,
+  Router, Tenant-Resolver, KI-Gate, UI-Slots). Ohne Overlay verhält sich die
+  App wie hier beschrieben (Self-Host, keine Konten, keine Gates). Ein
+  separates, nicht-öffentliches Overlay (z. B. ein gehostetes SaaS-Angebot mit
+  Login/Abo) kann sich hierüber einklinken, ohne dass kommerzieller Code in
+  diesem Repo liegt.
 
 ## Offen / mögliche nächste Schritte
 
 - **Karten-Geländeeditor** (Raster malen: Wasser/Wald/Gebirge/Weg/Siedlung +
   platzierbare Symbole) — eigenes Subsystem neben der bestehenden
   Pin-auf-Bild-Karte; bräuchte neue Schema-Felder (mapCells/mapSymbols).
-- **Stripe-Anbindung** — der SaaS-Modus setzt Abo-Stufen bereits durch und ist
-  strukturell zahlungsbereit, bindet aber noch keinen echten Bezahlvorgang an
-  (Stufen weist derzeit der Admin zu).
 
 ## Konventionen für die Umsetzung
 

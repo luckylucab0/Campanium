@@ -12,13 +12,12 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bot, Pencil, Plus, ScrollText, Send, Sparkles, X } from 'lucide-react';
+import { Bot, Pencil, Plus, ScrollText, Send, X } from 'lucide-react';
 import { entityConfigs } from '@campanium/shared';
+import { erweiterung } from 'campanium:erweiterung';
 import { IST_SPIELER_MODUS, ladeKiStatus, sendeKiChat, type KiAktion, type KiStatus } from '../api';
 import { useI18n } from '../i18n';
-import { usePlan } from '../plan';
 import { useStore } from '../store';
-import { AboModal } from './Abo';
 import { Markdown } from './Markdown';
 
 interface ChatNachricht {
@@ -31,10 +30,9 @@ interface ChatNachricht {
 export function KiChat() {
   const { kampagne, neuLaden } = useStore();
   const { t, sprache } = useI18n();
-  const { saasModus, erlaubt } = usePlan();
+  const gate = erweiterung.useKiGate('ki-assistent');
   const [status, setStatus] = useState<KiStatus>({ aktiv: false });
   const [offen, setOffen] = useState(false);
-  const [aboOffen, setAboOffen] = useState(false);
   const [nachrichten, setNachrichten] = useState<ChatNachricht[]>([]);
   const [eingabe, setEingabe] = useState('');
   const [laedt, setLaedt] = useState(false);
@@ -56,24 +54,10 @@ export function KiChat() {
 
   if (IST_SPIELER_MODUS || !kampagne) return null;
 
-  // SaaS mit zu niedrigem Plan: statt des Chats einen Upgrade-Knopf anbieten
-  // (im Self-Host greift diese Bedingung nie – dort ist erlaubt() immer true).
-  if (saasModus && !erlaubt('ki-assistent')) {
-    return (
-      <>
-        {!aboOffen && (
-          <button
-            className="kerze fixed bottom-5 right-5 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-gold/50 bg-flaeche-2 text-gold shadow-xl hover:bg-gold-flaeche"
-            onClick={() => setAboOffen(true)}
-            aria-label={t('KI-Assistent freischalten')}
-            title={t('KI-Assistent – ab Basis')}
-          >
-            <Sparkles size={22} />
-          </button>
-        )}
-        {aboOffen && <AboModal schliessen={() => setAboOffen(false)} />}
-      </>
-    );
+  // Erweiterung sperrt den Assistenten (SaaS: Plan zu niedrig) → Upgrade-UI
+  // statt Chat. Im Self-Host ist das Gate immer offen (erlaubt=true).
+  if (!gate.erlaubt) {
+    return gate.Sperre ? <gate.Sperre label={t('KI-Assistent – ab Basis')} /> : null;
   }
 
   if (!status.aktiv) return null;

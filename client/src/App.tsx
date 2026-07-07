@@ -8,16 +8,14 @@
  */
 import { useState } from 'react';
 import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { erweiterung } from 'campanium:erweiterung';
 import { IST_SPIELER_MODUS } from './api';
-import { AuthProvider, useAuth } from './auth';
 import { I18nProvider, useI18n } from './i18n';
 import { useStore, StoreProvider } from './store';
 import { ErrorBoundary } from './komponenten/ErrorBoundary';
 import { Layout } from './komponenten/Layout';
 import { UiProvider } from './komponenten/UiContext';
 import { Astrolab } from './komponenten/Ornament';
-import { AdminSeite } from './seiten/AdminSeite';
-import { Anmeldung } from './seiten/Anmeldung';
 import { Dashboard } from './seiten/Dashboard';
 import { EntityDetailSeite } from './seiten/EntityDetailSeite';
 import { EntityFormSeite } from './seiten/EntityFormSeite';
@@ -31,45 +29,23 @@ import { SpielabendSeite } from './seiten/SpielabendSeite';
 import { WidersacherSeite } from './seiten/WidersacherSeite';
 
 export default function App() {
+  // Erweiterungs-Slots (Self-Host: No-Op; SaaS-Overlay: Auth + Login-Gate).
+  // Der Store hängt bewusst UNTER `Zugang`, damit /api/kampagnen erst mit
+  // gültiger Session geladen wird.
   return (
     <HashRouter>
       <I18nProvider>
-        <AuthProvider>
-          <AuthGate />
-        </AuthProvider>
+        <erweiterung.Wurzel>
+          <erweiterung.Zugang>
+            <StoreProvider>
+              <UiProvider>
+                <Inhalt />
+              </UiProvider>
+            </StoreProvider>
+          </erweiterung.Zugang>
+        </erweiterung.Wurzel>
       </I18nProvider>
     </HashRouter>
-  );
-}
-
-/**
- * Entscheidet zwischen Login-Bildschirm und App. Im Self-Host-Modus
- * (saasModus false) wird der Store direkt geladen; im SaaS-Modus erst nach
- * erfolgreicher Anmeldung. Der Store hängt bewusst UNTER dieser Grenze,
- * damit /api/kampagnen erst mit gültiger Session geladen wird.
- */
-function AuthGate() {
-  const { saasModus, nutzer, laden } = useAuth();
-  const { t } = useI18n();
-
-  if (laden) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="font-serif text-lg italic text-text-schwach">
-          {t('Die Nebel lichten sich …')}
-        </p>
-      </div>
-    );
-  }
-
-  if (saasModus && !nutzer) return <Anmeldung />;
-
-  return (
-    <StoreProvider>
-      <UiProvider>
-        <Inhalt />
-      </UiProvider>
-    </StoreProvider>
   );
 }
 
@@ -122,7 +98,10 @@ function Inhalt() {
               <Route path="/widersacher" element={<WidersacherSeite />} />
               <Route path="/lesung" element={<LesungSeite />} />
               <Route path="/kalender" element={<KalenderSeite />} />
-              <Route path="/admin" element={<AdminSeite />} />
+              {/* Zusatzrouten der Erweiterung (SaaS: /admin). Self-Host: leer. */}
+              {erweiterung.routen.map((r) => (
+                <Route key={r.pfad} path={r.pfad} element={r.element} />
+              ))}
               <Route path="/:route/:id/bearbeiten" element={<EntityFormSeite />} />
             </>
           )}
