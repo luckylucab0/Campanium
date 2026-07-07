@@ -25,6 +25,36 @@ export const en: Record<string, string> = {
   'Bereits ein Konto? Anmelden': 'Already have an account? Sign in',
   Abmelden: 'Sign out',
 
+  // ---- Abo-Stufen & Verwaltung (nur SaaS-Modus) -----------------------------
+  Abo: 'Subscription',
+  'Abo-Stufen': 'Subscription tiers',
+  Kostenlos: 'Free',
+  'Dein aktueller Plan': 'Your current plan',
+  'Stufen werden derzeit vom Betreiber zugewiesen – es findet kein automatischer Bezahlvorgang statt.':
+    'Tiers are currently assigned by the operator – there is no automatic payment.',
+  'Diese Funktion gehört zu einem höheren Plan.': 'This feature belongs to a higher plan.',
+  'Verfügbar ab {plan} ({preis} / Monat).': 'Available from {plan} ({preis} / month).',
+  'Pläne ansehen': 'View plans',
+  'KI-Assistent freischalten': 'Unlock AI assistant',
+  'KI-Assistent – ab Basis': 'AI assistant – from Basic',
+  Verwaltung: 'Administration',
+  'Konten und ihre Abo-Stufen. Änderungen greifen sofort.':
+    'Accounts and their subscription tiers. Changes take effect immediately.',
+  Rolle: 'Role',
+  Plan: 'Plan',
+  'Plan für {email}': 'Plan for {email}',
+  admin: 'admin',
+  nutzer: 'user',
+  // Plan-Namen
+  Frei: 'Free',
+  Basis: 'Basic',
+  // „Plus“ und „Premium“ sind in beiden Sprachen gleich.
+  // Plan-Beschreibungen
+  'Alle Kernfunktionen. Keine KI.': 'All core features. No AI.',
+  'KI-Assistent mit eigenem Modell.': 'AI assistant with your own model.',
+  'Alle KI-Funktionen außer Kartengenerierung.': 'All AI features except map generation.',
+  'Zusätzlich KI-Kartengenerierung.': 'Plus AI map generation.',
+
   // ---- Allgemeine UI-Bausteine ----------------------------------------------
   Abbrechen: 'Cancel',
   Anlegen: 'Create',

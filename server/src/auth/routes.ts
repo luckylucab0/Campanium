@@ -8,6 +8,7 @@
  * `req.nutzerId` auf und schützt alle kampagnen-bezogenen Routen.
  */
 import express from 'express';
+import { istPlanStufe, parsePlan, planErlaubt, type KiFeature } from '@campanium/shared';
 import { MandantenRegister } from '../mandanten';
 import { NutzerStore, oeffentlich } from './nutzer';
 import { leseCookie, SESSION_COOKIE, SessionManager } from './session';
@@ -52,6 +53,55 @@ export function authPflicht(saas: SaasKontext): express.RequestHandler {
     (req as AuthRequest).nutzerId = nutzerId;
     next();
   };
+}
+
+/** Middleware: verlangt zusätzlich die Admin-Rolle (nach authPflicht). */
+export function adminPflicht(saas: SaasKontext): express.RequestHandler {
+  return (req, res, next) => {
+    const nutzer = saas.nutzerStore.holen((req as AuthRequest).nutzerId ?? '');
+    if (nutzer?.rolle !== 'admin') return res.status(403).json({ fehler: 'Nur für Admins' });
+    next();
+  };
+}
+
+/** Plan-Stufe des Requests (nur SaaS – authPflicht muss vorher gelaufen sein). */
+export function planVon(saas: SaasKontext, req: express.Request): string {
+  return saas.nutzerStore.holen((req as AuthRequest).nutzerId ?? '')?.plan ?? 'frei';
+}
+
+/** Router mit dem Abo-Status des angemeldeten Kontos (unter /api/plan). */
+export function planRouter(saas: SaasKontext): express.Router {
+  const router = express.Router();
+  router.get('/', (req, res) => {
+    const stufe = parsePlan(planVon(saas, req));
+    const features: Record<KiFeature, boolean> = {
+      'ki-assistent': planErlaubt(stufe, 'ki-assistent'),
+      'ki-erweitert': planErlaubt(stufe, 'ki-erweitert'),
+      'ki-kartengenerierung': planErlaubt(stufe, 'ki-kartengenerierung'),
+    };
+    res.json({ plan: stufe, features });
+  });
+  return router;
+}
+
+/** Admin-Router (unter /api/admin, hinter authPflicht + adminPflicht). */
+export function adminRouter(saas: SaasKontext): express.Router {
+  const router = express.Router();
+
+  router.get('/nutzer', (_req, res) => {
+    res.json(saas.nutzerStore.alle().map(oeffentlich));
+  });
+
+  router.put('/nutzer/:id/plan', (req, res) => {
+    const plan = req.body?.plan;
+    if (!istPlanStufe(plan)) return res.status(400).json({ fehler: 'Unbekannte Plan-Stufe' });
+    if (!saas.nutzerStore.holen(req.params.id)) {
+      return res.status(404).json({ fehler: 'Nutzer nicht gefunden' });
+    }
+    return res.json(oeffentlich(saas.nutzerStore.setzePlan(req.params.id, plan)));
+  });
+
+  return router;
 }
 
 /** Router mit /register, /login, /logout, /me – wird unter /api/auth montiert. */

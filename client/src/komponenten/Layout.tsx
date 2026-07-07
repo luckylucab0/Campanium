@@ -13,6 +13,7 @@ import {
   CalendarDays,
   Castle,
   Dices,
+  Gem,
   Home,
   Languages,
   LogOut,
@@ -20,6 +21,7 @@ import {
   Moon,
   Plus,
   Search,
+  Shield,
   Sun,
   Sparkles,
   Tent,
@@ -30,8 +32,10 @@ import { ENTITY_TYPEN, entityConfigs } from '@campanium/shared';
 import { IST_SPIELER_MODUS } from '../api';
 import { useAuth } from '../auth';
 import { SPRACHEN, useI18n, type Sprache } from '../i18n';
+import { usePlan } from '../plan';
 import { useStore } from '../store';
 import { entityIcon } from './icons';
+import { AboModal } from './Abo';
 import { Astrolab } from './Ornament';
 import { KiChat } from './KiChat';
 import { SearchPalette } from './SearchPalette';
@@ -50,9 +54,11 @@ export function Layout({ children }: { children: ReactNode }) {
   const { t, sprache, setzeSprache } = useI18n();
   const { speicherFehler, quittiereSpeicherFehler } = useStore();
   const { saasModus, nutzer, abmelden } = useAuth();
+  const { planInfo } = usePlan();
   const [sucheOffen, setSucheOffen] = useState(false);
   const [wuerfelOffen, setWuerfelOffen] = useState(false);
   const [menueOffen, setMenueOffen] = useState(false);
+  const [aboOffen, setAboOffen] = useState(false);
 
   // Cmd/Ctrl+K öffnet die globale Suche.
   useEffect(() => {
@@ -210,17 +216,35 @@ export function Layout({ children }: { children: ReactNode }) {
             )}
           </div>
 
-          {/* Konto-Fuß (nur SaaS-Modus): E-Mail + Abmelden. */}
+          {/* Konto-Fuß (nur SaaS-Modus): Abo, ggf. Verwaltung, E-Mail, Abmelden. */}
           {saasModus && nutzer && (
-            <div className="border-t border-rand px-4 py-3">
-              <div className="truncate text-xs text-text-schwach" title={nutzer.email}>
+            <div className="space-y-1 border-t border-rand px-2 py-3">
+              <button
+                className="flex w-full items-center gap-2.5 rounded px-3 py-1.5 text-sm text-text-normal hover:bg-flaeche-3 hover:text-gold"
+                onClick={() => setAboOffen(true)}
+              >
+                <Gem size={16} /> {t('Abo')}
+                <span className="ml-auto text-[11px] uppercase tracking-wider text-gold">
+                  {t(planInfo.name)}
+                </span>
+              </button>
+              {nutzer.rolle === 'admin' && (
+                <NavLink
+                  to="/admin"
+                  className={navKlasse}
+                  onClick={() => setMenueOffen(false)}
+                >
+                  <Shield size={16} /> {t('Verwaltung')}
+                </NavLink>
+              )}
+              <div className="truncate px-3 pt-1 text-xs text-text-schwach" title={nutzer.email}>
                 {nutzer.email}
               </div>
               <button
-                className="mt-1.5 flex items-center gap-2 text-sm text-text-normal hover:text-gold"
+                className="flex w-full items-center gap-2.5 rounded px-3 py-1.5 text-sm text-text-normal hover:bg-flaeche-3 hover:text-gold"
                 onClick={() => void abmelden()}
               >
-                <LogOut size={15} /> {t('Abmelden')}
+                <LogOut size={16} /> {t('Abmelden')}
               </button>
             </div>
           )}
@@ -257,6 +281,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
       {sucheOffen && <SearchPalette schliessen={() => setSucheOffen(false)} />}
       {wuerfelOffen && <Wuerfelorakel schliessen={() => setWuerfelOffen(false)} />}
+      {aboOffen && <AboModal schliessen={() => setAboOffen(false)} />}
       {!IST_SPIELER_MODUS && <KiChat />}
 
       {/* Toast bei fehlgeschlagenem Speichern (optimistische Writes wurden

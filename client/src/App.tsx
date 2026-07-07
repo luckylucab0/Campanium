@@ -16,6 +16,7 @@ import { ErrorBoundary } from './komponenten/ErrorBoundary';
 import { Layout } from './komponenten/Layout';
 import { UiProvider } from './komponenten/UiContext';
 import { Astrolab } from './komponenten/Ornament';
+import { AdminSeite } from './seiten/AdminSeite';
 import { Anmeldung } from './seiten/Anmeldung';
 import { Dashboard } from './seiten/Dashboard';
 import { EntityDetailSeite } from './seiten/EntityDetailSeite';
@@ -121,6 +122,7 @@ function Inhalt() {
               <Route path="/widersacher" element={<WidersacherSeite />} />
               <Route path="/lesung" element={<LesungSeite />} />
               <Route path="/kalender" element={<KalenderSeite />} />
+              <Route path="/admin" element={<AdminSeite />} />
               <Route path="/:route/:id/bearbeiten" element={<EntityFormSeite />} />
             </>
           )}

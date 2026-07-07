@@ -355,3 +355,23 @@ export async function registriere(email: string, passwort: string): Promise<Auth
 export async function meldeAb(): Promise<void> {
   await fetch('/api/auth/logout', { method: 'POST' });
 }
+
+// ---- Admin (nur SaaS-Modus, nur Rolle admin) --------------------------------
+
+/** Alle Konten (für die Admin-Verwaltung). */
+export async function ladeNutzerliste(): Promise<AuthNutzer[]> {
+  const antwort = await pruefe(await fetch('/api/admin/nutzer'));
+  return antwort.json();
+}
+
+/** Setzt die Abo-Stufe eines Kontos. */
+export async function setzeNutzerPlan(id: string, plan: string): Promise<AuthNutzer> {
+  const antwort = await pruefe(
+    await fetch(`/api/admin/nutzer/${id}/plan`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan }),
+    }),
+  );
+  return antwort.json();
+}

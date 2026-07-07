@@ -30,7 +30,16 @@ import { istEntityTyp, KampagnenVerwaltung, type Storage } from './storage';
 import { fuehreChatAus } from './ki/chat';
 import type { KiNachricht, KiProvider } from './ki/provider';
 import type { KiSprache } from './ki/tools';
-import { authPflicht, authRouter, type SaasKontext } from './auth/routes';
+import { planErlaubt } from '@campanium/shared';
+import {
+  adminPflicht,
+  adminRouter,
+  authPflicht,
+  authRouter,
+  planRouter,
+  planVon,
+  type SaasKontext,
+} from './auth/routes';
 
 /**
  * Baut die Express-App.
@@ -56,9 +65,13 @@ export function erstelleApp(
   app.get('/api/config', (_req, res) => res.json({ saas: !!saas }));
 
   if (saas) {
-    // Konten-Routen sind öffentlich; alles unter /api/kampagnen ist geschützt.
+    // Konten-Routen sind öffentlich; alles Kampagnen-/KI-/Plan-bezogene ist
+    // hinter der Session; /api/admin zusätzlich hinter der Admin-Rolle.
     app.use('/api/auth', authRouter(saas));
     app.use('/api/kampagnen', authPflicht(saas));
+    app.use('/api/ki', authPflicht(saas));
+    app.use('/api/plan', authPflicht(saas), planRouter(saas));
+    app.use('/api/admin', authPflicht(saas), adminPflicht(saas), adminRouter(saas));
   }
 
   /** Die für diesen Request zuständige Verwaltung (Self-Host: global; SaaS: pro Konto). */
@@ -267,10 +280,14 @@ export function erstelleApp(
 
   // ---- KI-Assistent (optional) ----------------------------------------------
 
-  /** Ist der Assistent konfiguriert? Der Client blendet den Chat sonst aus. */
-  app.get('/api/ki/status', (_req, res) => {
+  /**
+   * Ist der Assistent nutzbar? Der Client blendet den Chat sonst aus.
+   * Self-Host: allein vom Provider abhängig. SaaS: zusätzlich Plan ≥ Basis.
+   */
+  app.get('/api/ki/status', (req, res) => {
+    const planReicht = !saas || planErlaubt(planVon(saas, req), 'ki-assistent');
     res.json(
-      kiProvider
+      kiProvider && planReicht
         ? { aktiv: true, provider: kiProvider.provider, modell: kiProvider.modell }
         : { aktiv: false },
     );
@@ -294,6 +311,12 @@ export function erstelleApp(
       return res
         .status(503)
         .json({ fehler: 'KI-Assistent ist nicht konfiguriert (siehe .env.example)' });
+    }
+    // SaaS: Der Assistent verlangt mindestens den Basis-Plan.
+    if (saas && !planErlaubt(planVon(saas, req), 'ki-assistent')) {
+      return res
+        .status(402)
+        .json({ fehler: 'Der KI-Assistent erfordert mindestens den Basis-Plan', benoetigt: 'basis' });
     }
     mitKampagne(req, res, req.params.kid, (storage) => {
       const eintrag = verwaltungFuer(req).holen(req.params.kid)!;
